@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>MyClinicProtocols — Your Clinic. Your Protocols.</title>
+<meta name="description" content="Customizable clinical protocols for aesthetic and wellness practices. Professionally structured, provider-focused, state-specific, and editable." />
+<style>
+  :root{
+    --ink:#122033;
+    --muted:#657386;
+    --line:#dde5eb;
+    --soft:#f5f8fa;
+    --white:#ffffff;
+    --accent:#2f766f;
+    --accent-dark:#245e59;
+    --accent-soft:#eaf5f3;
+    --warm:#fbfaf7;
+    --navy:#10273f;
+    --success:#1f7a59;
+    --shadow:0 20px 50px rgba(18,32,51,.08);
+    --radius:24px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color:var(--ink);
+    background:var(--warm);
+    line-height:1.55;
+  }
+  a{text-decoration:none;color:inherit}
+  button,input,select,textarea{font:inherit}
+  .container{width:min(1160px, calc(100% - 36px)); margin:auto}
+  .nav{
+    position:sticky;top:0;z-index:30;
+    background:rgba(251,250,247,.91);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid rgba(221,229,235,.8);
+  }
+  .nav-inner{
+    height:76px;display:flex;align-items:center;justify-content:space-between;gap:20px
+  }
+  .brand{display:flex;align-items:center;gap:11px;font-weight:800;letter-spacing:-.03em}
+  .brand-mark{
+    width:36px;height:36px;border-radius:11px;background:var(--navy);position:relative;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)
+  }
+  .brand-mark:before,.brand-mark:after{
+    content:"";position:absolute;background:#fff;border-radius:99px;left:9px;right:9px;height:3px
+  }
+  .brand-mark:before{top:11px}
+  .brand-mark:after{top:21px}
+  .brand-mark i{position:absolute;width:3px;height:21px;background:#fff;left:16.5px;top:7.5px;border-radius:99px}
+  .nav-links{display:flex;align-items:center;gap:28px;color:#465668;font-size:14px;font-weight:650}
+  .nav-cta,.btn-primary{
+    border:0;background:var(--navy);color:#fff;border-radius:14px;padding:12px 18px;
+    font-weight:750;cursor:pointer;transition:.2s ease
+  }
+  .nav-cta:hover,.btn-primary:hover{transform:translateY(-1px);background:#173652}
+  .hero{padding:78px 0 58px;overflow:hidden}
+  .hero-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:60px;align-items:center}
+  .eyebrow{
+  font-weight: 700;
+    display:inline-flex;gap:8px;align-items:center;padding:7px 11px;border-radius:999px;
+    color:var(--accent-dark);background:var(--accent-soft);font-size:13px;font-weight:800
+  }
+  h1{
+    font-family: Georgia, "Times New Roman", serif;
+    font-size:clamp(38px, 4.25vw, 58px);line-height:1.08;letter-spacing:-0.025em;
+    margin:22px 0 24px;font-weight:600
+  
+  font-weight: 500;}
+  h1 em{font-style:normal;color:var(--accent)}
+  .hero p{font-size:19px;color:var(--muted);max-width:650px;margin:0 0 30px}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+  .btn-primary{padding:15px 22px;border-radius:15px;font-size:15px}
+  .btn-secondary{
+    padding:14px 20px;border-radius:15px;border:1px solid #ccd7df;background:#fff;
+    color:var(--ink);font-weight:750;cursor:pointer
+  }
+  .trust-row{display:flex;gap:18px;flex-wrap:wrap;margin-top:28px;color:#536474;font-size:13px;font-weight:650}
+  .trust-item:before{content:"✓";color:var(--success);font-weight:900;margin-right:7px}
+  .hero-card{
+    background:#fff;border:1px solid #e1e8ed;border-radius:30px;box-shadow:var(--shadow);
+    padding:22px;position:relative
+  }
+  .hero-card:before{
+    content:"";position:absolute;inset:-70px -80px auto auto;width:180px;height:180px;
+    background:radial-gradient(circle,rgba(47,118,111,.15),rgba(47,118,111,0) 70%);pointer-events:none
+  }
+  .doc-top{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:18px}
+  .mini-logo{font-weight:850;font-size:13px;letter-spacing:.03em}
+  .status{font-size:12px;font-weight:800;color:var(--success);background:#eaf7f0;padding:7px 10px;border-radius:999px}
+  .doc-title{font-family:Georgia,serif;font-size:27px;line-height:1.15;margin:22px 0 8px}
+  .doc-sub{color:var(--muted);font-size:14px}
+  .doc-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+  .doc-field{border:1px solid var(--line);background:var(--soft);border-radius:14px;padding:12px}
+  .doc-field small{display:block;color:#7a8794;font-size:10px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}
+  .doc-field strong{display:block;margin-top:4px;font-size:13px}
+  .fake-lines span{display:block;height:7px;border-radius:99px;background:#e7edf1;margin:9px 0}
+  .fake-lines span:nth-child(2){width:85%}.fake-lines span:nth-child(3){width:92%}.fake-lines span:nth-child(4){width:68%}
+  .section{padding:82px 0}
+  .section-head{max-width:720px;margin-bottom:36px}
+  .section-kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:900;color:var(--accent)}
+  h2{
+    font-family:Georgia,serif;font-size:clamp(36px,4.5vw,54px);line-height:1.05;
+    letter-spacing:-.035em;margin:11px 0 15px;font-weight:600
+  }
+  .section-head p{font-size:18px;color:var(--muted);margin:0}
+  .builder-wrap{
+    background:#fff;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);
+    display:grid;grid-template-columns:300px 1fr;overflow:hidden
+  }
+  .steps{background:var(--navy);color:#fff;padding:28px}
+  .steps h3{margin:0 0 24px;font-size:18px}
+  .step{display:flex;gap:12px;align-items:center;margin:17px 0;color:#9fb2c4;font-weight:700;font-size:14px}
+  .step .num{width:30px;height:30px;display:grid;place-items:center;border:1px solid #4c6378;border-radius:50%;font-size:12px}
+  .step.active{color:#fff}.step.active .num{background:#fff;color:var(--navy);border-color:#fff}
+  .builder{padding:34px}
+  .builder-panel{display:none}.builder-panel.active{display:block}
+  .builder h3{font-size:26px;margin:0 0 8px}
+  .builder .lead{color:var(--muted);margin:0 0 24px}
+  .option-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .option{
+    border:1px solid var(--line);border-radius:16px;padding:17px;cursor:pointer;background:#fff;
+    transition:.16s ease;text-align:left
+  }
+  .option:hover,.option.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,118,111,.09)}
+  .option strong{display:block}.option span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+  label{display:block;font-size:13px;font-weight:800;margin-bottom:7px}
+  select,input,textarea{
+    width:100%;border:1px solid #ccd7df;background:#fff;padding:13px 14px;border-radius:13px;color:var(--ink);outline:none
+  }
+  select:focus,input:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,118,111,.08)}
+  .builder-nav{display:flex;justify-content:space-between;gap:12px;margin-top:26px}
+  .btn-ghost{border:0;background:transparent;font-weight:800;color:#66788a;cursor:pointer;padding:12px}
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{
+    background:#fff;border:1px solid var(--line);border-radius:22px;padding:22px;min-height:175px
+  }
+  .card .icon{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:18px;font-size:19px}
+  .card h3{margin:0 0 7px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:14px}
+  .protocol-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .protocol{
+    background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;min-height:112px;
+    display:flex;flex-direction:column;justify-content:space-between
+  }
+  .protocol strong{font-size:14px}.protocol small{color:var(--muted)}
+  .sample{
+    background:var(--navy);color:#fff;border-radius:30px;padding:44px;display:grid;grid-template-columns:.95fr 1.05fr;gap:40px;align-items:center
+  }
+  .sample p{color:#bfd0df}
+  .sample .doc-preview{background:#fff;color:var(--ink);border-radius:22px;padding:24px}
+  .sample .doc-preview .bar{height:8px;border-radius:999px;background:#e7edf1;margin:10px 0}
+  .sample .doc-preview .bar:nth-child(2){width:80%}.sample .doc-preview .bar:nth-child(3){width:65%}
+  .pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .price{
+    background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;position:relative
+  }
+  .price.featured{border-color:var(--accent);box-shadow:0 15px 40px rgba(47,118,111,.12)}
+  .badge{position:absolute;right:18px;top:18px;background:var(--accent-soft);color:var(--accent-dark);font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px}
+  .price h3{margin:0 0 6px}.amount{font-family:Georgia,serif;font-size:42px;margin:14px 0}.amount small{font-family:inherit;font-size:14px;color:var(--muted)}
+  .price ul{padding-left:19px;color:var(--muted);font-size:14px}
+  .notice{
+    margin-top:26px;border:1px solid #e4dfcf;background:#fffdf6;border-radius:18px;padding:18px;color:#6c6659;font-size:13px
+  }
+  .faq{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  details{background:#fff;border:1px solid var(--line);border-radius:17px;padding:17px 19px}
+  summary{cursor:pointer;font-weight:800}details p{color:var(--muted);font-size:14px;margin-bottom:0}
+  footer{padding:42px 0 55px;border-top:1px solid var(--line);color:#6f7e8c;font-size:13px}
+  .footer-row{display:flex;justify-content:space-between;gap:30px;align-items:center}
+  .success-box{
+    display:none;border:1px solid #cae8d8;background:#f2fbf6;border-radius:18px;padding:18px;margin-top:18px
+  }
+  .success-box.show{display:block}
+  @media(max-width:900px){
+    .nav-links a:not(.nav-cta){display:none}
+    .hero-grid,.sample{grid-template-columns:1fr}
+    .hero{padding-top:52px}
+    .builder-wrap{grid-template-columns:1fr}
+    .steps{display:flex;overflow:auto;padding:18px;gap:18px}
+    .steps h3{display:none}.step{margin:0;white-space:nowrap}.step .num{flex:none}
+    .cards{grid-template-columns:1fr 1fr}
+    .protocol-grid{grid-template-columns:repeat(2,1fr)}
+    .pricing{grid-template-columns:1fr}
+  }
+  @media(max-width:620px){
+    .container{width:min(100% - 24px,1160px)}
+    .brand span{font-size:15px}
+    .nav-inner{height:68px}
+    h1{font-size:50px}
+    .hero p{font-size:17px}
+    .option-grid,.form-row,.cards,.faq{grid-template-columns:1fr}
+    .builder{padding:22px}
+    .section{padding:62px 0}
+    .sample{padding:26px}
+    .protocol-grid{grid-template-columns:1fr}
+  }
+
+  .protocol{cursor:pointer;transition:.18s ease}
+  .protocol:hover{transform:translateY(-2px);border-color:#b7c7d2;box-shadow:0 12px 28px rgba(18,32,51,.07)}
+  .protocol .arrow{margin-top:12px;color:var(--accent);font-weight:900;font-size:12px}
+  .upload-box{
+    border:1.5px dashed #b9c7d1;border-radius:16px;padding:16px;background:#fbfcfd;
+    display:flex;gap:14px;align-items:center;cursor:pointer
+  }
+  .upload-box:hover{border-color:var(--accent);background:var(--accent-soft)}
+  .logo-preview{
+    width:54px;height:54px;border-radius:12px;border:1px solid var(--line);background:#fff;
+    display:grid;place-items:center;overflow:hidden;flex:none;color:#8493a1;font-size:11px;text-align:center
+  }
+  .logo-preview img{width:100%;height:100%;object-fit:contain}
+  .summary-card{
+    margin-top:18px;border:1px solid var(--line);border-radius:18px;background:#fff;padding:18px
+  }
+  .summary-row{display:flex;justify-content:space-between;gap:18px;padding:8px 0;border-bottom:1px solid #edf1f4;font-size:14px}
+  .summary-row:last-child{border-bottom:0}
+  .summary-row span:first-child{color:var(--muted)}
+  .summary-row strong{text-align:right}
+  .plan-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .plan-option{border:1px solid var(--line);border-radius:14px;padding:13px;cursor:pointer;background:#fff;text-align:left}
+  .plan-option.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,118,111,.08)}
+  .plan-option strong{display:block;font-size:13px}.plan-option span{color:var(--muted);font-size:12px}
+  .microcopy{font-size:12px;color:#7c8b99;margin-top:8px}
+  .mobile-menu{display:none}
+  @media(max-width:900px){
+    .plan-options{grid-template-columns:1fr}
+  }
+
+  /* V3 visual refresh */
+  :root{--accent:#0c948f;--accent-dark:#087d79;--navy:#0b2b5c;--accent-soft:#eaf8f7}
+  .nav{background:rgba(255,255,255,.96);border-bottom:1px solid #edf2f4}
+  .brand{gap:12px}
+  .brand-myc{font-size:30px;letter-spacing:-.08em;display:inline-flex;align-items:center;color:var(--navy);line-height:1}
+  .brand-myc .teal{color:var(--accent)}
+  .brand-myc .pmark{position:relative;color:var(--navy);margin-left:1px}
+  .brand-myc .pmark:after{content:'≡';position:absolute;left:8px;top:4px;color:var(--accent);font-size:12px;letter-spacing:-3px}
+  .brand-name{font-size:12px;font-weight:850;letter-spacing:.2em;color:var(--navy);line-height:1.1;border-left:1px solid #9fb0bf;padding-left:12px}
+  .brand-name small{display:block;font-size:8px;letter-spacing:.42em;margin-top:6px}
+  .hero{padding:72px 0 58px;background:radial-gradient(circle at 76% 18%,rgba(12,148,143,.10),transparent 24%),linear-gradient(180deg,#fff,#fbfdfd)}
+  .hero h1{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:clamp(48px,5.8vw,76px);font-weight:600;line-height:1.02;color:var(--navy);letter-spacing:-.045em}
+  .hero h1 em{color:var(--accent);font-style:normal}
+  .eyebrow{background:transparent;padding:0;text-transform:uppercase;letter-spacing:.12em;font-size:11px}
+  .hero-card{background:linear-gradient(135deg,#f6fbfb,#e9f7f6);border-color:#d9ebe9;border-radius:28px;min-height:390px;overflow:hidden}
+  .hero-card:before{width:260px;height:260px;background:radial-gradient(circle,rgba(12,148,143,.15),rgba(12,148,143,0) 70%)}
+  .hero-card .doc-top{background:#fff;border:1px solid #dfe9ed;border-radius:18px;padding:18px;margin-bottom:15px}
+  .hero-card .doc-title{color:var(--navy)}
+  .trust-row{background:#fff;border:1px solid #e1eaee;border-radius:18px;padding:16px 18px;box-shadow:0 14px 32px rgba(11,43,92,.07);gap:22px}
+  .trust-item:before{color:var(--accent)}
+  .section-kicker{color:var(--accent)}
+  .btn-primary,.nav-cta{background:var(--accent)}
+  .btn-primary:hover,.nav-cta:hover{background:var(--accent-dark)}
+  .sample{background:linear-gradient(135deg,var(--navy),#123b6e)}
+  .card .icon{background:var(--accent-soft);color:var(--accent)}
+  .protocol:hover{border-color:#b7d9d6}
+  .price.featured{border-color:var(--accent)}
+  @media(max-width:620px){.brand-name{display:none}.brand-myc{font-size:27px}}
+
+/* MyClinicProtocols brand font — Manrope */
+html, body,
+button, input, select, textarea,
+nav, a, p, span, li, label, small, strong,
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
+}
+h1 { font-weight: 500 !important; }
+h2 { font-weight: 500 !important; }
+h3, h4, h5, h6 { font-weight: 500 !important; }
+body, p, li, label, input, select, textarea { font-weight: 400; }
+button, nav a, .btn, .button { font-weight: 500 !important; }
+
+
+/* Lighter Manrope refinement */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400 !important;
+}
+nav a,
+button,
+.btn,
+.button {
+  font-weight: 500 !important;
+}
+body,
+p,
+li,
+label,
+input,
+select,
+textarea {
+  font-weight: 400 !important;
+}
+
+
+/* Fix protocol preview section contrast and hierarchy */
+.sample h2 {
+  color: #ffffff !important;
+  font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
+  font-weight: 500 !important;
+  font-size: clamp(34px, 3.7vw, 48px) !important;
+  line-height: 1.12 !important;
+  letter-spacing: -0.025em !important;
+}
+.sample > div:first-child > p {
+  color: #d8e4ee !important;
+  font-size: 17px;
+  line-height: 1.65;
+  max-width: 520px;
+}
+.sample .section-kicker {
+  color: #60d8cf !important;
+  font-weight: 600 !important;
+}
+.sample .doc-preview h3 {
+  color: var(--navy) !important;
+  font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
+  font-weight: 500 !important;
+}
+
+
+/* Self-contained homepage hero slideshow */
+.hero-slideshow{
+  position:relative;
+  width:100%;
+  min-height:390px;
+  aspect-ratio:1.18/1;
+  overflow:hidden;
+  border-radius:28px;
+  background:#eef8f8;
+  border:1px solid #d8eceb;
+  box-shadow:0 22px 55px rgba(16,39,63,.10);
+}
+.hero-slide-stage{position:absolute;inset:0}
+.hero-slide{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  opacity:0;
+  transition:opacity .85s ease;
+}
+.hero-slide.active{opacity:1}
+.hero-slide-dots{
+  position:absolute;
+  z-index:5;
+  left:50%;
+  bottom:14px;
+  transform:translateX(-50%);
+  display:flex;
+  gap:7px;
+  padding:7px 10px;
+  border-radius:999px;
+  background:rgba(255,255,255,.84);
+  box-shadow:0 4px 14px rgba(16,39,63,.08);
+}
+.hero-dot{
+  width:8px;
+  height:8px;
+  min-width:8px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#9bcfd1;
+  cursor:pointer;
+}
+.hero-dot.active{background:#07969b}
+@media (max-width:900px){
+  .hero-slideshow{
+    max-width:720px;
+    min-height:0;
+    aspect-ratio:4/3;
+    margin:0 auto;
+  }
+}
+
+
+/* MyClinicProtocols preview font — Figtree */
+html, body,
+button, input, select, textarea,
+nav, a, p, span, li, label, small, strong,
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400 !important;
+}
+nav a, button, .btn, .button {
+  font-weight: 500 !important;
+}
+body, p, li, label, input, select, textarea {
+  font-weight: 400 !important;
+}
+
+</style>
+
+<style>
+/* Approved brand colors + uncropped logo */
+:root{
+  --ink:#071f57; --navy:#071f57;
+  --accent:#07969b; --accent-dark:#087f86;
+  --accent-soft:#e9f7f7; --warm:#ffffff;
+}
+body,button,input,select,textarea{
+  font-family:"Avenir Next","Century Gothic","Futura","Segoe UI",Arial,sans-serif;
+}
+.nav{background:rgba(255,255,255,.98);border-bottom:1px solid #edf1f3}
+.nav-inner{height:104px}
+.brand{
+  display:flex;
+  align-items:center;
+  width:420px;
+  max-width:42vw;
+  overflow:visible;
+}
+.approved-logo{
+  display:block;
+  width:100%;
+  overflow:visible;
+  line-height:0;
+}
+.approved-logo img{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:88px;
+  object-fit:contain;
+  object-position:left center;
+}
+.nav-links{color:var(--navy)}
+.nav-cta,.btn-primary{background:var(--accent)}
+.nav-cta:hover,.btn-primary:hover{background:var(--accent-dark)}
+.hero{
+  background:radial-gradient(circle at 76% 18%,rgba(7,150,155,.10),transparent 24%),linear-gradient(180deg,#fff,#fbfdfd)
+}
+.hero h1,h1,h2,.doc-title,.amount{
+  font-family:"Avenir Next","Century Gothic","Futura","Segoe UI",Arial,sans-serif;
+  color:var(--navy)
+}
+.hero h1{font-weight:700}
+.hero h1 em,.section-kicker{color:var(--accent)}
+.eyebrow{color:var(--accent-dark)}
+.trust-item:before,.card .icon,.protocol .arrow{color:var(--accent)}
+.hero-card{background:linear-gradient(135deg,#f7fcfc,#eaf8f8);border-color:#d6ecec}
+.sample{background:linear-gradient(135deg,var(--navy),#0b3670)}
+.price.featured{border-color:var(--accent)}
+footer .brand{width:390px;max-width:100%}
+footer .approved-logo img{max-height:82px}
+@media(max-width:900px){
+  .brand{width:330px;max-width:55vw}
+  .nav-inner{height:94px}
+}
+@media(max-width:620px){
+  .brand{width:245px;max-width:68vw}
+  .approved-logo img{max-height:68px}
+  .nav-inner{height:82px}
+}
+</style>
+
+
+<style>
+/* Navigation tabs styled to match the supplied reference */
+.nav-inner{
+  height:102px;
+}
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:30px;
+  height:100%;
+  font-size:13px;
+  font-weight:700;
+  letter-spacing:.01em;
+  white-space:nowrap;
+}
+.nav-links .nav-tab{
+  position:relative;
+  display:flex;
+  align-items:center;
+  height:100%;
+  color:#0b2b5c;
+  transition:color .18s ease;
+}
+.nav-links .nav-tab:hover{
+  color:#07969b;
+}
+.nav-links .nav-tab::after{
+  content:"";
+  position:absolute;
+  left:50%;
+  bottom:22px;
+  width:0;
+  height:2px;
+  background:#07969b;
+  transform:translateX(-50%);
+  transition:width .18s ease;
+  border-radius:2px;
+}
+.nav-links .nav-tab:hover::after,
+.nav-links .nav-tab.active::after{
+  width:100%;
+}
+.nav-links .nav-tab.active{
+  color:#07969b;
+}
+.nav-links .nav-cta{
+  background:linear-gradient(180deg,#129b9f,#078e93);
+  color:#fff;
+  padding:13px 22px;
+  border-radius:14px;
+  box-shadow:0 4px 12px rgba(7,150,155,.18);
+  transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+.nav-links .nav-cta:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 16px rgba(7,150,155,.23);
+  background:linear-gradient(180deg,#0da3a6,#078589);
+}
+@media(max-width:1000px){
+  .nav-links{gap:18px;font-size:12px}
+}
+@media(max-width:900px){
+  .nav-links .nav-tab{display:none}
+  .nav-links .nav-cta{display:inline-flex}
+}
+</style>
+
+
+<style>
+/* Icon benefit strip replacing the simple checkmark row */
+.icon-benefits{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin-top:28px;
+  padding:18px 14px;
+  background:#fff;
+  border:1px solid #dce7eb;
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(7,31,87,.08);
+}
+.icon-benefits .benefit{
+  display:grid;
+  grid-template-columns:64px 1fr;
+  gap:14px;
+  align-items:center;
+  padding:8px 18px;
+  min-width:0;
+}
+.icon-benefits .benefit + .benefit{
+  border-left:1px solid #d8e1e5;
+}
+.benefit-icon{
+  width:58px;
+  height:58px;
+  color:#071f57;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.benefit-icon svg{
+  width:100%;
+  height:100%;
+}
+.benefit-copy strong{
+  display:block;
+  color:#071f57;
+  font-size:13px;
+  line-height:1.22;
+  letter-spacing:.01em;
+  font-weight:800;
+}
+.benefit-copy span{
+  display:block;
+  margin-top:8px;
+  color:#4f5e6f;
+  font-size:12px;
+  line-height:1.4;
+  font-weight:500;
+}
+@media(max-width:1050px){
+  .icon-benefits{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .icon-benefits .benefit:nth-child(3){
+    border-left:0;
+    border-top:1px solid #d8e1e5;
+  }
+  .icon-benefits .benefit:nth-child(4){
+    border-top:1px solid #d8e1e5;
+  }
+}
+@media(max-width:620px){
+  .icon-benefits{
+    grid-template-columns:1fr;
+    padding:8px 14px;
+  }
+  .icon-benefits .benefit{
+    border-left:0 !important;
+    border-top:1px solid #d8e1e5;
+    padding:15px 6px;
+  }
+  .icon-benefits .benefit:first-child{
+    border-top:0;
+  }
+}
+</style>
+
+
+<style>
+/* FIX: benefits span full width below hero content */
+.hero-benefits-wrap{
+  margin-top:34px;
+}
+.icon-benefits{
+  width:100%;
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:0;
+  margin:0;
+  padding:22px 20px;
+  background:#fff;
+  border:1px solid #dce7eb;
+  border-radius:20px;
+  box-shadow:0 14px 34px rgba(7,31,87,.08);
+}
+.icon-benefits .benefit{
+  display:grid;
+  grid-template-columns:70px minmax(0,1fr);
+  gap:16px;
+  align-items:center;
+  padding:6px 22px;
+  min-width:0;
+}
+.icon-benefits .benefit + .benefit{
+  border-left:1px solid #d8e1e5;
+}
+.benefit-icon{
+  width:64px;
+  height:64px;
+  flex:none;
+}
+.benefit-copy{
+  min-width:0;
+}
+.benefit-copy strong{
+  display:block;
+  color:#071f57;
+  font-size:13px;
+  line-height:1.28;
+  letter-spacing:.015em;
+  font-weight:800;
+}
+.benefit-copy span{
+  display:block;
+  margin-top:7px;
+  color:#4f5e6f;
+  font-size:12px;
+  line-height:1.45;
+  font-weight:500;
+}
+@media(max-width:1050px){
+  .icon-benefits{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .icon-benefits .benefit:nth-child(3){
+    border-left:0;
+    border-top:1px solid #d8e1e5;
+  }
+  .icon-benefits .benefit:nth-child(4){
+    border-top:1px solid #d8e1e5;
+  }
+}
+@media(max-width:620px){
+  .hero-benefits-wrap{
+    margin-top:24px;
+  }
+  .icon-benefits{
+    grid-template-columns:1fr;
+    padding:8px 16px;
+  }
+  .icon-benefits .benefit{
+    grid-template-columns:58px 1fr;
+    padding:16px 4px;
+    border-left:0 !important;
+    border-top:1px solid #d8e1e5;
+  }
+  .icon-benefits .benefit:first-child{
+    border-top:0;
+  }
+  .benefit-icon{
+    width:52px;
+    height:52px;
+  }
+}
+</style>
+
+
+<style>
+/* Typography lock — matched to approved reference */
+html, body,
+button, input, select, textarea,
+.nav-links, .nav-cta,
+.eyebrow, .trust-row,
+.card, .protocol, .price,
+details, summary, footer {
+  font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif !important;
+}
+
+h1, h2, h3,
+.hero h1,
+.doc-title,
+.amount,
+.brand,
+.brand-name,
+.benefit-copy strong {
+  font-family: "Avenir Next", Avenir, "Segoe UI", Arial, sans-serif !important;
+}
+
+h1,
+.hero h1 {
+  font-weight: 700 !important;
+  letter-spacing: -0.035em !important;
+}
+
+h2 {
+  font-weight: 700 !important;
+  letter-spacing: -0.025em !important;
+}
+
+h3,
+.nav-links,
+.nav-cta,
+.btn-primary,
+.btn-secondary,
+.section-kicker,
+.benefit-copy strong {
+  font-weight: 600 !important;
+}
+
+body,
+.hero p,
+.section-head p,
+.benefit-copy span,
+.card p,
+.protocol small,
+details p {
+  font-weight: 400 !important;
+}
+</style>
+
+
+<style>
+/* Exact user-approved compact logo — enhanced resolution only */
+.brand{
+  display:flex !important;
+  align-items:center !important;
+  width:365px !important;
+  max-width:40vw !important;
+  overflow:visible !important;
+}
+.approved-logo.exact-logo{
+  display:block !important;
+  width:100% !important;
+  line-height:0 !important;
+  overflow:visible !important;
+}
+.approved-logo.exact-logo img{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:78px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+}
+footer .brand{
+  width:330px !important;
+  max-width:100% !important;
+}
+@media(max-width:900px){
+  .brand{width:290px !important;max-width:52vw !important}
+}
+@media(max-width:620px){
+  .brand{width:220px !important;max-width:66vw !important}
+  .approved-logo.exact-logo img{max-height:62px !important}
+}
+</style>
+
+
+<style>
+/* FINAL APPROVED LOGO */
+.brand{
+  display:flex !important;
+  align-items:center !important;
+  width:390px !important;
+  max-width:42vw !important;
+  overflow:visible !important;
+}
+.approved-logo.exact-logo{
+  display:block !important;
+  width:100% !important;
+  line-height:0 !important;
+  overflow:visible !important;
+}
+.approved-logo.exact-logo img{
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  max-height:82px !important;
+  object-fit:contain !important;
+  object-position:left center !important;
+}
+footer .brand{
+  width:350px !important;
+  max-width:100% !important;
+}
+footer .approved-logo.exact-logo img{
+  max-height:74px !important;
+}
+@media(max-width:900px){
+  .brand{width:315px !important;max-width:54vw !important}
+}
+@media(max-width:620px){
+  .brand{width:235px !important;max-width:68vw !important}
+  .approved-logo.exact-logo img{max-height:62px !important}
+}
+</style>
+
+
+<style>
+/* Hero eyebrow — match supplied rounded PROFESSIONAL PROTOCOLS reference */
+.hero .eyebrow{
+  display:inline-flex !important;
+  align-items:center !important;
+  width:max-content !important;
+  margin:0 0 18px 0 !important;
+  padding:9px 16px !important;
+  border-radius:11px !important;
+  background:#e7f7f7 !important;
+  color:#078f96 !important;
+  font-family:"Avenir Next",Avenir,"Segoe UI",Arial,sans-serif !important;
+  font-size:12px !important;
+  line-height:1 !important;
+  font-weight:600 !important;
+  letter-spacing:.025em !important;
+  text-transform:uppercase !important;
+  border:0 !important;
+  box-shadow:none !important;
+}
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Final typography lock — approved Figtree direction */
+html, body,
+button, input, select, textarea,
+.nav-links, .nav-cta,
+.eyebrow, .trust-row,
+.card, .protocol, .price,
+details, summary, footer,
+h1, h2, h3,
+.hero h1, .hero .eyebrow,
+.doc-title, .amount,
+.brand, .brand-name,
+.benefit-copy strong {
+  font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="#"><span class="approved-logo exact-logo"><img src="assets/logo.png" alt="MyClinicProtocols — Your Clinic. Your Protocols."></span></a>
+    
+<div class="nav-links">
+  <a class="nav-tab active" href="#">HOME</a>
+  <a class="nav-tab" href="#about">ABOUT</a>
+  <a class="nav-tab" href="#protocols">PROTOCOLS</a>
+  <a class="nav-tab" href="#pricing">PRICING</a>
+  <a class="nav-tab" href="#faq">FAQS</a>
+  <a class="nav-tab" href="#contact">CONTACT</a>
+  <a class="nav-cta" href="#builder">GET STARTED</a>
+</div>
+
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <h1>Professional Protocols.<br>Built for <em>Your Clinic.</em></h1>
+      <p>Customizable clinical protocols designed to support safe practices, streamline workflows, and make provider review easier.</p>
+      <div class="hero-actions">
+        <a class="btn-primary" href="#builder">Browse Protocols</a>
+        <a class="btn-secondary" href="#builder">How It Works</a>
+      </div>
+    </div>
+
+    <div class="hero-slideshow" aria-label="Aesthetic clinic slideshow">
+      <div class="hero-slide-stage">
+        <img class="hero-slide active" src="assets/slide-1.jpg" alt="Aesthetic clinic consultation scene 1">
+        <img class="hero-slide" src="assets/slide-2.jpg" alt="Aesthetic clinic consultation scene 2">
+        <img class="hero-slide" src="assets/slide-3.jpg" alt="Aesthetic clinic consultation scene 3">
+        <img class="hero-slide" src="assets/slide-4.jpg" alt="Aesthetic clinic consultation scene 4">
+        <img class="hero-slide" src="assets/slide-5.jpg" alt="Aesthetic clinic consultation scene 5">
+        <img class="hero-slide" src="assets/slide-6.jpg" alt="Aesthetic clinic consultation scene 6">
+      </div>
+      <div class="hero-slide-dots"><button class="hero-dot active" type="button" aria-label="Show image 1"></button><button class="hero-dot" type="button" aria-label="Show image 2"></button><button class="hero-dot" type="button" aria-label="Show image 3"></button><button class="hero-dot" type="button" aria-label="Show image 4"></button><button class="hero-dot" type="button" aria-label="Show image 5"></button><button class="hero-dot" type="button" aria-label="Show image 6"></button></div>
+    </div>
+  </div>
+
+  <div class="container hero-benefits-wrap">
+<div class="trust-row icon-benefits">
+        <div class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M16 9h24l9 9v34H16z" stroke="currentColor" stroke-width="3"/>
+              <path d="M40 9v11h10" stroke="currentColor" stroke-width="3"/>
+              <path d="M23 29h15M23 37h12M23 45h10" stroke="#07969b" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="45" cy="46" r="10" fill="white" stroke="#07969b" stroke-width="3"/>
+              <path d="M40 46l3 3 6-7" stroke="#07969b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="benefit-copy">
+            <strong>PROFESSIONALLY<br>STRUCTURED</strong>
+            <span>Developed by experienced providers and clinical experts.</span>
+          </div>
+        </div>
+
+        <div class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M32 7c8 7 14 8 19 9v15c0 13-8 22-19 27C21 53 13 44 13 31V16c5-1 11-2 19-9z" stroke="currentColor" stroke-width="3"/>
+              <path d="M24 32l6 6 11-14" stroke="#07969b" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="benefit-copy">
+            <strong>EVIDENCE-INFORMED</strong>
+            <span>Built on best practices and current clinical standards.</span>
+          </div>
+        </div>
+
+        <div class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <circle cx="28" cy="17" r="9" stroke="currentColor" stroke-width="3"/>
+              <path d="M13 47c1-12 7-19 15-19s14 7 15 19z" stroke="currentColor" stroke-width="3"/>
+              <circle cx="47" cy="43" r="10" fill="white" stroke="#07969b" stroke-width="3"/>
+              <path d="M42 43l3 3 6-7" stroke="#07969b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="benefit-copy">
+            <strong>PROVIDER FOCUSED</strong>
+            <span>Practical, easy-to-follow protocols you can trust.</span>
+          </div>
+        </div>
+
+        <div class="benefit">
+          <div class="benefit-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+              <path d="M16 9h24l9 9v34H16z" stroke="currentColor" stroke-width="3"/>
+              <path d="M40 9v11h10" stroke="currentColor" stroke-width="3"/>
+              <path d="M23 29h15M23 37h12M23 45h10" stroke="#07969b" stroke-width="3" stroke-linecap="round"/>
+              <path d="M49 39v14M43 48l6 6 6-6" stroke="#07969b" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="benefit-copy">
+            <strong>EDITABLE WORD<br>+ PDF</strong>
+            <span>Fully customizable to fit your clinic’s needs.</span>
+          </div>
+        </div>
+      </div>
+  </div>
+</header>
+
+<section class="section" id="builder">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-kicker">Build your protocol</div>
+      <h2>Four simple steps. No template hunting.</h2>
+      <p>Tell us what your clinic needs. We use those details to prepare a customized protocol for provider review.</p>
+    </div>
+
+    <div class="builder-wrap">
+      <aside class="steps">
+        <h3>Your protocol</h3>
+        <div class="step active" data-step-indicator="1"><span class="num">1</span>Treatment</div>
+        <div class="step" data-step-indicator="2"><span class="num">2</span>State</div>
+        <div class="step" data-step-indicator="3"><span class="num">3</span>Provider</div>
+        <div class="step" data-step-indicator="4"><span class="num">4</span>Clinic</div>
+      </aside>
+
+      <div class="builder">
+        <div class="builder-panel active" data-panel="1">
+          <h3>What protocol do you need?</h3>
+          <p class="lead">Choose one to start. You can order additional protocols later.</p>
+          <div class="option-grid" id="treatments">
+            <button class="option" data-value="Neurotoxin / Botox"><strong>💉 Neurotoxin / Botox</strong><span>Administration & safety protocol</span></button>
+            <button class="option" data-value="GLP-1 Weight Management"><strong>⚖️ GLP-1 Weight Management</strong><span>Semaglutide / tirzepatide workflow</span></button>
+            <button class="option" data-value="Microneedling"><strong>✨ Microneedling</strong><span>Treatment & aftercare protocol</span></button>
+            <button class="option" data-value="IV Therapy"><strong>💧 IV Therapy</strong><span>IV hydration & infusion workflow</span></button>
+            <button class="option" data-value="Dermal Filler"><strong>💉 Dermal Filler</strong><span>Injection & adverse event protocol</span></button>
+            <button class="option" data-value="PRP / PRF"><strong>🩸 PRP / PRF</strong><span>Preparation & treatment protocol</span></button>
+            <button class="option" data-value="Hyaluronidase"><strong>🧪 Hyaluronidase</strong><span>Filler-dissolving safety workflow</span></button>
+            <button class="option" data-value="Vascular Occlusion"><strong>🚨 Vascular Occlusion</strong><span>Emergency recognition & response</span></button>
+            <button class="option" data-value="Chemical Peel"><strong>🧴 Chemical Peel</strong><span>Treatment & aftercare protocol</span></button>
+            <button class="option" data-value="Anaphylaxis Response"><strong>🆘 Anaphylaxis Response</strong><span>Emergency response workflow</span></button>
+          </div>
+          <div class="builder-nav"><span></span><button class="btn-primary next" data-next="2">Continue</button></div>
+        </div>
+
+        <div class="builder-panel" data-panel="2">
+          <h3>Where is your clinic?</h3>
+          <p class="lead">We use your state to identify relevant considerations for customization.</p>
+          <div class="form-row">
+            <div><label>Country</label><select id="country"><option>United States</option></select></div>
+            <div><label>State</label><select id="state">
+              <option value="">Select your state</option>
+              <option>Alabama</option><option>Alaska</option><option>Arizona</option><option>Arkansas</option><option>California</option>
+              <option>Colorado</option><option>Connecticut</option><option>Delaware</option><option>Florida</option><option>Georgia</option>
+              <option>Hawaii</option><option>Idaho</option><option>Illinois</option><option>Indiana</option><option>Iowa</option>
+              <option>Kansas</option><option>Kentucky</option><option>Louisiana</option><option>Maine</option><option>Maryland</option>
+              <option>Massachusetts</option><option>Michigan</option><option>Minnesota</option><option>Mississippi</option><option>Missouri</option>
+              <option>Montana</option><option>Nebraska</option><option>Nevada</option><option>New Hampshire</option><option>New Jersey</option>
+              <option>New Mexico</option><option>New York</option><option>North Carolina</option><option>North Dakota</option><option>Ohio</option>
+              <option>Oklahoma</option><option>Oregon</option><option>Pennsylvania</option><option>Rhode Island</option><option>South Carolina</option>
+              <option>South Dakota</option><option>Tennessee</option><option>Texas</option><option>Utah</option><option>Vermont</option>
+              <option>Virginia</option><option>Washington</option><option>West Virginia</option><option>Wisconsin</option><option>Wyoming</option>
+            </select></div>
+          </div>
+          <div class="builder-nav"><button class="btn-ghost back" data-back="1">← Back</button><button class="btn-primary next" data-next="3">Continue</button></div>
+        </div>
+
+        <div class="builder-panel" data-panel="3">
+          <h3>Who performs the treatment?</h3>
+          <p class="lead">Provider role can affect how a protocol should be structured and reviewed.</p>
+          <div class="option-grid" id="providers">
+            <button class="option" data-value="MD / DO"><strong>MD / DO</strong><span>Physician</span></button>
+            <button class="option" data-value="NP"><strong>NP</strong><span>Nurse Practitioner</span></button>
+            <button class="option" data-value="PA"><strong>PA</strong><span>Physician Assistant</span></button>
+            <button class="option" data-value="RN"><strong>RN</strong><span>Registered Nurse</span></button>
+            <button class="option" data-value="Other"><strong>Other</strong><span>Tell us more in clinic details</span></button>
+          </div>
+          <div class="builder-nav"><button class="btn-ghost back" data-back="2">← Back</button><button class="btn-primary next" data-next="4">Continue</button></div>
+        </div>
+
+        <div class="builder-panel" data-panel="4">
+          <h3>Tell us about your clinic.</h3>
+          <p class="lead">We'll use these details to personalize your request and prepare the branded protocol.</p>
+
+          <div class="form-row">
+            <div><label>Clinic name</label><input id="clinicName" placeholder="e.g. Radiance Aesthetics" /></div>
+            <div><label>Medical director / reviewer</label><input id="reviewer" placeholder="Dr. Name" /></div>
+          </div>
+
+          <div class="form-row">
+            <div><label>Email</label><input type="email" id="email" placeholder="you@clinic.com" /></div>
+            <div><label>Website (optional)</label><input id="website" placeholder="yourclinic.com" /></div>
+          </div>
+
+          <label>Choose your package</label>
+          <div class="plan-options" id="plans">
+            <button class="plan-option" data-plan="Editable Template" data-price="39"><strong>Editable Template — $39</strong><span>DIY editing</span></button>
+            <button class="plan-option selected" data-plan="Customized Protocol" data-price="99"><strong>Customized Protocol — $99</strong><span>Clinic + provider + state-specific customization</span></button>
+            <button class="plan-option" data-plan="Branded Custom" data-price="149"><strong>Branded Custom — $149</strong><span>Customization + polished clinic branding</span></button>
+          </div>
+
+          <div style="margin-top:16px">
+            <label>Clinic logo (optional in prototype)</label>
+            <label class="upload-box" for="logoUpload">
+              <div class="logo-preview" id="logoPreview">LOGO</div>
+              <div><strong>Upload your clinic logo</strong><div class="microcopy">PNG, JPG or SVG. Used for branded protocol formatting.</div></div>
+            </label>
+            <input id="logoUpload" type="file" accept="image/png,image/jpeg,image/svg+xml" style="display:none" />
+          </div>
+
+          <div style="margin-top:16px">
+            <label>Notes about your workflow, products or devices</label>
+            <textarea rows="4" id="notes" placeholder="Example: Allergan Botox, SkinPen, specific IV formulas, clinic-specific workflow..."></textarea>
+          </div>
+
+          <div class="notice">Final protocols should be reviewed and approved by an appropriately qualified medical professional and, when needed, legal/compliance counsel. MyClinicProtocols does not guarantee legal compliance or replace professional advice.</div>
+
+          <div class="builder-nav"><button class="btn-ghost back" data-back="3">← Back</button><button class="btn-primary" id="finish">Preview My Request</button></div>
+          <div class="success-box" id="success"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head"><div class="section-kicker">Why it’s different</div><h2>More than a downloadable template.</h2><p>We tailor the document around the way your practice actually operates, then prepare it for professional review.</p></div>
+    <div class="cards">
+      <div class="card"><div class="icon">📍</div><h3>State-specific</h3><p>Your state is part of the intake so relevant jurisdiction-specific considerations can be addressed.</p></div>
+      <div class="card"><div class="icon">🩺</div><h3>Provider-specific</h3><p>MD/DO, NP, PA, RN or another role — the protocol structure starts with who is actually performing the service.</p></div>
+      <div class="card"><div class="icon">🏥</div><h3>Clinic-specific</h3><p>Your practice details, workflows, services, products and devices are captured during customization.</p></div>
+      <div class="card"><div class="icon">🎨</div><h3>Your branding</h3><p>Clinic name, details and logo can be incorporated into a polished final document.</p></div>
+      <div class="card"><div class="icon">📄</div><h3>Word + PDF</h3><p>Receive an editable working copy plus a clean PDF for your records and review process.</p></div>
+      <div class="card"><div class="icon">✓</div><h3>Ready for review</h3><p>Designed to make medical-director/provider review, edits and approval easier to manage.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="protocols">
+  <div class="container">
+    <div class="section-head"><div class="section-kicker">Protocol library</div><h2>Start with the services clinics use most.</h2><p>Our launch library focuses on high-demand aesthetic, wellness and emergency-response workflows.</p></div>
+    <div class="protocol-grid">
+      <div class="protocol" data-value="Neurotoxin / Botox"><strong>Neurotoxin / Botox</strong><small>Injectables</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Dermal Filler"><strong>Dermal Filler</strong><small>Injectables</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="GLP-1 Weight Management"><strong>GLP-1 Weight Management</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="IV Therapy"><strong>IV Therapy</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Microneedling"><strong>Microneedling</strong><small>Aesthetics</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="PRP / PRF"><strong>PRP / PRF</strong><small>Regenerative aesthetics</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Hyaluronidase"><strong>Hyaluronidase</strong><small>Filler safety</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Vascular Occlusion"><strong>Vascular Occlusion</strong><small>Emergency response</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Chemical Peel"><strong>Chemical Peel</strong><small>Aesthetics</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Anaphylaxis Response"><strong>Anaphylaxis Response</strong><small>Emergency response</small><span class="arrow">Customize →</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="sample">
+      <div>
+        <div class="section-kicker" style="color:#77c8bc">See what you're buying</div>
+        <h2 style="margin-top:12px">A protocol that looks like it belongs to your clinic.</h2>
+        <p>Not a generic file with blanks everywhere. Your final version is organized around your clinic details and prepared for qualified provider review.</p>
+      </div>
+      <div class="doc-preview">
+        <strong style="font-size:12px;letter-spacing:.08em">YOUR CLINIC LOGO</strong>
+        <h3 style="font-family:Georgia,serif;font-size:25px;margin:18px 0 5px">Microneedling Treatment Protocol</h3>
+        <div style="color:#778593;font-size:12px">Prepared for your practice • State-specific considerations • Version 1.0</div>
+        <div style="margin-top:22px"><div class="bar"></div><div class="bar"></div><div class="bar"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="pricing">
+  <div class="container">
+    <div class="section-head"><div class="section-kicker">Simple pricing</div><h2>Start small. Add more when you need them.</h2><p>Initial pricing concept for the MVP. We can refine it after the first real orders.</p></div>
+    <div class="pricing">
+      <div class="price"><h3>Editable Template</h3><div class="amount">$39</div><p>For clinics that prefer to customize internally.</p><ul><li>Editable protocol template</li><li>Word format</li><li>Provider review required</li></ul><button class="btn-secondary choose-plan" data-plan="Editable Template" data-price="39">Choose Template</button></div>
+      <div class="price featured"><span class="badge">MOST POPULAR</span><h3>Customized Protocol</h3><div class="amount">$99</div><p>Built around your clinic, state and provider.</p><ul><li>Clinic-specific customization</li><li>State-specific considerations</li><li>Word + PDF</li><li>Prepared for provider review</li></ul><button class="btn-primary choose-plan" data-plan="Customized Protocol" data-price="99">Build My Protocol</button></div>
+      <div class="price"><h3>Branded Custom</h3><div class="amount">$149</div><p>Our most polished single-protocol package.</p><ul><li>Everything in Customized</li><li>Clinic branding</li><li>Logo placement</li><li>Priority formatting</li></ul><button class="btn-secondary choose-plan" data-plan="Branded Custom" data-price="149">Choose Branded</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="faq">
+  <div class="container">
+    <div class="section-head"><div class="section-kicker">FAQ</div><h2>Clear from the start.</h2></div>
+    <div class="faq">
+      <details><summary>Is this guaranteed to be compliant in my state?</summary><p>No. State-specific considerations can be incorporated, but final legal and clinical compliance depends on your practice circumstances and should be reviewed by a qualified medical professional and, where appropriate, legal counsel.</p></details>
+      <details><summary>Can you customize for RNs, NPs, PAs and physicians?</summary><p>Yes. Provider role is part of the intake and helps us structure the document around the practice workflow.</p></details>
+      <details><summary>Will I receive an editable file?</summary><p>Yes. The intended MVP delivery includes an editable Word version and a clean PDF version.</p></details>
+      <details><summary>Can I add my clinic logo?</summary><p>Yes. Branded customization can include your clinic name, contact information and logo.</p></details>
+    </div>
+    <div class="notice" style="margin-top:24px"><strong>Important:</strong> MyClinicProtocols provides customizable clinical documentation resources. Content is intended to support, not replace, independent clinical judgment, legal advice, professional licensing requirements, manufacturer instructions, or applicable federal/state law.</div>
+  </div>
+</section>
+
+<div id="contact" style="position:relative;top:-90px;"></div>
+<footer>
+  <div class="container footer-row">
+    <div class="brand"><span class="approved-logo exact-logo"><img src="assets/logo.png" alt="MyClinicProtocols — Your Clinic. Your Protocols."></span></div>
+    <div>© 2026 MyClinicProtocols • Prototype MVP</div>
+  </div>
+</footer>
+
+<script>
+let current = 1;
+let data = {
+  treatment:"",
+  state:"",
+  provider:"",
+  plan:"Customized Protocol",
+  price:99,
+  logoName:""
+};
+
+function showStep(n){
+  current=n;
+  document.querySelectorAll('.builder-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelector('[data-panel="'+n+'"]').classList.add('active');
+  document.querySelectorAll('.step').forEach(s=>s.classList.remove('active'));
+  document.querySelector('[data-step-indicator="'+n+'"]').classList.add('active');
+  document.querySelector('#builder').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function selectTreatment(value){
+  data.treatment=value;
+  document.querySelectorAll('#treatments .option').forEach(b=>{
+    b.classList.toggle('selected', b.dataset.value===value);
+  });
+}
+
+document.querySelectorAll('#treatments .option').forEach(btn=>{
+  btn.addEventListener('click',()=>selectTreatment(btn.dataset.value));
+});
+
+document.querySelectorAll('#providers .option').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#providers .option').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    data.provider=btn.dataset.value;
+  });
+});
+
+document.querySelectorAll('#plans .plan-option').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('#plans .plan-option').forEach(b=>b.classList.remove('selected'));
+    btn.classList.add('selected');
+    data.plan=btn.dataset.plan;
+    data.price=parseInt(btn.dataset.price);
+  });
+});
+
+document.querySelectorAll('.next').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    if(current===1 && !data.treatment){alert('Please choose a protocol first.'); return;}
+    if(current===2){
+      data.state=document.getElementById('state').value;
+      if(!data.state){alert('Please select your state.'); return;}
+    }
+    showStep(parseInt(btn.dataset.next));
+  });
+});
+
+document.querySelectorAll('.back').forEach(btn=>{
+  btn.addEventListener('click',()=>showStep(parseInt(btn.dataset.back)));
+});
+
+document.querySelectorAll('.protocol').forEach(card=>{
+  card.addEventListener('click',()=>{
+    selectTreatment(card.dataset.value);
+    showStep(1);
+  });
+});
+
+document.querySelectorAll('.choose-plan').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    data.plan=btn.dataset.plan;
+    data.price=parseInt(btn.dataset.price);
+    document.querySelectorAll('#plans .plan-option').forEach(b=>{
+      b.classList.toggle('selected', b.dataset.plan===data.plan);
+    });
+    document.querySelector('#builder').scrollIntoView({behavior:'smooth'});
+  });
+});
+
+document.getElementById('logoUpload').addEventListener('change',(e)=>{
+  const file=e.target.files && e.target.files[0];
+  if(!file) return;
+  data.logoName=file.name;
+  const preview=document.getElementById('logoPreview');
+  if(file.type.startsWith('image/')){
+    const reader=new FileReader();
+    reader.onload=ev=> preview.innerHTML='<img src="'+ev.target.result+'" alt="Logo preview">';
+    reader.readAsDataURL(file);
+  }
+});
+
+document.getElementById('finish').addEventListener('click',()=>{
+  const clinic=document.getElementById('clinicName').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const reviewer=document.getElementById('reviewer').value.trim();
+  const website=document.getElementById('website').value.trim();
+  const notes=document.getElementById('notes').value.trim();
+
+  if(!data.provider){alert('Please go back and select the provider type.'); return;}
+  if(!clinic || !email){alert('Please enter your clinic name and email.'); return;}
+
+  const box=document.getElementById('success');
+  box.innerHTML=`
+    <strong style="font-size:17px">Your request preview</strong>
+    <div class="summary-card">
+      <div class="summary-row"><span>Protocol</span><strong>${data.treatment}</strong></div>
+      <div class="summary-row"><span>Clinic</span><strong>${clinic}</strong></div>
+      <div class="summary-row"><span>State</span><strong>${data.state}</strong></div>
+      <div class="summary-row"><span>Provider</span><strong>${data.provider}</strong></div>
+      <div class="summary-row"><span>Package</span><strong>${data.plan}</strong></div>
+      <div class="summary-row"><span>Price</span><strong>$${data.price}</strong></div>
+      ${reviewer ? `<div class="summary-row"><span>Reviewer</span><strong>${reviewer}</strong></div>` : ""}
+      ${data.logoName ? `<div class="summary-row"><span>Logo</span><strong>${data.logoName}</strong></div>` : ""}
+    </div>
+    <div style="margin-top:14px;color:#5c6d61;font-size:13px">
+      This is the working prototype. Checkout and secure form submission will be connected when we publish the MVP.
+    </div>`;
+  box.classList.add('show');
+
+  localStorage.setItem('myclinicprotocols_draft', JSON.stringify({
+    ...data, clinic, email, reviewer, website, notes, savedAt:new Date().toISOString()
+  }));
+});
+</script>
+
+<script>
+(function(){
+  const tabs = [...document.querySelectorAll('.nav-tab')];
+
+  function setActiveFromHash(){
+    const y = window.scrollY;
+    if(y < 120){
+      tabs.forEach(t=>t.classList.remove('active'));
+      const home = document.querySelector('.nav-tab[href="#"]');
+      if(home) home.classList.add('active');
+      return;
+    }
+
+    const sections = [
+      ['#about', document.getElementById('about')],
+      ['#protocols', document.getElementById('protocols')],
+      ['#pricing', document.getElementById('pricing')],
+      ['#faq', document.getElementById('faq')],
+      ['#contact', document.getElementById('contact')]
+    ].filter(x=>x[1]);
+
+    let current = '#';
+    sections.forEach(([id, el])=>{
+      if(el.getBoundingClientRect().top <= 150) current = id;
+    });
+
+    tabs.forEach(t=>t.classList.toggle('active', t.getAttribute('href') === current));
+  }
+
+  tabs.forEach(tab=>{
+    tab.addEventListener('click', ()=>{
+      tabs.forEach(t=>t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  window.addEventListener('scroll', setActiveFromHash, {passive:true});
+  setActiveFromHash();
+})();
+</script>
+
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.hero-slide'));
+  const dots = Array.from(document.querySelectorAll('.hero-dot'));
+  if (!slides.length) return;
+  let current = 0;
+  let timer;
+
+  function show(index){
+    current = (index + slides.length) % slides.length;
+    slides.forEach((s,i)=>s.classList.toggle('active', i===current));
+    dots.forEach((d,i)=>d.classList.toggle('active', i===current));
+  }
+  function start(){
+    clearInterval(timer);
+    timer = setInterval(()=>show(current+1), 4200);
+  }
+  dots.forEach((d,i)=>d.addEventListener('click', ()=>{ show(i); start(); }));
+  show(0);
+  start();
+})();
+</script>
+
+</body>
+</html>
