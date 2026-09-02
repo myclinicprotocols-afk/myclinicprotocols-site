@@ -871,6 +871,136 @@ h1, h2, h3,
   font-family: "Figtree", "Segoe UI", Arial, sans-serif !important;
 }
 </style>
+
+<style>
+/* Customizable protocol document carousel */
+.custom-protocols{
+  padding:72px 0;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 85% 10%,rgba(7,150,155,.12),transparent 32%),
+    linear-gradient(135deg,#f7fdfd 0%,#edf9f9 52%,#ffffff 100%);
+  border-top:1px solid #e2f0f0;
+  border-bottom:1px solid #e2f0f0;
+}
+.custom-protocols-grid{
+  display:grid;
+  grid-template-columns:minmax(260px,.72fr) minmax(0,1.28fr);
+  align-items:center;
+  gap:54px;
+}
+.custom-copy{position:relative;z-index:2}
+.custom-copy .section-kicker{margin-bottom:12px}
+.custom-copy h2{
+  margin:0 0 18px;
+  color:var(--navy);
+  font-size:clamp(36px,4vw,58px);
+  line-height:1.03;
+  letter-spacing:-.035em;
+  font-weight:600 !important;
+}
+.custom-copy h2 em{display:block;color:var(--accent);font-style:normal}
+.custom-copy>p{
+  margin:0 0 25px;
+  max-width:470px;
+  color:#51647a;
+  font-size:18px;
+  line-height:1.65;
+}
+.custom-points{display:grid;gap:11px;margin:0 0 28px;padding:0;list-style:none}
+.custom-points li{display:flex;gap:10px;align-items:center;color:var(--navy);font-size:15px;font-weight:500}
+.custom-points li:before{
+  content:"✓";
+  display:grid;
+  place-items:center;
+  width:24px;
+  height:24px;
+  flex:0 0 24px;
+  border-radius:50%;
+  color:white;
+  background:var(--accent);
+  font-size:13px;
+  font-weight:800;
+}
+.custom-carousel{
+  position:relative;
+  overflow:hidden;
+  border:1px solid rgba(7,150,155,.18);
+  border-radius:24px;
+  background:#f9ffff;
+  box-shadow:0 24px 65px rgba(7,31,87,.13);
+}
+.custom-slide-stage{position:relative;aspect-ratio:3/2}
+.custom-slide{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0;
+  transform:scale(1.012);
+  transition:opacity .75s ease,transform 1.1s ease;
+}
+.custom-slide.active{opacity:1;transform:scale(1)}
+.custom-carousel-controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:14px 16px;
+  background:rgba(255,255,255,.96);
+  border-top:1px solid #e0eeee;
+}
+.custom-caption{min-width:0;color:#5b6c7d;font-size:14px;line-height:1.35}
+.custom-caption strong{display:block;color:var(--navy);font-size:16px;font-weight:600}
+.custom-nav{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.custom-arrow{
+  display:grid;
+  place-items:center;
+  width:38px;
+  height:38px;
+  padding:0;
+  border:1px solid #cfe4e5;
+  border-radius:50%;
+  color:var(--navy);
+  background:white;
+  cursor:pointer;
+  font-size:20px;
+  transition:.2s ease;
+}
+.custom-arrow:hover,.custom-arrow:focus-visible{color:white;background:var(--accent);border-color:var(--accent)}
+.custom-dots{display:flex;justify-content:center;gap:7px}
+.custom-dot{
+  width:8px;
+  height:8px;
+  min-width:8px;
+  padding:0;
+  border:0;
+  border-radius:50%;
+  background:#a8ced0;
+  cursor:pointer;
+}
+.custom-dot.active{width:24px;background:var(--accent);border-radius:999px}
+@media(max-width:900px){
+  .custom-protocols{padding:58px 0}
+  .custom-protocols-grid{grid-template-columns:1fr;gap:34px}
+  .custom-copy{text-align:center}
+  .custom-copy>p{margin-left:auto;margin-right:auto}
+  .custom-points{max-width:420px;margin-left:auto;margin-right:auto;text-align:left}
+}
+@media(max-width:620px){
+  .custom-protocols{padding:46px 0}
+  .custom-copy h2{font-size:38px}
+  .custom-copy>p{font-size:16px}
+  .custom-slide-stage{aspect-ratio:1/1}
+  .custom-slide{object-fit:cover}
+  .custom-carousel-controls{align-items:flex-start;flex-direction:column}
+  .custom-nav{width:100%;justify-content:space-between}
+}
+@media(prefers-reduced-motion:reduce){
+  .custom-slide{transition:none}
+}
+</style>
 </head>
 <body>
 <nav class="nav">
@@ -977,6 +1107,51 @@ h1, h2, h3,
       </div>
   </div>
 </header>
+
+<section class="custom-protocols" aria-labelledby="custom-protocols-title">
+  <div class="container custom-protocols-grid">
+    <div class="custom-copy">
+      <div class="section-kicker">Made for your practice</div>
+      <h2 id="custom-protocols-title">Custom Protocols,<em>Your Way.</em></h2>
+      <p>Every clinic is unique. Your protocols are customized around your branding, providers, state, services, workflows, and standards of care.</p>
+      <ul class="custom-points">
+        <li>Your clinic logo and brand colors</li>
+        <li>Provider roles and credentials</li>
+        <li>Editable Word and ready-to-use PDF</li>
+      </ul>
+      <a class="btn-primary" href="#builder">Customize Your Protocol</a>
+    </div>
+
+    <div class="custom-carousel" aria-label="Examples of customizable protocol forms">
+      <div class="custom-slide-stage" aria-live="polite">
+        <img class="custom-slide active" src="assets/custom-slide-1.webp" alt="Clinic logo, clinic name, and brand color customization example" data-title="Your clinic. Your branding." data-copy="Add your logo, clinic name, and brand colors.">
+        <img class="custom-slide" src="assets/custom-slide-2.webp" alt="Medical director and provider credential customization example" data-title="Provider details built in." data-copy="Customize roles, credentials, signatures, and review fields.">
+        <img class="custom-slide" src="assets/custom-slide-3.webp" alt="State and scope of practice customization example" data-title="Prepared for your state." data-copy="Shape the protocol around your location and provider scope.">
+        <img class="custom-slide" src="assets/custom-slide-4.webp" alt="Clinic services, products, and devices customization example" data-title="Matched to your services." data-copy="Select the treatments, products, and devices your clinic uses.">
+        <img class="custom-slide" src="assets/custom-slide-5.webp" alt="Clinical workflow and emergency response customization example" data-title="Workflows that fit your team." data-copy="Tailor screening, procedure, aftercare, and escalation steps.">
+        <img class="custom-slide" src="assets/custom-slide-6.webp" alt="Editable Word and ready-to-use PDF protocol package example" data-title="Delivered in practical formats." data-copy="Receive an editable Word file and a polished PDF for review.">
+      </div>
+      <div class="custom-carousel-controls">
+        <div class="custom-caption">
+          <strong>Your clinic. Your branding.</strong>
+          <span>Add your logo, clinic name, and brand colors.</span>
+        </div>
+        <div class="custom-nav">
+          <button class="custom-arrow custom-prev" type="button" aria-label="Previous customization example">‹</button>
+          <div class="custom-dots" aria-label="Choose a customization example">
+            <button class="custom-dot active" type="button" aria-label="Show customization example 1"></button>
+            <button class="custom-dot" type="button" aria-label="Show customization example 2"></button>
+            <button class="custom-dot" type="button" aria-label="Show customization example 3"></button>
+            <button class="custom-dot" type="button" aria-label="Show customization example 4"></button>
+            <button class="custom-dot" type="button" aria-label="Show customization example 5"></button>
+            <button class="custom-dot" type="button" aria-label="Show customization example 6"></button>
+          </div>
+          <button class="custom-arrow custom-next" type="button" aria-label="Next customization example">›</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="section" id="builder">
   <div class="container">
@@ -1363,6 +1538,46 @@ document.getElementById('finish').addEventListener('click',()=>{
     timer = setInterval(()=>show(current+1), 4200);
   }
   dots.forEach((d,i)=>d.addEventListener('click', ()=>{ show(i); start(); }));
+  show(0);
+  start();
+})();
+</script>
+
+<script>
+(function(){
+  const carousel = document.querySelector('.custom-carousel');
+  if(!carousel) return;
+  const slides = Array.from(carousel.querySelectorAll('.custom-slide'));
+  const dots = Array.from(carousel.querySelectorAll('.custom-dot'));
+  const captionTitle = carousel.querySelector('.custom-caption strong');
+  const captionCopy = carousel.querySelector('.custom-caption span');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let current = 0;
+  let timer;
+
+  function show(index){
+    current = (index + slides.length) % slides.length;
+    slides.forEach((slide,i)=>slide.classList.toggle('active',i===current));
+    dots.forEach((dot,i)=>{
+      dot.classList.toggle('active',i===current);
+      dot.setAttribute('aria-current',i===current ? 'true' : 'false');
+    });
+    captionTitle.textContent = slides[current].dataset.title;
+    captionCopy.textContent = slides[current].dataset.copy;
+  }
+  function stop(){ clearInterval(timer); }
+  function start(){
+    stop();
+    if(!reduceMotion) timer=setInterval(()=>show(current+1),5200);
+  }
+
+  carousel.querySelector('.custom-prev').addEventListener('click',()=>{show(current-1);start();});
+  carousel.querySelector('.custom-next').addEventListener('click',()=>{show(current+1);start();});
+  dots.forEach((dot,i)=>dot.addEventListener('click',()=>{show(i);start();}));
+  carousel.addEventListener('mouseenter',stop);
+  carousel.addEventListener('mouseleave',start);
+  carousel.addEventListener('focusin',stop);
+  carousel.addEventListener('focusout',start);
   show(0);
   start();
 })();
