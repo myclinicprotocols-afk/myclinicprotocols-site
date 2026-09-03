@@ -890,7 +890,20 @@ h1, h2, h3,
   gap:54px;
 }
 .custom-copy{position:relative;z-index:2}
-.custom-copy .section-kicker{margin-bottom:12px}
+.custom-copy .section-kicker{
+  display:inline-flex;
+  align-items:center;
+  width:max-content;
+  margin:0 0 18px;
+  padding:9px 16px;
+  border-radius:11px;
+  background:#e3f5f5;
+  color:#078f96;
+  font-size:12px;
+  line-height:1;
+  font-weight:600;
+  letter-spacing:.025em;
+}
 .custom-copy h2{
   margin:0 0 18px;
   color:var(--navy);
@@ -907,7 +920,7 @@ h1, h2, h3,
   font-size:18px;
   line-height:1.65;
 }
-.custom-points{display:grid;gap:11px;margin:0 0 28px;padding:0;list-style:none}
+.custom-points{display:grid;grid-template-columns:1fr 1fr;gap:11px 18px;margin:0 0 28px;padding:0;list-style:none}
 .custom-points li{display:flex;gap:10px;align-items:center;color:var(--navy);font-size:15px;font-weight:500}
 .custom-points li:before{
   content:"✓";
@@ -930,13 +943,13 @@ h1, h2, h3,
   background:#f9ffff;
   box-shadow:0 24px 65px rgba(7,31,87,.13);
 }
-.custom-slide-stage{position:relative;aspect-ratio:3/2}
+.custom-slide-stage{position:relative;aspect-ratio:1680/1004;background:#f4fbfb}
 .custom-slide{
   position:absolute;
   inset:0;
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain;
   opacity:0;
   transform:scale(1.012);
   transition:opacity .75s ease,transform 1.1s ease;
@@ -985,6 +998,7 @@ h1, h2, h3,
   .custom-protocols{padding:58px 0}
   .custom-protocols-grid{grid-template-columns:1fr;gap:34px}
   .custom-copy{text-align:center}
+  .custom-copy .section-kicker{margin-left:auto;margin-right:auto}
   .custom-copy>p{margin-left:auto;margin-right:auto}
   .custom-points{max-width:420px;margin-left:auto;margin-right:auto;text-align:left}
 }
@@ -992,8 +1006,7 @@ h1, h2, h3,
   .custom-protocols{padding:46px 0}
   .custom-copy h2{font-size:38px}
   .custom-copy>p{font-size:16px}
-  .custom-slide-stage{aspect-ratio:1/1}
-  .custom-slide{object-fit:cover}
+  .custom-points{grid-template-columns:1fr}
   .custom-carousel-controls{align-items:flex-start;flex-direction:column}
   .custom-nav{width:100%;justify-content:space-between}
 }
@@ -1113,11 +1126,14 @@ h1, h2, h3,
     <div class="custom-copy">
       <div class="section-kicker">Made for your practice</div>
       <h2 id="custom-protocols-title">Custom Protocols,<em>Your Way.</em></h2>
-      <p>Every clinic is unique. Your protocols are customized around your branding, providers, state, services, workflows, and standards of care.</p>
+      <p>See what your customized protocol package can include:</p>
       <ul class="custom-points">
-        <li>Your clinic logo and brand colors</li>
-        <li>Provider roles and credentials</li>
-        <li>Editable Word and ready-to-use PDF</li>
+        <li>Clinic logo and branding</li>
+        <li>Provider information</li>
+        <li>State considerations</li>
+        <li>Services and devices</li>
+        <li>Clinical workflows</li>
+        <li>Editable Word and PDF</li>
       </ul>
       <a class="btn-primary" href="#builder">Customize Your Protocol</a>
     </div>
