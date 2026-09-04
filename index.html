@@ -113,6 +113,13 @@
     background:#fff;border:1px solid var(--line);border-radius:30px;box-shadow:var(--shadow);
     display:grid;grid-template-columns:300px 1fr;overflow:hidden
   }
+  .builder-wrap[hidden]{display:none!important}
+  .process-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .process-card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;min-height:210px;box-shadow:0 12px 34px rgba(18,32,51,.05)}
+  .process-number{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-dark);font-weight:900;margin-bottom:20px}
+  .process-card h3{font-size:18px;margin:0 0 8px}
+  .process-card p{color:var(--muted);font-size:14px;margin:0}
+  .process-cta{display:flex;justify-content:center;margin-top:26px}
   .steps{background:var(--navy);color:#fff;padding:28px}
   .steps h3{margin:0 0 24px;font-size:18px}
   .step{display:flex;gap:12px;align-items:center;margin:17px 0;color:#9fb2c4;font-weight:700;font-size:14px}
@@ -190,6 +197,7 @@
     .cards{grid-template-columns:1fr 1fr}
     .protocol-grid{grid-template-columns:repeat(2,1fr)}
     .pricing{grid-template-columns:1fr}
+    .process-overview{grid-template-columns:1fr 1fr}
   }
   @media(max-width:620px){
     .container{width:min(100% - 24px,1160px)}
@@ -202,6 +210,7 @@
     .section{padding:62px 0}
     .sample{padding:26px}
     .protocol-grid{grid-template-columns:1fr}
+    .process-overview{grid-template-columns:1fr}
   }
 
   .protocol{cursor:pointer;transition:.18s ease}
@@ -1275,10 +1284,18 @@ h1, h2, h3,
     <div class="section-head">
       <div class="section-kicker">Build your protocol</div>
       <h2>Four simple steps to your customized package.</h2>
-      <p>Choose one treatment or build a multi-protocol package, then tell us how your clinic operates.</p>
+      <p>Complete one organized order—even when your clinic needs several protocols.</p>
     </div>
 
-    <div class="builder-wrap">
+    <div class="process-overview">
+      <article class="process-card"><div class="process-number">1</div><h3>Choose your package</h3><p>Select one or several treatments and choose a customized protocol or complete treatment package.</p></article>
+      <article class="process-card"><div class="process-number">2</div><h3>Complete one intake</h3><p>Enter your clinic, state, provider, branding, medication, device, and workflow details only once.</p></article>
+      <article class="process-card"><div class="process-number">3</div><h3>Review and pay</h3><p>Confirm the scope, bundle pricing, requested documents, and final order before secure checkout.</p></article>
+      <article class="process-card"><div class="process-number">4</div><h3>Review your draft</h3><p>Receive your customized draft, submit consolidated comments, and get final Word and PDF files.</p></article>
+    </div>
+    <div class="process-cta"><a class="btn-primary" href="order.html">Start My Order</a></div>
+
+    <div class="builder-wrap" hidden>
       <aside class="steps">
         <h3>Your protocol</h3>
         <div class="step active" data-step-indicator="1"><span class="num">1</span>Treatments</div>
