@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://myclinicprotocols.com/sitemap.xml
