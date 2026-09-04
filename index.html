@@ -163,7 +163,11 @@
   .price.featured{border-color:var(--accent);box-shadow:0 15px 40px rgba(47,118,111,.12)}
   .badge{position:absolute;right:18px;top:18px;background:var(--accent-soft);color:var(--accent-dark);font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px}
   .price h3{margin:0 0 6px}.amount{font-family:Georgia,serif;font-size:42px;margin:14px 0}.amount small{font-family:inherit;font-size:14px;color:var(--muted)}
-  .price ul{padding-left:19px;color:var(--muted);font-size:14px}
+  .price ul{padding-left:19px;color:var(--muted);font-size:14px;line-height:1.65}
+  .price-note{color:var(--muted);font-size:13px;margin-top:16px}
+  .quality-note{margin-top:22px;background:linear-gradient(135deg,var(--navy),#123b6e);color:#fff;border-radius:24px;padding:26px 28px}
+  .quality-note strong{display:block;font-size:20px;margin-bottom:8px}
+  .quality-note p{color:#d8e4ee;line-height:1.65;margin:0;max-width:940px}
   .notice{
     margin-top:26px;border:1px solid #e4dfcf;background:#fffdf6;border-radius:18px;padding:18px;color:#6c6659;font-size:13px
   }
@@ -221,13 +225,16 @@
   .summary-row span:first-child{color:var(--muted)}
   .summary-row strong{text-align:right}
   .plan-options{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+  .plan-options.two{grid-template-columns:repeat(2,1fr)}
   .plan-option{border:1px solid var(--line);border-radius:14px;padding:13px;cursor:pointer;background:#fff;text-align:left}
   .plan-option.selected{border-color:var(--accent);box-shadow:0 0 0 3px rgba(47,118,111,.08)}
   .plan-option strong{display:block;font-size:13px}.plan-option span{color:var(--muted);font-size:12px}
   .microcopy{font-size:12px;color:#7c8b99;margin-top:8px}
+  .selection-count{margin:14px 0 0;padding:11px 13px;border-radius:12px;background:var(--accent-soft);color:var(--accent-dark);font-size:13px;font-weight:700}
+  .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
   .mobile-menu{display:none}
   @media(max-width:900px){
-    .plan-options{grid-template-columns:1fr}
+    .plan-options,.plan-options.two,.detail-grid{grid-template-columns:1fr}
   }
 
   /* V3 visual refresh */
@@ -1267,23 +1274,23 @@ h1, h2, h3,
   <div class="container">
     <div class="section-head">
       <div class="section-kicker">Build your protocol</div>
-      <h2>Four simple steps.<br>No more template hunting.</h2>
-      <p>Tell us what your clinic needs. We use those details to prepare a customized protocol for provider review.</p>
+      <h2>Four simple steps to your customized package.</h2>
+      <p>Choose one treatment or build a multi-protocol package, then tell us how your clinic operates.</p>
     </div>
 
     <div class="builder-wrap">
       <aside class="steps">
         <h3>Your protocol</h3>
-        <div class="step active" data-step-indicator="1"><span class="num">1</span>Treatment</div>
+        <div class="step active" data-step-indicator="1"><span class="num">1</span>Treatments</div>
         <div class="step" data-step-indicator="2"><span class="num">2</span>State</div>
         <div class="step" data-step-indicator="3"><span class="num">3</span>Provider</div>
-        <div class="step" data-step-indicator="4"><span class="num">4</span>Clinic</div>
+        <div class="step" data-step-indicator="4"><span class="num">4</span>Package &amp; clinic</div>
       </aside>
 
       <div class="builder">
         <div class="builder-panel active" data-panel="1">
-          <h3>What protocol do you need?</h3>
-          <p class="lead">Choose one to start. You can order additional protocols later.</p>
+          <h3>Which treatments do you need?</h3>
+          <p class="lead">Select one or several. Bundle savings are calculated automatically.</p>
           <div class="option-grid" id="treatments">
             <button class="option" data-value="Neurotoxin / Botox"><strong>💉 Neurotoxin / Botox</strong><span>Administration & safety protocol</span></button>
             <button class="option" data-value="GLP-1 Weight Management"><strong>⚖️ GLP-1 Weight Management</strong><span>Semaglutide / tirzepatide workflow</span></button>
@@ -1296,6 +1303,7 @@ h1, h2, h3,
             <button class="option" data-value="Chemical Peel"><strong>🧴 Chemical Peel</strong><span>Treatment & aftercare protocol</span></button>
             <button class="option" data-value="Anaphylaxis Response"><strong>🆘 Anaphylaxis Response</strong><span>Emergency response workflow</span></button>
           </div>
+          <div class="selection-count" id="selectionCount">No treatments selected yet.</div>
           <div class="builder-nav"><span></span><button class="btn-primary next" data-next="2">Continue</button></div>
         </div>
 
@@ -1348,15 +1356,14 @@ h1, h2, h3,
             <div><label>Website (optional)</label><input id="website" placeholder="yourclinic.com" /></div>
           </div>
 
-          <label>Choose your package</label>
-          <div class="plan-options" id="plans">
-            <button class="plan-option" data-plan="Editable Template" data-price="39"><strong>Editable Template — $39</strong><span>DIY editing</span></button>
-            <button class="plan-option selected" data-plan="Customized Protocol" data-price="99"><strong>Customized Protocol — $99</strong><span>Clinic + provider + state-specific customization</span></button>
-            <button class="plan-option" data-plan="Branded Custom" data-price="149"><strong>Branded Custom — $149</strong><span>Customization + polished clinic branding</span></button>
+          <label>Choose your package level</label>
+          <div class="plan-options two" id="plans">
+            <button class="plan-option" data-plan="Customized Protocol" data-price="99"><strong>Customized Protocol — $99 per treatment</strong><span>Customized protocol/SOP, clinic branding, Word + PDF, and two revision rounds</span></button>
+            <button class="plan-option selected" data-plan="Complete Treatment Package" data-price="149"><strong>Complete Treatment Package — $149 per treatment</strong><span>Protocol plus all applicable consents, forms, aftercare, checklists, and emergency guidance</span></button>
           </div>
 
           <div style="margin-top:16px">
-            <label>Clinic logo (optional in prototype)</label>
+            <label>Clinic logo (optional)</label>
             <label class="upload-box" for="logoUpload">
               <div class="logo-preview" id="logoPreview">LOGO</div>
               <div><strong>Upload your clinic logo</strong><div class="microcopy">PNG, JPG or SVG. Used for branded protocol formatting.</div></div>
@@ -1364,14 +1371,19 @@ h1, h2, h3,
             <input id="logoUpload" type="file" accept="image/png,image/jpeg,image/svg+xml" style="display:none" />
           </div>
 
+          <div class="detail-grid">
+            <div><label>Medications, products, or IV formulas</label><textarea rows="4" id="medications" placeholder="List the clinic-approved medication, concentration, formula, or product details for each treatment."></textarea></div>
+            <div><label>Devices, techniques, or methods</label><textarea rows="4" id="methods" placeholder="Example: SkinPen, device model, injection method, or clinic-specific technique."></textarea></div>
+          </div>
+
           <div style="margin-top:16px">
-            <label>Notes about your workflow, products or devices</label>
-            <textarea rows="4" id="notes" placeholder="Example: Allergan Botox, SkinPen, specific IV formulas, clinic-specific workflow..."></textarea>
+            <label>Workflow, emergency steps, or other instructions</label>
+            <textarea rows="4" id="notes" placeholder="Tell us how your clinic performs the treatments and any special requirements for your package."></textarea>
           </div>
 
           <div class="notice">Final protocols should be reviewed and approved by an appropriately qualified medical professional and, when needed, legal/compliance counsel. MyClinicProtocols does not guarantee legal compliance or replace professional advice.</div>
 
-          <div class="builder-nav"><button class="btn-ghost back" data-back="3">← Back</button><button class="btn-primary" id="finish">Preview My Request</button></div>
+          <div class="builder-nav"><button class="btn-ghost back" data-back="3">← Back</button><button class="btn-primary" id="finish">Review My Package</button></div>
           <div class="success-box" id="success"></div>
         </div>
       </div>
@@ -1433,11 +1445,16 @@ h1, h2, h3,
 
 <section class="section" id="pricing">
   <div class="container">
-    <div class="section-head"><div class="section-kicker">Simple pricing</div><h2>Start small. Add more when you need them.</h2><p>Initial pricing concept for the MVP. We can refine it after the first real orders.</p></div>
+    <div class="section-head"><div class="section-kicker">Founding pricing</div><h2>Start with one. Save when you build a package.</h2><p>Choose the level of support your clinic needs. Every option is customized and includes two revision rounds.</p></div>
     <div class="pricing">
-      <div class="price"><h3>Editable Template</h3><div class="amount">$39</div><p>For clinics that prefer to customize internally.</p><ul><li>Editable protocol template</li><li>Word format</li><li>Provider review required</li></ul><button class="btn-secondary choose-plan" data-plan="Editable Template" data-price="39">Choose Template</button></div>
-      <div class="price featured"><span class="badge">MOST POPULAR</span><h3>Customized Protocol</h3><div class="amount">$99</div><p>Built around your clinic, state and provider.</p><ul><li>Clinic-specific customization</li><li>State-specific considerations</li><li>Word + PDF</li><li>Prepared for provider review</li></ul><button class="btn-primary choose-plan" data-plan="Customized Protocol" data-price="99">Build My Protocol</button></div>
-      <div class="price"><h3>Branded Custom</h3><div class="amount">$149</div><p>Our most polished single-protocol package.</p><ul><li>Everything in Customized</li><li>Clinic branding</li><li>Logo placement</li><li>Priority formatting</li></ul><button class="btn-secondary choose-plan" data-plan="Branded Custom" data-price="149">Choose Branded</button></div>
+      <div class="price"><h3>Customized Protocol</h3><div class="amount">$99 <small>/ treatment</small></div><p>For clinics that already have their supporting forms.</p><ul><li>Customized treatment protocol or SOP</li><li>Clinic branding and workflow details</li><li>Medication, IV, device, or method options</li><li>Editable Word file + polished PDF</li><li>Two consolidated revision rounds</li></ul><button class="btn-secondary choose-plan" data-plan="Customized Protocol" data-price="99">Build My Protocol</button></div>
+      <div class="price featured"><span class="badge">MOST POPULAR</span><h3>Complete Treatment Package</h3><div class="amount">$149 <small>/ treatment</small></div><p>Everything your clinic needs for the selected treatment.</p><ul><li>Everything in Customized Protocol</li><li>Applicable patient consent and intake form</li><li>Treatment record and clinic checklist</li><li>Pre- and post-care instructions</li><li>Applicable emergency or adverse-event guide</li></ul><button class="btn-primary choose-plan" data-plan="Complete Treatment Package" data-price="149">Build My Complete Package</button></div>
+      <div class="price"><h3>Multi-Protocol Savings</h3><div class="amount">From $249</div><p>Choose different treatments at the same package level.</p><ul><li>3 Customized Protocols — $249</li><li>5 Customized Protocols — $379</li><li>10 Customized Protocols — $699</li><li>3 Complete Packages — $399</li><li>5 Complete Packages — $625</li><li>10 Complete Packages — from $1,099</li></ul><button class="btn-secondary choose-plan" data-plan="Complete Treatment Package" data-price="149">Build a Bundle</button></div>
+    </div>
+    <p class="price-note">Founding pricing is available for the first 25 paid orders. Multi-protocol savings are applied automatically when eligible quantities are selected.</p>
+    <div class="quality-note">
+      <strong>Built from medical-director-reviewed references. RN-prepared. Customized for your clinic.</strong>
+      <p>Every package is customized for your clinic and prepared and quality-checked by a registered nurse with extensive experience supporting U.S. healthcare, aesthetic, and wellness practices. Our preparation standards are built around clinical reference protocols reviewed by an experienced multi-state medical director. Each document is checked for completeness, consistency, and professional presentation. Final clinical approval remains the responsibility of the purchasing clinic’s qualified medical director or supervising provider.</p>
     </div>
   </div>
 </section>
@@ -1450,6 +1467,9 @@ h1, h2, h3,
       <details><summary>Can you customize for RNs, NPs, PAs and physicians?</summary><p>Yes. Provider role is part of the intake and helps us structure the document around the practice workflow.</p></details>
       <details><summary>Will I receive an editable file?</summary><p>Yes. The intended MVP delivery includes an editable Word version and a clean PDF version.</p></details>
       <details><summary>Can I add my clinic logo?</summary><p>Yes. Branded customization can include your clinic name, contact information and logo.</p></details>
+      <details><summary>Can I order more than one protocol?</summary><p>Yes. Select as many treatments as your clinic needs. Founding bundle pricing is available for packages of 3, 5, and 10 treatments.</p></details>
+      <details><summary>What is included in the Complete Treatment Package?</summary><p>It includes the customized protocol plus all applicable consent, intake, treatment-record, aftercare, checklist, and emergency-guidance documents for the selected treatment.</p></details>
+      <details><summary>How do revisions work?</summary><p>Every order includes two consolidated revision rounds submitted within 14 days. A new treatment, state, device, or substantially different formula may require a new order.</p></details>
     </div>
     <div class="notice" style="margin-top:24px"><strong>Important:</strong> MyClinicProtocols provides customizable clinical documentation resources. Content is intended to support, not replace, independent clinical judgment, legal advice, professional licensing requirements, manufacturer instructions, or applicable federal/state law.</div>
   </div>
@@ -1459,18 +1479,18 @@ h1, h2, h3,
 <footer>
   <div class="container footer-row">
     <div class="brand"><span class="approved-logo exact-logo"><img src="assets/logo.png" alt="MyClinicProtocols — Your Clinic. Your Protocols."></span></div>
-    <div>© 2026 MyClinicProtocols • Prototype MVP</div>
+    <div>© 2026 MyClinicProtocols • Your Clinic. Your Protocols.</div>
   </div>
 </footer>
 
 <script>
 let current = 1;
 let data = {
-  treatment:"",
+  treatments:[],
   state:"",
   provider:"",
-  plan:"Customized Protocol",
-  price:99,
+  plan:"Complete Treatment Package",
+  price:149,
   logoName:""
 };
 
@@ -1484,10 +1504,14 @@ function showStep(n){
 }
 
 function selectTreatment(value){
-  data.treatment=value;
+  const index=data.treatments.indexOf(value);
+  if(index===-1) data.treatments.push(value);
+  else data.treatments.splice(index,1);
   document.querySelectorAll('#treatments .option').forEach(b=>{
-    b.classList.toggle('selected', b.dataset.value===value);
+    b.classList.toggle('selected', data.treatments.includes(b.dataset.value));
   });
+  const count=data.treatments.length;
+  document.getElementById('selectionCount').textContent=count ? `${count} treatment${count===1?'':'s'} selected${[3,5,10].includes(count)?' — bundle pricing unlocked!':''}` : 'No treatments selected yet.';
 }
 
 document.querySelectorAll('#treatments .option').forEach(btn=>{
@@ -1513,7 +1537,7 @@ document.querySelectorAll('#plans .plan-option').forEach(btn=>{
 
 document.querySelectorAll('.next').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    if(current===1 && !data.treatment){alert('Please choose a protocol first.'); return;}
+    if(current===1 && !data.treatments.length){alert('Please choose at least one treatment first.'); return;}
     if(current===2){
       data.state=document.getElementById('state').value;
       if(!data.state){alert('Please select your state.'); return;}
@@ -1528,7 +1552,7 @@ document.querySelectorAll('.back').forEach(btn=>{
 
 document.querySelectorAll('.protocol').forEach(card=>{
   card.addEventListener('click',()=>{
-    selectTreatment(card.dataset.value);
+    if(!data.treatments.includes(card.dataset.value)) selectTreatment(card.dataset.value);
     showStep(1);
   });
 });
@@ -1561,31 +1585,47 @@ document.getElementById('finish').addEventListener('click',()=>{
   const email=document.getElementById('email').value.trim();
   const reviewer=document.getElementById('reviewer').value.trim();
   const website=document.getElementById('website').value.trim();
+  const medications=document.getElementById('medications').value.trim();
+  const methods=document.getElementById('methods').value.trim();
   const notes=document.getElementById('notes').value.trim();
 
   if(!data.provider){alert('Please go back and select the provider type.'); return;}
   if(!clinic || !email){alert('Please enter your clinic name and email.'); return;}
 
+  const bundlePrices={
+    'Customized Protocol':{1:99,3:249,5:379,10:699},
+    'Complete Treatment Package':{1:149,3:399,5:625,10:1099}
+  };
+  const count=data.treatments.length;
+  const prices=bundlePrices[data.plan];
+  const dp=Array(count+1).fill(Infinity); dp[0]=0;
+  for(let i=1;i<=count;i++){
+    Object.keys(prices).map(Number).forEach(size=>{
+      if(size<=i) dp[i]=Math.min(dp[i],dp[i-size]+prices[size]);
+    });
+  }
+  const total=dp[count];
+  const escapeHtml=value=>value.replace(/[&<>'"]/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[char]));
   const box=document.getElementById('success');
   box.innerHTML=`
-    <strong style="font-size:17px">Your request preview</strong>
+    <strong style="font-size:17px">Your package review</strong>
     <div class="summary-card">
-      <div class="summary-row"><span>Protocol</span><strong>${data.treatment}</strong></div>
-      <div class="summary-row"><span>Clinic</span><strong>${clinic}</strong></div>
+      <div class="summary-row"><span>Treatments</span><strong>${data.treatments.map(escapeHtml).join(', ')}</strong></div>
+      <div class="summary-row"><span>Clinic</span><strong>${escapeHtml(clinic)}</strong></div>
       <div class="summary-row"><span>State</span><strong>${data.state}</strong></div>
       <div class="summary-row"><span>Provider</span><strong>${data.provider}</strong></div>
       <div class="summary-row"><span>Package</span><strong>${data.plan}</strong></div>
-      <div class="summary-row"><span>Price</span><strong>$${data.price}</strong></div>
-      ${reviewer ? `<div class="summary-row"><span>Reviewer</span><strong>${reviewer}</strong></div>` : ""}
-      ${data.logoName ? `<div class="summary-row"><span>Logo</span><strong>${data.logoName}</strong></div>` : ""}
+      <div class="summary-row"><span>Estimated founding total</span><strong>$${total}</strong></div>
+      ${reviewer ? `<div class="summary-row"><span>Reviewer</span><strong>${escapeHtml(reviewer)}</strong></div>` : ""}
+      ${data.logoName ? `<div class="summary-row"><span>Logo</span><strong>${escapeHtml(data.logoName)}</strong></div>` : ""}
     </div>
     <div style="margin-top:14px;color:#5c6d61;font-size:13px">
-      This is the working prototype. Checkout and secure form submission will be connected when we publish the MVP.
+      Your package selections are ready. Secure payment and document submission will be connected in the checkout setup.
     </div>`;
   box.classList.add('show');
 
   localStorage.setItem('myclinicprotocols_draft', JSON.stringify({
-    ...data, clinic, email, reviewer, website, notes, savedAt:new Date().toISOString()
+    ...data, clinic, email, reviewer, website, medications, methods, notes, total, savedAt:new Date().toISOString()
   }));
 });
 </script>
