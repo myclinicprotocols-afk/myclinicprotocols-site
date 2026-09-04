@@ -39,8 +39,8 @@ h1 em{color:var(--teal);font-style:normal}
 .hero-lede{font-size:20px;line-height:1.65;color:#4e6178;max-width:690px;margin:0}
 .byline{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:22px;color:#6d7d90;font-size:13px}
 .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
-.hero-visual{overflow:hidden;border:1px solid rgba(7,150,155,.18);border-radius:24px;background:#fff;box-shadow:var(--shadow)}
-.hero-visual img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.hero-visual{min-width:0;margin:0;overflow:hidden;border:1px solid rgba(7,150,155,.18);border-radius:24px;background:#fff;box-shadow:var(--shadow)}
+.hero-visual img{display:block;width:100%;height:auto;max-height:520px;aspect-ratio:auto;object-fit:contain;background:#f2fbfb}
 .hero-visual figcaption{padding:14px 18px;color:#65758c;font-size:13px;border-top:1px solid var(--line)}
 .quick-answer{margin-top:-28px;position:relative;z-index:2}
 .quick-answer-inner{padding:25px 30px;border-radius:20px;background:var(--navy);color:#fff;box-shadow:0 18px 50px rgba(7,31,87,.2)}
