@@ -1128,7 +1128,7 @@ h1, h2, h3,
   <a class="nav-tab" href="#pricing">PRICING</a>
   <a class="nav-tab" href="#faq">FAQS</a>
   <a class="nav-tab" href="#contact">CONTACT</a>
-  <a class="nav-cta" href="#builder">GET STARTED</a>
+  <a class="nav-cta" href="order.html">GET STARTED</a>
 </div>
 
   </div>
@@ -1140,7 +1140,7 @@ h1, h2, h3,
       <h1>Professional Protocols.<br>Built for <em>Your Clinic.</em></h1>
       <p>Customizable clinical protocols designed to support safe practices, streamline workflows, and make provider review easier.</p>
       <div class="hero-actions">
-        <a class="btn-primary" href="#builder">Browse Protocols</a>
+        <a class="btn-primary" href="#protocols">Browse Protocols</a>
         <a class="btn-secondary" href="#builder">How It Works</a>
       </div>
     </div>
@@ -1236,7 +1236,7 @@ h1, h2, h3,
         <li>Clinical workflows</li>
         <li>Editable Word and PDF</li>
       </ul>
-      <a class="btn-primary" href="#builder">Customize Your Protocol</a>
+      <a class="btn-primary" href="order.html">Customize Your Protocol</a>
     </div>
 
     <div class="custom-carousel" aria-label="Examples of customizable protocol forms">
@@ -1552,19 +1552,14 @@ document.querySelectorAll('.back').forEach(btn=>{
 
 document.querySelectorAll('.protocol').forEach(card=>{
   card.addEventListener('click',()=>{
-    if(!data.treatments.includes(card.dataset.value)) selectTreatment(card.dataset.value);
-    showStep(1);
+    window.location.href='order.html?treatment='+encodeURIComponent(card.dataset.value);
   });
 });
 
 document.querySelectorAll('.choose-plan').forEach(btn=>{
   btn.addEventListener('click',()=>{
-    data.plan=btn.dataset.plan;
-    data.price=parseInt(btn.dataset.price);
-    document.querySelectorAll('#plans .plan-option').forEach(b=>{
-      b.classList.toggle('selected', b.dataset.plan===data.plan);
-    });
-    document.querySelector('#builder').scrollIntoView({behavior:'smooth'});
+    const packageKey=btn.dataset.plan==='Complete Treatment Package'?'complete':'protocol';
+    window.location.href='order.html?package='+packageKey;
   });
 });
 
@@ -1620,8 +1615,9 @@ document.getElementById('finish').addEventListener('click',()=>{
       ${data.logoName ? `<div class="summary-row"><span>Logo</span><strong>${escapeHtml(data.logoName)}</strong></div>` : ""}
     </div>
     <div style="margin-top:14px;color:#5c6d61;font-size:13px">
-      Your package selections are ready. Secure payment and document submission will be connected in the checkout setup.
-    </div>`;
+      Your package selections are ready. Continue to the secure order page to complete the clinic and treatment details.
+    </div>
+    <a class="btn-primary" style="display:inline-block;margin-top:14px" href="order.html">Continue My Order</a>`;
   box.classList.add('show');
 
   localStorage.setItem('myclinicprotocols_draft', JSON.stringify({
