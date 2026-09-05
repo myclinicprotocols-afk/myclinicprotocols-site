@@ -226,6 +226,12 @@
   .card .icon{width:42px;height:42px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;margin-bottom:18px;font-size:19px}
   .card h3{margin:0 0 7px;font-size:18px}.card p{margin:0;color:var(--muted);font-size:14px}
   .protocol-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .protocol-group-title{
+    grid-column:1/-1;margin:24px 0 2px;padding:10px 14px;border-radius:12px;
+    background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:900;
+    letter-spacing:.08em;text-transform:uppercase
+  }
+  .protocol-group-title:first-child{margin-top:0}
   .protocol{
     background:#fff;border:1px solid var(--line);border-radius:18px;padding:16px;min-height:112px;
     display:flex;flex-direction:column;justify-content:space-between
@@ -1490,14 +1496,14 @@ body.lightbox-open{overflow:hidden}
           <h3>Which treatments do you need?</h3>
           <p class="lead">Select one or several. Bundle savings are calculated automatically.</p>
           <div class="option-grid" id="treatments">
-            <button class="option" data-value="Neurotoxin / Botox"><strong>💉 Neurotoxin / Botox</strong><span>Administration & safety protocol</span></button>
-            <button class="option" data-value="GLP-1 Weight Management"><strong>⚖️ GLP-1 Weight Management</strong><span>Semaglutide / tirzepatide workflow</span></button>
-            <button class="option" data-value="Microneedling"><strong>✨ Microneedling</strong><span>Treatment & aftercare protocol</span></button>
-            <button class="option" data-value="IV Therapy"><strong>💧 IV Therapy</strong><span>IV hydration & infusion workflow</span></button>
-            <button class="option" data-value="Dermal Filler"><strong>💉 Dermal Filler</strong><span>Injection & adverse event protocol</span></button>
-            <button class="option" data-value="PRP / PRF"><strong>🩸 PRP / PRF</strong><span>Preparation & treatment protocol</span></button>
-            <button class="option" data-value="Hyaluronidase"><strong>🧪 Hyaluronidase</strong><span>Filler-dissolving safety workflow</span></button>
-            <button class="option" data-value="Vascular Occlusion"><strong>🚨 Vascular Occlusion</strong><span>Emergency recognition & response</span></button>
+            <button class="option" data-value="Neuromodulators"><strong>💉 Neuromodulators</strong><span>Administration and safety protocol</span></button>
+            <button class="option" data-value="Dermal Fillers"><strong>💉 Dermal Fillers</strong><span>Injection and adverse-event protocol</span></button>
+            <button class="option" data-value="Medical Weight Management / GLP-1"><strong>⚖️ Medical Weight Management / GLP-1</strong><span>Medication and monitoring workflow</span></button>
+            <button class="option" data-value="Microneedling / SkinPen"><strong>✨ Microneedling / SkinPen</strong><span>Device-specific treatment and aftercare</span></button>
+            <button class="option" data-value="IV Hydration / Nutrient Therapy"><strong>💧 IV Hydration / Nutrient Therapy</strong><span>Infusion and safety workflow</span></button>
+            <button class="option" data-value="PRP / PRF / PRFM"><strong>🩸 PRP / PRF / PRFM</strong><span>Preparation and treatment protocol</span></button>
+            <button class="option" data-value="Laser Hair Removal"><strong>⚡ Laser Hair Removal</strong><span>Device, screening, and aftercare workflow</span></button>
+            <button class="option" data-value="IM / SQ Wellness Injections"><strong>🧪 IM / SQ Wellness Injections</strong><span>NAD+, glutathione, MIC-B12, and more</span></button>
             <button class="option" data-value="Chemical Peel"><strong>🧴 Chemical Peel</strong><span>Treatment & aftercare protocol</span></button>
             <button class="option" data-value="Anaphylaxis Response"><strong>🆘 Anaphylaxis Response</strong><span>Emergency response workflow</span></button>
           </div>
@@ -1607,25 +1613,66 @@ body.lightbox-open{overflow:hidden}
   <div class="container">
     <div class="section-head"><div class="section-kicker">Protocol library</div><h2>Choose the protocols your clinic needs.</h2><p>Build one customized protocol or combine multiple aesthetic, wellness, dermatology, specialty-treatment, and emergency-response workflows.</p></div>
     <div class="protocol-grid">
-      <div class="protocol" data-value="Neurotoxin / Botox"><strong>Neurotoxin / Botox</strong><small>Injectables</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="Dermal Filler"><strong>Dermal Filler</strong><small>Injectables</small><span class="arrow">Customize →</span></div>
+      <div class="protocol-group-title">Injectables</div>
+      <div class="protocol" data-value="Neuromodulators"><strong>Neuromodulators</strong><small>Botox®, Dysport®, Xeomin®, Jeuveau®, and clinic-selected products</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Dermal Fillers"><strong>Dermal Fillers</strong><small>Injection workflow and adverse-event planning</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Biostimulatory Injectables"><strong>Biostimulatory Injectables</strong><small>Injectables</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="Microneedling"><strong>Microneedling</strong><small>Aesthetics</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Hyaluronidase / Filler Dissolution"><strong>Hyaluronidase / Filler Dissolution</strong><small>Elective and emergency use workflows</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="PDO Thread Treatments"><strong>PDO Thread Treatments</strong><small>Thread treatment and aftercare</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Sclerotherapy"><strong>Sclerotherapy</strong><small>Spider-vein treatment workflow</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Regenerative, Skin &amp; Scalp</div>
+      <div class="protocol" data-value="PRP / PRF / PRFM"><strong>PRP / PRF / PRFM</strong><small>Regenerative preparation and treatment</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="VAMP / PDRN Regenerative Treatments"><strong>VAMP / PDRN Regenerative Treatments</strong><small>Clinic-selected regenerative workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Microneedling / SkinPen"><strong>Microneedling / SkinPen</strong><small>Device-specific treatment and aftercare</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="RF Microneedling"><strong>RF Microneedling</strong><small>Energy-device treatment and safety</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="HydraFacial"><strong>HydraFacial</strong><small>Facial treatment workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Keravive Scalp Treatment"><strong>Keravive Scalp Treatment</strong><small>Scalp-specific treatment and aftercare</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Chemical Peel"><strong>Chemical Peel</strong><small>Aesthetics</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Dermaplaning"><strong>Dermaplaning</strong><small>Aesthetics</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Acne Extractions & Blackhead Removal"><strong>Acne Extractions & Blackhead Removal</strong><small>Skin care</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="PRP / PRF"><strong>PRP / PRF</strong><small>Regenerative aesthetics</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="GLP-1 Weight Management"><strong>GLP-1 Weight Management</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="IV Therapy"><strong>IV Therapy</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="Peptide Therapy"><strong>Peptide Therapy</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Hair Restoration Treatments"><strong>Hair Restoration Treatments</strong><small>Scalp, PRP/PRF, and clinic-selected methods</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Laser &amp; Energy Devices</div>
+      <div class="protocol" data-value="Aerolase Treatments"><strong>Aerolase Treatments</strong><small>Device- and indication-specific workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Laser Hair Removal"><strong>Laser Hair Removal</strong><small>Screening, settings, safety, and aftercare</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Laser Tattoo Removal"><strong>Laser Tattoo Removal</strong><small>Laser treatment and aftercare</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Vascular / Spider Vein Laser"><strong>Vascular / Spider Vein Laser</strong><small>Vascular laser workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="IPL / BBL Photofacial"><strong>IPL / BBL Photofacial</strong><small>Light-based treatment and safety</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Laser Skin Resurfacing"><strong>Laser Skin Resurfacing</strong><small>Ablative or non-ablative device workflow</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Wellness &amp; Medical Treatments</div>
+      <div class="protocol" data-value="Medical Weight Management / GLP-1"><strong>Medical Weight Management / GLP-1</strong><small>Medication, monitoring, and follow-up</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Peptide Therapies"><strong>Peptide Therapies</strong><small>Clinic-selected medication workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="IM / SQ Wellness Injections"><strong>IM / SQ Wellness Injections</strong><small>NAD+, glutathione, MIC-B12, and more</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="IV Hydration / Nutrient Therapy"><strong>IV Hydration / Nutrient Therapy</strong><small>Formula, infusion, and safety workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Blood Draws / Laboratory Services"><strong>Blood Draws / Laboratory Services</strong><small>Collection, handling, and result workflow</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="HRT / TRT"><strong>HRT / TRT</strong><small>Hormone wellness</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Sexual Wellness Treatments"><strong>Sexual Wellness Treatments</strong><small>Clinic-selected treatment workflow</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Red Light Therapy / Photobiomodulation"><strong>Red Light Therapy / Photobiomodulation</strong><small>Wellness</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Ketamine Infusion (TRD)"><strong>Ketamine Infusion (TRD)</strong><small>Specialty infusion</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Spravato / Esketamine"><strong>Spravato / Esketamine</strong><small>Specialty treatment</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Body &amp; Pelvic Floor</div>
+      <div class="protocol" data-value="EMSCULPT / Body Contouring"><strong>EMSCULPT / Body Contouring</strong><small>Device-specific body treatment</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Pelvic Floor Electromagnetic Treatments"><strong>Pelvic Floor Electromagnetic Treatments</strong><small>EMSELLA, EmChair, or clinic-selected device</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Dermatology &amp; Minor Procedures</div>
       <div class="protocol" data-value="Medical Dermatology Standing Orders"><strong>Medical Dermatology Standing Orders</strong><small>Dermatology</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="Hyaluronidase"><strong>Hyaluronidase</strong><small>Filler safety</small><span class="arrow">Customize →</span></div>
-      <div class="protocol" data-value="Vascular Occlusion"><strong>Vascular Occlusion</strong><small>Emergency response</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Minor Aesthetic Procedures / Skin Tag Removal"><strong>Minor Aesthetic Procedures / Skin Tag Removal</strong><small>Clinic-selected minor procedure</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Cryotherapy / Benign Lesion Removal"><strong>Cryotherapy / Benign Lesion Removal</strong><small>Procedure and documentation workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Shave / Punch Biopsy"><strong>Shave / Punch Biopsy</strong><small>Procedure and pathology workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Cyst / Wart Treatment"><strong>Cyst / Wart Treatment</strong><small>Clinic-selected treatment workflow</small><span class="arrow">Customize →</span></div>
+
+      <div class="protocol-group-title">Safety &amp; Operations</div>
+      <div class="protocol" data-value="Vascular Occlusion Response"><strong>Vascular Occlusion Response</strong><small>Recognition, escalation, and emergency response</small><span class="arrow">Customize →</span></div>
       <div class="protocol" data-value="Anaphylaxis Response"><strong>Anaphylaxis Response</strong><small>Emergency response</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Syncope / Medical Emergency Response"><strong>Syncope / Medical Emergency Response</strong><small>Emergency assessment and escalation</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Laser Burn & Eye Safety"><strong>Laser Burn &amp; Eye Safety</strong><small>Prevention, response, and documentation</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Infection Prevention / Bloodborne Pathogens"><strong>Infection Prevention / Bloodborne Pathogens</strong><small>Exposure prevention and response</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Medication Storage / Inventory / Cold Chain"><strong>Medication Storage / Inventory / Cold Chain</strong><small>Storage, tracking, and quality controls</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Adverse Event Documentation & Escalation"><strong>Adverse Event Documentation &amp; Escalation</strong><small>Reporting and follow-up workflow</small><span class="arrow">Customize →</span></div>
+      <div class="protocol" data-value="Emergency Cart & Supply Checklist"><strong>Emergency Cart &amp; Supply Checklist</strong><small>Readiness and routine verification</small><span class="arrow">Customize →</span></div>
     </div>
   </div>
 </section>
