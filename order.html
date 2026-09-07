@@ -149,7 +149,7 @@
             <label class="inline-check"><input type="checkbox" id="approveClinical"> I understand that final clinical approval remains the responsibility of my clinic’s appropriately qualified medical director or supervising provider.</label>
             <label class="inline-check"><input type="checkbox" id="approveScope"> I confirm that this order contains no patient-identifying or protected health information.</label>
           </div>
-          <div class="checkout-area"><h3>Secure checkout</h3><p>Your completed intake will be tied to the payment so the production team receives one organized order.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-note" id="checkoutNote">Your order has been saved in this browser. Stripe is not connected yet, so no payment was taken. Once your real Stripe checkout is added, this button will open the secure payment page.</div><div class="saved" id="saved">Draft saved.</div></div>
+          <div class="checkout-area"><h3>Secure checkout</h3><p>Your completed intake will be tied to the payment so the production team receives one organized order.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-note" id="checkoutNote">Your order has been saved in this browser. The secure PayPal link for this bundle quantity is still being finalized, so no payment was taken. Please download your order summary or choose one treatment to pay now.</div><div class="saved" id="saved">Draft saved.</div></div>
           <div class="what-next"><div><b>1. Payment</b>Secure checkout</div><div><b>2. Preparation</b>3–5 business days</div><div><b>3. Review</b>Comment on your draft</div><div><b>4. Delivery</b>Word + PDF</div></div>
           <div class="actions"><button class="btn btn-secondary back" type="button" data-back="4">← Edit details</button><span></span></div>
         </div>
@@ -161,7 +161,10 @@
 
   <script>
   (()=>{
-    const STRIPE_CHECKOUT_URL="";
+    const PAYPAL_CHECKOUT_URLS={
+      protocol:{1:"https://www.paypal.com/ncp/payment/HHKTFKGBY8Y3N"},
+      complete:{1:"https://www.paypal.com/ncp/payment/RCPGU6R4LRNWQ"}
+    };
     const states=["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
     const treatments=[
       ["Neuromodulators","Injectables"],["Dermal Fillers","Injectables"],["Biostimulatory Injectables","Injectables"],["Hyaluronidase / Filler Dissolution","Injectables"],["PDO Thread Treatments","Injectables"],["Sclerotherapy","Injectables"],
@@ -233,7 +236,7 @@
     $('#brandColor').oninput=e=>$('#brandHex').value=e.target.value;$('#brandHex').oninput=e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value))$('#brandColor').value=e.target.value};
     $('#logo').onchange=e=>{const f=e.target.files?.[0];if(!f)return;model.logoName=f.name;const reader=new FileReader();reader.onload=x=>$('#logoPreview').innerHTML=`<img src="${x.target.result}" alt="Logo preview">`;reader.readAsDataURL(f)};
     function toggleCheckout(){$('#checkout').disabled=!($('#approveClinical').checked&&$('#approveScope').checked)}$('#approveClinical').onchange=toggleCheckout;$('#approveScope').onchange=toggleCheckout;
-    $('#checkout').onclick=()=>{save();if(STRIPE_CHECKOUT_URL){location.href=STRIPE_CHECKOUT_URL}else{$('#checkoutNote').classList.add('show');$('#saved').classList.add('show')}};
+    $('#checkout').onclick=()=>{save();const count=allTreatments().length;const checkoutURL=PAYPAL_CHECKOUT_URLS[model.package]?.[count];if(checkoutURL){location.href=checkoutURL}else{$('#checkoutNote').classList.add('show');$('#saved').classList.add('show')}};
     $('#download').onclick=()=>{const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
 
     const qp=new URLSearchParams(location.search),t=qp.get('treatment'),p=qp.get('package');if(p&&pricing[p]){model.package=p;$$('.package').forEach(x=>x.classList.toggle('selected',x.dataset.package===p))}if(t){const btn=$$('.treatment').find(x=>x.dataset.name===t);if(btn)btn.click();else{model.custom.push(t);renderCustom()}}
