@@ -149,7 +149,7 @@
             <label class="inline-check"><input type="checkbox" id="approveClinical"> I understand that final clinical approval remains the responsibility of my clinic’s appropriately qualified medical director or supervising provider.</label>
             <label class="inline-check"><input type="checkbox" id="approveScope"> I confirm that this order contains no patient-identifying or protected health information.</label>
           </div>
-          <div class="checkout-area"><h3>Secure checkout</h3><p>Your completed intake will be tied to the payment so the production team receives one organized order.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-note" id="checkoutNote">Your order has been saved in this browser. The secure PayPal link for this bundle quantity is still being finalized, so no payment was taken. Please download your order summary or choose one treatment to pay now.</div><div class="saved" id="saved">Draft saved.</div></div>
+          <div class="checkout-area"><h3>Secure checkout</h3><p>Your completed intake will be tied to the payment so the production team receives one organized order.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-note" id="checkoutNote">Your order has been saved in this browser. Online checkout is available for packages containing 1, 3, 5, or 10 treatments. Please adjust the number selected or download your order summary for a custom quantity.</div><div class="saved" id="saved">Draft saved.</div></div>
           <div class="what-next"><div><b>1. Payment</b>Secure checkout</div><div><b>2. Preparation</b>3–5 business days</div><div><b>3. Review</b>Comment on your draft</div><div><b>4. Delivery</b>Word + PDF</div></div>
           <div class="actions"><button class="btn btn-secondary back" type="button" data-back="4">← Edit details</button><span></span></div>
         </div>
@@ -162,8 +162,18 @@
   <script>
   (()=>{
     const PAYPAL_CHECKOUT_URLS={
-      protocol:{1:"https://www.paypal.com/ncp/payment/HHKTFKGBY8Y3N"},
-      complete:{1:"https://www.paypal.com/ncp/payment/RCPGU6R4LRNWQ"}
+      protocol:{
+        1:"https://www.paypal.com/ncp/payment/HHKTFKGBY8Y3N",
+        3:"https://www.paypal.com/ncp/payment/BFP2LJDCTZYD6",
+        5:"https://www.paypal.com/ncp/payment/GZN8NPNREBN62",
+        10:"https://www.paypal.com/ncp/payment/YSGARRWR5DRDC"
+      },
+      complete:{
+        1:"https://www.paypal.com/ncp/payment/RCPGU6R4LRNWQ",
+        3:"https://www.paypal.com/ncp/payment/P33B6F5MEG428",
+        5:"https://www.paypal.com/ncp/payment/QZLNEAUVGUD98",
+        10:"https://www.paypal.com/ncp/payment/8ZSU3KVPNJZ8W"
+      }
     };
     const states=["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
     const treatments=[
