@@ -60,6 +60,9 @@ h1 em{color:var(--teal);font-style:normal}
 .article a.btn-primary,.article a.btn-primary:visited{color:#fff}
 .article a.btn-primary:hover,.article a.btn-primary:focus-visible{color:#fff;background:var(--teal-dark)}
 .page-cta .btn-primary{min-width:210px;font-size:16px;text-shadow:0 1px 1px rgba(0,0,0,.12)}
+.article-visual{margin:34px 0 8px;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:#fff;box-shadow:0 16px 36px rgba(7,31,87,.08)}
+.article-visual img{display:block;width:100%;aspect-ratio:16/9;object-fit:cover}
+.article-visual figcaption{padding:13px 17px;color:#65758c;font-size:14px;line-height:1.5;border-top:1px solid var(--line)}
 .article ul{padding-left:22px}
 .article li+li{margin-top:7px}
 .definition-grid,.feature-grid,.package-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:26px 0}
