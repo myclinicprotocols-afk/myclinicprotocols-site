@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Preparing Your Draft | MyClinicProtocols</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root{--navy:#062765;--teal:#079ba2;--muted:#5f718d;--line:#d7e2e8;--soft:#eef9f9}*{box-sizing:border-box}body{margin:0;background:#f7fafb;color:var(--navy);font-family:Figtree,Arial,sans-serif}.wrap{max-width:760px;margin:8vh auto;padding:24px}.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:38px;box-shadow:0 18px 55px rgba(6,39,101,.08)}.brand{font-weight:800;font-size:20px;margin-bottom:30px}.brand span{color:var(--teal)}h1{font-size:38px;line-height:1.08;margin:0 0 14px}p{color:var(--muted);font-size:17px;line-height:1.6}.status{margin:24px 0;padding:18px;border-radius:14px;background:var(--soft);font-weight:700}.btn{display:none;padding:15px 22px;border-radius:12px;background:var(--teal);color:#fff;font-weight:800;text-decoration:none}.btn.show{display:inline-block}.details{margin-top:28px;border-top:1px solid var(--line);padding-top:22px;font-size:14px;line-height:1.6;color:var(--muted)}.error{background:#fff4f2;color:#962f24}@media(max-width:600px){.wrap{padding:14px}.card{padding:26px}h1{font-size:31px}}
+  </style>
+</head>
+<body>
+  <main class="wrap"><section class="card">
+    <div class="brand">MYCLINIC<span>PROTOCOLS</span></div>
+    <h1 id="title">Confirming your payment…</h1>
+    <p id="message">Please keep this page open while we securely verify PayPal and prepare your personalized draft package.</p>
+    <div class="status" id="status" role="status">Verifying payment</div>
+    <a class="btn" id="download" href="#">Download Draft DOCX + PDF Package</a>
+    <div class="details"><strong>DRAFT — Qualified Provider Review Required.</strong><br>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set. The reviewed version includes up to two consolidated revision rounds requested within 14 calendar days of delivery; revisions normally take 3–5 business days.</div>
+  </section></main>
+  <script>
+  (async()=>{
+    const API="https://orders.myclinicprotocols.com",status=document.getElementById('status'),title=document.getElementById('title'),message=document.getElementById('message'),download=document.getElementById('download');
+    let pending;
+    try{pending=JSON.parse(localStorage.getItem('mycp_pending_payment')||'null')}catch(e){}
+    const token=new URLSearchParams(location.search).get('token');
+    if(!pending?.orderReference||!pending?.paypalOrderId||!token||token!==pending.paypalOrderId){
+      title.textContent="We need help matching this order";message.textContent="Your payment has not been marked as complete on this page. Please email your PayPal receipt to myclinicprotocols@gmail.com.";status.textContent="Order match unavailable";status.classList.add('error');return;
+    }
+    try{
+      const response=await fetch(`${API}/api/checkout/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(pending)});
+      const result=await response.json();if(!response.ok||result.status!=='COMPLETED')throw new Error(result.detail||'Verification failed');
+      title.textContent="Payment confirmed — your draft is ready";message.textContent="Download your files below. We also sent a backup link to the order email address.";status.textContent=`Order ${pending.orderReference} completed`;download.href=result.downloadUrl;download.classList.add('show');localStorage.removeItem('mycp_pending_payment');
+    }catch(error){
+      title.textContent="We’re still confirming your order";message.textContent="Please do not submit another payment. Email myclinicprotocols@gmail.com with your PayPal receipt so we can complete delivery.";status.textContent=error.message;status.classList.add('error');
+    }
+  })();
+  </script>
+</body>
+</html>
