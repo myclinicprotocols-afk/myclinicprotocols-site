@@ -1,0 +1,5 @@
+private-templates/
+private-orders/
+*.env
+.env*
+__pycache__/
