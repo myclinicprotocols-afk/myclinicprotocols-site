@@ -28,3 +28,13 @@ python -m unittest fulfillment.test_documents
 Production activation still requires PayPal API credentials, private object
 storage, a transactional email provider, and deployment of the API service.
 Never commit those credentials or proprietary reviewed source documents.
+
+## Required production secrets
+
+Copy the names in `.env.example` into the hosting provider's encrypted secret
+manager. Do not commit real values. Start in `PAYPAL_MODE=sandbox`; switch to
+`live` only after a successful full sandbox purchase, download, and email test.
+
+The container stores orders under `/data`, which must be a private persistent
+volume. For multi-instance deployment, replace the local SQLite/filesystem
+adapter with a managed database and private object storage.
