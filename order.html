@@ -198,6 +198,19 @@
     const pricing={protocol:{label:"Customized Protocol",units:{1:99,3:249,5:379,10:699}},complete:{label:"Complete Treatment Package",units:{1:149,3:399,5:625,10:1099}}};
     const model={step:1,package:"complete",treatments:[],custom:[],providers:[],documents:[],details:{},logoName:""};
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+    const qp=new URLSearchParams(location.search);
+    const attribution={
+      campaign_name:qp.get('utm_campaign')||'direct',
+      campaign_source:qp.get('utm_source')||'direct',
+      campaign_medium:qp.get('utm_medium')||'direct'
+    };
+    const track=(name,params={})=>{
+      if(typeof window.gtag==='function')window.gtag('event',name,{...attribution,...params});
+    };
+    track('view_order_builder',{
+      requested_package:qp.get('package')||'none',
+      requested_treatment:qp.get('treatment')||'none'
+    });
     states.forEach(s=>$("#state").insertAdjacentHTML("beforeend",`<option>${s}</option>`));
     let currentTreatmentGroup="";
     treatments.forEach(([name,type])=>{
@@ -218,7 +231,7 @@
     function renderCustom(){$("#customChips").innerHTML=model.custom.map((x,i)=>`<span class="chip">${escapeHTML(x)}<button type="button" data-remove="${i}" aria-label="Remove ${escapeHTML(x)}">×</button></span>`).join("");$$("[data-remove]").forEach(b=>b.onclick=()=>{model.custom.splice(+b.dataset.remove,1);renderCustom();refreshTotal()})}
     function escapeHTML(v){return String(v||"").replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
     function show(n){
-      model.step=n;$$('.panel').forEach(p=>p.classList.toggle('active',+p.dataset.panel===n));$$('.progress-step').forEach(p=>{const v=+p.dataset.progress;p.classList.toggle('active',v===n);p.classList.toggle('done',v<n)});window.scrollTo({top:0,behavior:'smooth'});if(n===3)renderDocs();if(n===4)renderDetails();if(n===5)renderReview();save();
+      model.step=n;$$('.panel').forEach(p=>p.classList.toggle('active',+p.dataset.panel===n));$$('.progress-step').forEach(p=>{const v=+p.dataset.progress;p.classList.toggle('active',v===n);p.classList.toggle('done',v<n)});window.scrollTo({top:0,behavior:'smooth'});if(n===3)renderDocs();if(n===4)renderDetails();if(n===5)renderReview();save();track('order_step_view',{step_number:n,package:model.package,treatment_count:allTreatments().length});
     }
     function validate(step){
       const err=$("#error"+step);if(err)err.classList.remove("show");
@@ -245,19 +258,19 @@
     function save(){try{localStorage.setItem('myclinicprotocols_order',JSON.stringify(orderData()))}catch(e){}}
     function summary(){const d=orderData();return `MYCLINICPROTOCOLS ORDER SUMMARY\n\nClinic: ${d.clinic.name}\nEmail: ${d.clinic.email}\nPhone: ${d.clinic.phone}\nWebsite: ${d.clinic.website}\nPrimary state: ${d.clinic.state}\nAdditional states: ${d.clinic.additionalStates}\nAddress: ${d.clinic.address}\nPractice type: ${d.clinic.type}\nBrand color: ${d.clinic.brandColor}\nLogo file: ${d.clinic.logoName}\n\nPackage: ${pricing[model.package].label}\nTreatments: ${allTreatments().join(', ')}\nRequested documents: ${d.documents.join(', ')}\nEstimated founding total: $${d.estimatedTotal}\n\nProviders: ${model.providers.join(', ')}\nMedical director / supervising provider: ${d.oversight.director}\nLicensing state(s): ${d.oversight.licensingStates}\nTreatment setting: ${d.oversight.facility}\nOwnership structure: ${d.oversight.ownership}\nOversight notes: ${d.oversight.notes}\n\nTREATMENT DETAILS\n${allTreatments().map(x=>`\n${x}\nProduct/device: ${d.details[x]?.product||''}\nDose/settings: ${d.details[x]?.dose||''}\nMethod: ${d.details[x]?.method||''}\nWorkflow: ${d.details[x]?.workflow||''}`).join('\n')}\n\nNo payment has been taken. Final clinical approval remains with the purchasing clinic's qualified medical director or supervising provider.`}
 
-    $$('.package').forEach(b=>b.onclick=()=>{$$('.package').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');model.package=b.dataset.package;model.documents=[];refreshTotal()});
-    $$('.treatment').forEach(b=>b.onclick=()=>{b.classList.toggle('selected');const n=b.dataset.name,idx=model.treatments.indexOf(n);idx<0?model.treatments.push(n):model.treatments.splice(idx,1);refreshTotal()});
+    $$('.package').forEach(b=>b.onclick=()=>{$$('.package').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');model.package=b.dataset.package;model.documents=[];refreshTotal();track('select_package',{package:model.package,package_name:pricing[model.package].label,estimated_value:total(),currency:'USD'})});
+    $$('.treatment').forEach(b=>b.onclick=()=>{b.classList.toggle('selected');const n=b.dataset.name,idx=model.treatments.indexOf(n),adding=idx<0;adding?model.treatments.push(n):model.treatments.splice(idx,1);refreshTotal();track('select_treatment',{treatment:n,selection_action:adding?'add':'remove',package:model.package,treatment_count:allTreatments().length})});
     $$('.choice').forEach(b=>b.onclick=()=>{b.classList.toggle('selected');const n=b.dataset.provider,idx=model.providers.indexOf(n);idx<0?model.providers.push(n):model.providers.splice(idx,1)});
     $('#addCustom').onclick=()=>{const el=$('#customTreatment'),v=el.value.trim();if(v&&!allTreatments().some(x=>x.toLowerCase()===v.toLowerCase())){model.custom.push(v);el.value='';renderCustom();refreshTotal()}};
     $('#customTreatment').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#addCustom').click()}};
-    $$('.next').forEach(b=>b.onclick=()=>{if(validate(model.step))show(+b.dataset.next)});$$('.back').forEach(b=>b.onclick=()=>show(+b.dataset.back));
+    $$('.next').forEach(b=>b.onclick=()=>{if(validate(model.step)){track('order_step_complete',{step_number:model.step,next_step:+b.dataset.next,package:model.package,treatment_count:allTreatments().length});show(+b.dataset.next)}});$$('.back').forEach(b=>b.onclick=()=>show(+b.dataset.back));
     $('#brandColor').oninput=e=>$('#brandHex').value=e.target.value;$('#brandHex').oninput=e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value))$('#brandColor').value=e.target.value};
     $('#logo').onchange=e=>{const f=e.target.files?.[0];if(!f)return;model.logoName=f.name;const reader=new FileReader();reader.onload=x=>$('#logoPreview').innerHTML=`<img src="${x.target.result}" alt="Logo preview">`;reader.readAsDataURL(f)};
     function toggleCheckout(){$('#checkout').disabled=!($('#approveClinical').checked&&$('#approveScope').checked)}$('#approveClinical').onchange=toggleCheckout;$('#approveScope').onchange=toggleCheckout;
-    $('#checkout').onclick=()=>{save();const count=allTreatments().length;const checkoutURL=PAYPAL_CHECKOUT_URLS[model.package]?.[count];if(checkoutURL){location.href=checkoutURL}else{$('#checkoutNote').classList.add('show');$('#saved').classList.add('show')}};
-    $('#download').onclick=()=>{const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
+    $('#checkout').onclick=()=>{save();const count=allTreatments().length,checkoutURL=PAYPAL_CHECKOUT_URLS[model.package]?.[count],value=total(),items=allTreatments().map((name,index)=>({item_id:name.toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,''),item_name:name,item_category:'Clinical Documentation',item_variant:pricing[model.package].label,index,price:value/count,quantity:1}));if(checkoutURL){track('begin_checkout',{currency:'USD',value,items});track('checkout_redirect',{checkout_provider:'PayPal',package:model.package,treatment_count:count,value,currency:'USD'});location.href=checkoutURL}else{track('checkout_unavailable',{package:model.package,treatment_count:count,value,currency:'USD'});$('#checkoutNote').classList.add('show');$('#saved').classList.add('show')}};
+    $('#download').onclick=()=>{track('order_summary_download',{package:model.package,treatment_count:allTreatments().length,value:total(),currency:'USD'});const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
 
-    const qp=new URLSearchParams(location.search),t=qp.get('treatment'),p=qp.get('package');if(p&&pricing[p]){model.package=p;$$('.package').forEach(x=>x.classList.toggle('selected',x.dataset.package===p))}if(t){const btn=$$('.treatment').find(x=>x.dataset.name===t);if(btn)btn.click();else{model.custom.push(t);renderCustom()}}
+    const t=qp.get('treatment'),p=qp.get('package');if(p&&pricing[p]){model.package=p;$$('.package').forEach(x=>x.classList.toggle('selected',x.dataset.package===p))}if(t){const btn=$$('.treatment').find(x=>x.dataset.name===t);if(btn)btn.click();else{model.custom.push(t);renderCustom();track('select_treatment',{treatment:t,selection_action:'add',package:model.package,treatment_count:allTreatments().length})}}
     try{const prior=JSON.parse(localStorage.getItem('myclinicprotocols_draft')||'null');if(prior?.clinic&&!field('clinicName')){$('#clinicName').value=prior.clinic||'';$('#email').value=prior.email||'';$('#state').value=prior.state||'';$('#website').value=prior.website||'';$('#directorName').value=prior.reviewer||'';prior.treatments?.forEach(name=>{const b=$$('.treatment').find(x=>x.dataset.name===name);if(b&&!model.treatments.includes(name))b.click()})}}catch(e){}
     renderDocs();refreshTotal();
   })();
