@@ -9,4 +9,4 @@ USER appuser
 
 ENV MYCP_PRIVATE_ROOT=/data
 EXPOSE 8000
-CMD ["uvicorn", "fulfillment.service:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["sh", "-c", "uvicorn fulfillment.service:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers"]
