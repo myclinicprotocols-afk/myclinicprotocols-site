@@ -20,7 +20,7 @@
   </section></main>
   <script>
   (async()=>{
-    const API="https://orders.myclinicprotocols.com",status=document.getElementById('status'),title=document.getElementById('title'),message=document.getElementById('message'),download=document.getElementById('download');
+    const API="https://myclinicprotocols-fulfillment-sandbox.onrender.com",status=document.getElementById('status'),title=document.getElementById('title'),message=document.getElementById('message'),download=document.getElementById('download');
     let pending;
     try{pending=JSON.parse(localStorage.getItem('mycp_pending_payment')||'null')}catch(e){}
     const token=new URLSearchParams(location.search).get('token');
