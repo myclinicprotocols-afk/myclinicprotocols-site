@@ -30,7 +30,7 @@
     try{
       const response=await fetch(`${API}/api/checkout/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(pending)});
       const result=await response.json();if(!response.ok||result.status!=='COMPLETED')throw new Error(result.detail||'Verification failed');
-      title.textContent="Payment confirmed — your draft is ready";message.textContent="Download your files below. We also sent a backup link to the order email address.";status.textContent=`Order ${pending.orderReference} completed`;download.href=result.downloadUrl;download.classList.add('show');localStorage.removeItem('mycp_pending_payment');
+      title.textContent="Payment confirmed — your draft is ready";message.textContent=result.emailDelivery?.customer?"Download your files below. We also sent a backup link to the order email address.":"Download your files below and save them now. Email delivery has not been confirmed.";status.textContent=`Order ${pending.orderReference} completed`;download.href=result.downloadUrl;download.classList.add('show');localStorage.removeItem('mycp_pending_payment');
     }catch(error){
       title.textContent="We’re still confirming your order";message.textContent="Please do not submit another payment. Email myclinicprotocols@gmail.com with your PayPal receipt so we can complete delivery.";status.textContent=error.message;status.classList.add('error');
     }
