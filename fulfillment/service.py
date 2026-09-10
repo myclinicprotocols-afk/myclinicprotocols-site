@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 import hashlib
 import hmac
 import json
+import logging
 import os
 from pathlib import Path
 import secrets
@@ -103,9 +104,13 @@ async def _paypal_token(client: httpx.AsyncClient) -> str:
 
 async def _paypal(client: httpx.AsyncClient, method: str, path: str, payload: dict | None = None) -> dict:
     token = await _paypal_token(client)
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json",
+               "Prefer": "return=representation"}
+    if method == "POST" and path.endswith("/capture"):
+        headers["PayPal-Request-Id"] = "capture-" + path.split("/")[-2]
     response = await client.request(
         method, f"{_paypal_base()}{path}", json=payload,
-        headers={"Authorization": f"Bearer {token}", "Content-Type": "application/json"},
+        headers=headers,
     )
     if response.status_code >= 400:
         raise HTTPException(status_code=502, detail="PayPal rejected the payment request")
@@ -177,6 +182,29 @@ async def create_checkout(checkout: Checkout):
     return {"orderReference": reference, "paypalOrderId": paypal["id"], "approvalUrl": approval}
 
 
+def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
+    """Verify the full order fetched from PayPal, never a minimal POST response."""
+    units = result.get("purchase_units") or []
+    unit = units[0] if len(units) == 1 else {}
+    expected_amount = {"value": row["amount"], "currency_code": row["currency"]}
+    valid = (result.get("id") == row["paypal_id"]
+             and result.get("intent") == "CAPTURE"
+             and unit.get("custom_id") == row["reference"]
+             and unit.get("invoice_id") == row["reference"]
+             and all(unit.get("amount", {}).get(k) == v for k, v in expected_amount.items()))
+    if require_capture:
+        captures = unit.get("payments", {}).get("captures") or []
+        payment = captures[0] if len(captures) == 1 else {}
+        valid = (valid and result.get("status") == "COMPLETED"
+                 and payment.get("status") == "COMPLETED"
+                 and bool(payment.get("id"))
+                 and all(payment.get("amount", {}).get(k) == v for k, v in expected_amount.items()))
+    if not valid:
+        logging.warning("PayPal verification failed for %s (order status %s)",
+                        row["reference"], result.get("status"))
+        raise HTTPException(status_code=409, detail="Payment could not be verified")
+
+
 @app.post("/api/checkout/capture")
 async def capture_checkout(capture: Capture):
     with _connect() as db:
@@ -186,14 +214,18 @@ async def capture_checkout(capture: Capture):
     if row["status"] == "COMPLETED":
         return {"status": "COMPLETED", "downloadUrl": _download_url(row["reference"])}
     async with httpx.AsyncClient(timeout=25) as client:
-        result = await _paypal(client, "POST", f"/v2/checkout/orders/{row['paypal_id']}/capture")
-    unit = result.get("purchase_units", [{}])[0]
-    capture_data = unit.get("payments", {}).get("captures", [{}])[0]
-    amount = capture_data.get("amount", {})
-    if (result.get("status") != "COMPLETED" or capture_data.get("status") != "COMPLETED"
-            or unit.get("custom_id") != row["reference"] or amount.get("value") != row["amount"]
-            or amount.get("currency_code") != row["currency"]):
-        raise HTTPException(status_code=409, detail="Payment could not be verified")
+        path = f"/v2/checkout/orders/{row['paypal_id']}"
+        result = await _paypal(client, "GET", path)
+        _verify_paypal_order(result, row, require_capture=False)
+        if result.get("status") == "APPROVED":
+            try:
+                await _paypal(client, "POST", path + "/capture")
+            except (HTTPException, httpx.TransportError):
+                # A capture can succeed even when its response is lost. Reconcile
+                # against PayPal before deciding whether fulfillment is allowed.
+                logging.warning("Reconciling capture response for %s", row["reference"])
+            result = await _paypal(client, "GET", path)
+        _verify_paypal_order(result, row, require_capture=True)
     order = json.loads(row["intake"])
     order["orderReference"] = row["reference"]
     package_path = ROOT / row["reference"] / "draft-package.zip"
