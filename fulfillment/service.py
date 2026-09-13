@@ -51,7 +51,7 @@ class Checkout(BaseModel):
 
 
 class Capture(BaseModel):
-    orderReference: str
+    orderReference: str | None = None
     paypalOrderId: str
 
 
@@ -208,11 +208,24 @@ def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
 @app.post("/api/checkout/capture")
 async def capture_checkout(capture: Capture):
     with _connect() as db:
-        row = db.execute("SELECT * FROM orders WHERE reference=? AND paypal_id=?", (capture.orderReference, capture.paypalOrderId)).fetchone()
+        if capture.orderReference:
+            row = db.execute(
+                "SELECT * FROM orders WHERE reference=? AND paypal_id=?",
+                (capture.orderReference, capture.paypalOrderId),
+            ).fetchone()
+        else:
+            row = db.execute(
+                "SELECT * FROM orders WHERE paypal_id=?",
+                (capture.paypalOrderId,),
+            ).fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Order not found")
     if row["status"] == "COMPLETED":
-        return {"status": "COMPLETED", "downloadUrl": _download_url(row["reference"])}
+        return {
+            "status": "COMPLETED",
+            "orderReference": row["reference"],
+            "downloadUrl": _download_url(row["reference"]),
+        }
     async with httpx.AsyncClient(timeout=25) as client:
         path = f"/v2/checkout/orders/{row['paypal_id']}"
         result = await _paypal(client, "GET", path)
@@ -221,8 +234,6 @@ async def capture_checkout(capture: Capture):
             try:
                 await _paypal(client, "POST", path + "/capture")
             except (HTTPException, httpx.TransportError):
-                # A capture can succeed even when its response is lost. Reconcile
-                # against PayPal before deciding whether fulfillment is allowed.
                 logging.warning("Reconciling capture response for %s", row["reference"])
             result = await _paypal(client, "GET", path)
         _verify_paypal_order(result, row, require_capture=True)
@@ -247,6 +258,7 @@ async def capture_checkout(capture: Capture):
     )
     return {
         "status": "COMPLETED",
+        "orderReference": row["reference"],
         "downloadUrl": url,
         "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},
     }
