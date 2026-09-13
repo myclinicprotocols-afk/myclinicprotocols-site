@@ -20,19 +20,25 @@
   </section></main>
   <script>
   (async()=>{
-    const API="https://myclinicprotocols-fulfillment-sandbox.onrender.com",status=document.getElementById('status'),title=document.getElementById('title'),message=document.getElementById('message'),download=document.getElementById('download');
+    const API="https://orders.myclinicprotocols.com",status=document.getElementById('status'),title=document.getElementById('title'),message=document.getElementById('message'),download=document.getElementById('download');
     let pending;
     try{pending=JSON.parse(localStorage.getItem('mycp_pending_payment')||'null')}catch(e){}
     const token=new URLSearchParams(location.search).get('token');
-    if(!pending?.orderReference||!pending?.paypalOrderId||!token||token!==pending.paypalOrderId){
-      title.textContent="We need help matching this order";message.textContent="Your payment has not been marked as complete on this page. Please email your PayPal receipt to myclinicprotocols@gmail.com.";status.textContent="Order match unavailable";status.classList.add('error');return;
+    if(!token){
+      title.textContent="We need help matching this order";message.textContent="PayPal did not return an order token. Please do not submit another payment. Email your PayPal receipt to myclinicprotocols@gmail.com.";status.textContent="Order token unavailable";status.classList.add('error');return;
     }
+    const capture={paypalOrderId:token};
+    if(pending?.orderReference&&pending?.paypalOrderId===token)capture.orderReference=pending.orderReference;
     try{
-      const response=await fetch(`${API}/api/checkout/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(pending)});
+      const response=await fetch(`${API}/api/checkout/capture`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(capture)});
       const result=await response.json();if(!response.ok||result.status!=='COMPLETED')throw new Error(result.detail||'Verification failed');
-      title.textContent="Payment confirmed — your draft is ready";message.textContent=result.emailDelivery?.customer?"Download your files below. We also sent a backup link to the order email address.":"Download your files below and save them now. Email delivery has not been confirmed.";status.textContent=`Order ${pending.orderReference} completed`;download.href=result.downloadUrl;download.classList.add('show');localStorage.removeItem('mycp_pending_payment');
+      const reference=result.orderReference||capture.orderReference||'confirmed order';
+      title.textContent="Payment confirmed — your draft is ready";
+      message.textContent=result.emailDelivery?.customer?"Download your files below. We also sent a backup link to the order email address.":"Download your files below and save them now. Email delivery has not been confirmed.";
+      status.textContent=`Order ${reference} completed`;download.href=result.downloadUrl;download.classList.add('show');
+      if(pending?.paypalOrderId===token)localStorage.removeItem('mycp_pending_payment');
     }catch(error){
-      title.textContent="We’re still confirming your order";message.textContent="Please do not submit another payment. Email myclinicprotocols@gmail.com with your PayPal receipt so we can complete delivery.";status.textContent=error.message;status.classList.add('error');
+      title.textContent="We’re still confirming your order";message.textContent="Please do not submit another payment. We could not automatically match or verify this PayPal order. Email myclinicprotocols@gmail.com with your PayPal receipt so we can complete delivery.";status.textContent=error.message;status.classList.add('error');
     }
   })();
   </script>
