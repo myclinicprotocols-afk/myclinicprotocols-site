@@ -102,6 +102,7 @@
           </div>
           <span class="section-label">Treatments</span>
           <div class="treatment-grid" id="treatmentGrid"></div>
+          <details style="margin:20px 0"><summary style="cursor:pointer;font-weight:600">Liquid Lipo, exosome hair treatments, and detox pills</summary><p class="help">These custom requests need product and scope review before purchase. Email the exact product, ingredients or device, intended method, provider role, and state. Acceptance is not guaranteed.</p><ul><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Liquid%20Lipo%20Package">Liquid Lipo Package — request review</a></li><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Hair%20Growth%20with%20Exosomes">Hair Growth with Exosomes — request review</a></li><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Detox%20Pills">Detox Pills — request review</a></li></ul></details>
           <div class="custom-add"><input id="customTreatment" aria-label="Other treatment" placeholder="Other treatment, medication, IV formula, or method"><button type="button" id="addCustom">Add</button></div>
           <div class="chips" id="customChips"></div>
           <div class="error" id="error1">Please select or add at least one treatment.</div>
@@ -180,6 +181,8 @@
       ["Medical Dermatology Standing Orders","Dermatology & Minor Procedures"],["Minor Aesthetic Procedures / Skin Tag Removal","Dermatology & Minor Procedures"],["Cryotherapy / Benign Lesion Removal","Dermatology & Minor Procedures"],["Shave / Punch Biopsy","Dermatology & Minor Procedures"],["Cyst / Wart Treatment","Dermatology & Minor Procedures"],
       ["Vascular Occlusion Response","Safety & Operations"],["Anaphylaxis Response","Safety & Operations"],["Syncope / Medical Emergency Response","Safety & Operations"],["Laser Burn & Eye Safety","Safety & Operations"],["Infection Prevention / Bloodborne Pathogens","Safety & Operations"],["Medication Storage / Inventory / Cold Chain","Safety & Operations"],["Adverse Event Documentation & Escalation","Safety & Operations"],["Emergency Cart & Supply Checklist","Safety & Operations"]
     ];
+    const treatmentLabels={"Medical Weight Management / GLP-1":"Weight Loss Injections / GLP-1","EMSCULPT / Body Contouring":"Body Sculpting / EMSCULPT","Chemical Peel":"Chemical Peels","IM / SQ Wellness Injections":"Vitamin B12 / Lipo-B / Wellness Injections"};
+    const treatmentSummaries={"Medical Weight Management / GLP-1":"Medication-specific weight-management protocols","EMSCULPT / Body Contouring":"Device-specific body contouring and aftercare","Chemical Peel":"Product, peel depth, screening, and aftercare","IM / SQ Wellness Injections":"Vitamin B12 injections and Lipo-B / MIC-B12 formulations; product-specific review"};
     const providerRoles=[["MD / DO","Physician"],["NP","Nurse practitioner"],["PA","Physician assistant"],["RN","Registered nurse"],["LPN / LVN","Practical / vocational nurse"],["Aesthetician","Licensed aesthetician"],["Other","Add details below"]];
     const docs=["Clinical protocol / SOP","Patient consent","Intake / eligibility","Treatment record","Pre- and post-care","Room / safety checklist","Emergency / adverse-event guide"];
     const pricing={protocol:{label:"Customized Protocol",units:{1:99,3:249,5:379,10:699}},complete:{label:"Complete Treatment Package",units:{1:149,3:399,5:625,10:1099}}};
@@ -192,7 +195,7 @@
         currentTreatmentGroup=type;
         $("#treatmentGrid").insertAdjacentHTML("beforeend",`<h3 class="treatment-group-title">${type}</h3>`);
       }
-      $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span><strong>${name}</strong><span>${type}</span></span></button>`);
+      $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span><strong>${treatmentLabels[name]||name}</strong><span>${treatmentSummaries[name]||type}</span></span></button>`);
     });
     providerRoles.forEach(([name,type])=>$("#providerGrid").insertAdjacentHTML("beforeend",`<button type="button" class="choice" data-provider="${name}">${name}<small>${type}</small></button>`));
 
