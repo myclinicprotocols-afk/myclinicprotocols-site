@@ -11,6 +11,13 @@
 .mycp-search-empty{margin:14px 0 6px;padding:16px 18px;border:1px dashed #c8d7df;border-radius:13px;background:#f8fbfc;color:#65758c;font-size:14px}
 .mycp-visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
 
+/* Force filtered results to disappear even when existing page CSS sets display on cards. */
+.protocol[hidden],
+.protocol-group-title[hidden],
+.treatment[hidden],
+.treatment-group-title[hidden],
+.mycp-search-empty[hidden]{display:none!important}
+
 .mycp-support-launcher{position:fixed;right:24px;bottom:24px;z-index:9998;display:flex;align-items:center;gap:9px;border:0;border-radius:999px;background:#06999f;color:#fff;padding:13px 18px;font-family:"Figtree","Segoe UI",Arial,sans-serif;font-size:14px;font-weight:800;box-shadow:0 14px 34px rgba(8,40,93,.22);cursor:pointer;transition:transform .18s ease,background .18s ease}
 .mycp-support-launcher:hover{background:#057e83;transform:translateY(-2px)}
 .mycp-support-launcher svg{width:20px;height:20px;flex:none}
