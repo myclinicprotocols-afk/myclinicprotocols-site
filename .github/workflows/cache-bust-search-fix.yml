@@ -1,0 +1,38 @@
+name: Refresh protocol search fix
+
+on:
+  push:
+    paths:
+      - '.github/workflows/cache-bust-search-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh-search:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Refresh search stylesheet version
+        shell: python
+        run: |
+          from pathlib import Path
+          for filename in ('index.html', 'order.html'):
+              path = Path(filename)
+              text = path.read_text(encoding='utf-8')
+              text = text.replace('assets/mycp-search-support.css?v=20260916', 'assets/mycp-search-support.css?v=20260916b')
+              path.write_text(text, encoding='utf-8')
+
+      - name: Commit refresh and remove helper
+        shell: bash
+        run: |
+          git config user.name "MyClinicProtocols Automation"
+          git config user.email "myclinicprotocols@gmail.com"
+          git rm .github/workflows/cache-bust-search-fix.yml
+          git add index.html order.html
+          git commit -m "Refresh fixed protocol search stylesheet"
+          git push origin main
