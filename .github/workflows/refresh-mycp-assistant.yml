@@ -1,0 +1,65 @@
+name: Refresh MYCP assistant
+
+on:
+  push:
+    paths:
+      - '.github/workflows/refresh-mycp-assistant.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Upgrade assistant styling and cache versions
+        shell: python
+        run: |
+          from pathlib import Path
+          import re
+
+          css_path = Path('assets/mycp-search-support.css')
+          css = css_path.read_text(encoding='utf-8')
+          marker = '/* Smart MYCP assistant actions */'
+          if marker not in css:
+              css += r'''
+
+/* Smart MYCP assistant actions */
+.mycp-support-panel{width:min(430px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 110px))}
+.mycp-support-body{scroll-behavior:smooth}
+.mycp-message-text{white-space:pre-line}
+.mycp-message-actions{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;padding-top:9px;border-top:1px solid #e7eef1}
+.mycp-message-link{display:inline-flex;align-items:center;justify-content:center;min-height:31px;padding:7px 10px;border:1px solid #bee0e2;border-radius:999px;background:#f3fbfb;color:#057e83!important;font-size:10.5px;font-weight:800;text-decoration:none!important;line-height:1.25;transition:.15s ease}
+.mycp-message-link:hover{background:#e6f7f7;border-color:#06999f;transform:translateY(-1px)}
+.mycp-quick-actions{margin-top:13px;max-height:124px;overflow:auto;padding-right:2px}
+.mycp-support-compose input::placeholder{color:#8898aa}
+@media(max-width:620px){
+  .mycp-support-panel{width:calc(100vw - 28px);max-height:calc(100vh - 90px)}
+  .mycp-message{max-width:94%}
+  .mycp-message-link{font-size:10px}
+}
+'''
+              css_path.write_text(css, encoding='utf-8')
+
+          for html in Path('.').rglob('*.html'):
+              text = html.read_text(encoding='utf-8')
+              original = text
+              text = re.sub(r'assets/mycp-search-support\.js\?v=[A-Za-z0-9._-]+', 'assets/mycp-search-support.js?v=20260916f', text)
+              text = re.sub(r'assets/mycp-search-support\.css\?v=[A-Za-z0-9._-]+', 'assets/mycp-search-support.css?v=20260916f', text)
+              if text != original:
+                  html.write_text(text, encoding='utf-8')
+
+      - name: Commit refresh and remove helper
+        shell: bash
+        run: |
+          git config user.name "MyClinicProtocols Automation"
+          git config user.email "myclinicprotocols@gmail.com"
+          git rm .github/workflows/refresh-mycp-assistant.yml
+          git add -A
+          git commit -m "Refresh smart MYCP assistant across website"
+          git push origin main
