@@ -106,7 +106,6 @@
           </div>
           <span class="section-label">Treatments</span>
           <div class="treatment-grid" id="treatmentGrid"></div>
-          <details style="margin:20px 0"><summary style="cursor:pointer;font-weight:600">Liquid Lipo, exosome hair treatments, and detox pills</summary><p class="help">These custom requests need product and scope review before purchase. Email the exact product, ingredients or device, intended method, provider role, and state. Acceptance is not guaranteed.</p><ul><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Liquid%20Lipo%20Package">Liquid Lipo Package — request review</a></li><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Hair%20Growth%20with%20Exosomes">Hair Growth with Exosomes — request review</a></li><li><a href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Detox%20Pills">Detox Pills — request review</a></li></ul></details>
           <div class="custom-add"><input id="customTreatment" aria-label="Other treatment" placeholder="Other treatment, medication, IV formula, or method"><button type="button" id="addCustom">Add</button></div>
           <div class="chips" id="customChips"></div>
           <div class="error" id="error1">Please select or add at least one treatment.</div>
@@ -193,13 +192,20 @@
     const model={step:1,package:"complete",treatments:[],custom:[],providers:[],documents:[],details:{},logoName:"",orderReference:"",paymentStatus:"Not started"};
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     states.forEach(s=>$("#state").insertAdjacentHTML("beforeend",`<option>${s}</option>`));
+    const reviewRequests=[{"name":"Liquid Lipo Package","category":"Body & Pelvic Floor","description":"Specify the product, ingredients, route, and treatment area. Scope review required before purchase."},{"name":"Hair Growth with Exosomes","category":"Regenerative, Skin & Scalp","description":"Product and regulatory review required before any protocol scope is accepted."},{"name":"Detox Pills","category":"Wellness & Medical Treatments","description":"Provide the exact oral product and ingredients for review. No detoxification benefit is assumed."}];
     let currentTreatmentGroup="";
-    treatments.forEach(([name,type])=>{
+    treatments.forEach(([name,type],index)=>{
       if(type!==currentTreatmentGroup){
         currentTreatmentGroup=type;
         $("#treatmentGrid").insertAdjacentHTML("beforeend",`<h3 class="treatment-group-title">${type}</h3>`);
       }
       $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span><strong>${treatmentLabels[name]||name}</strong><span>${treatmentSummaries[name]||type}</span></span></button>`);
+      if(treatments[index+1]?.[1]!==type){
+        reviewRequests.filter(item=>item.category===type).forEach(item=>{
+          const href="mailto:myclinicprotocols@gmail.com?subject="+encodeURIComponent("Protocol scope review: "+item.name);
+          $("#treatmentGrid").insertAdjacentHTML("beforeend",`<a class="treatment treatment-review" href="${href}"><span><strong>${item.name}</strong><span>${item.description}</span><span>Request review →</span></span></a>`);
+        });
+      }
     });
     providerRoles.forEach(([name,type])=>$("#providerGrid").insertAdjacentHTML("beforeend",`<button type="button" class="choice" data-provider="${name}">${name}<small>${type}</small></button>`));
 
