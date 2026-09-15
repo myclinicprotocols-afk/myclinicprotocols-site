@@ -1,0 +1,139 @@
+name: Upgrade 2026 weight management library
+
+on:
+  push:
+    paths:
+      - '.github/workflows/upgrade-weightloss-library.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Upgrade weight management catalog
+        shell: python
+        run: |
+          from pathlib import Path
+
+          index = Path('index.html')
+          text = index.read_text(encoding='utf-8')
+          old = '''      <div class="protocol-group-title">Weight Loss</div>
+      <div class="protocol" data-value="Medical Weight Management / GLP-1"><strong>Weight Loss Injections / GLP-1</strong><small>Medication-specific weight-management protocols</small><span class="arrow">Customize →</span></div>'''
+          new = '''      <div class="protocol-group-title">Weight Loss</div>
+      <div class="protocol mycp-weight-feature" data-value="Injectable GLP-1 / GIP Weight Management"><span class="mycp-protocol-badge core">CORE</span><strong>Injectable GLP-1 / GIP Weight Management</strong><small>Semaglutide, tirzepatide, and clinic-selected injectable obesity-medication workflows covering eligibility, titration, monitoring, adverse effects, maintenance, and escalation.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="Oral GLP-1 Weight Management"><span class="mycp-protocol-badge new">NEW 2026</span><strong>Oral GLP-1 Weight Management</strong><small>Oral incretin-based weight-management workflow for FDA-approved oral options, with eligibility, dosing and timing considerations, monitoring, adverse effects, and follow-up.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="GLP-1 Maintenance & Weight-Regain Prevention"><span class="mycp-protocol-badge trend">TRENDING</span><strong>GLP-1 Maintenance &amp; Weight-Regain Prevention</strong><small>Goal-weight transition, individualized maintenance planning, follow-up cadence, lifestyle reinforcement, weight-regain triggers, and escalation or re-evaluation pathways.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="Muscle Preservation & Body Composition"><span class="mycp-protocol-badge trend">TRENDING</span><strong>Muscle Preservation &amp; Body Composition</strong><small>Protein and nutrition support, resistance-training guidance, lean-mass and functional monitoring, body-composition tracking, and higher-risk patient considerations.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="GLP-1 Side-Effect & Nutrition Support"><span class="mycp-protocol-badge support">SUPPORT</span><strong>GLP-1 Side-Effect &amp; Nutrition Support</strong><small>GI symptom screening, hydration, nutrition adequacy, nausea, reflux, constipation and diarrhea guidance, micronutrient-risk review, and escalation criteria.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="Menopause & Metabolic Weight Management"><span class="mycp-protocol-badge focus">SPECIALTY</span><strong>Menopause &amp; Metabolic Weight Management</strong><small>Peri- and post-menopausal weight-management workflow with cardiometabolic risk review, body-composition goals, medication considerations, monitoring, and referral triggers.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="PCOS / Insulin-Resistance Weight Management"><span class="mycp-protocol-badge focus">SPECIALTY</span><strong>PCOS / Insulin-Resistance Weight Management</strong><small>Metabolic assessment, lifestyle support, weight-management medication considerations, monitoring, and referral or escalation for patients with PCOS or insulin resistance.</small><span class="arrow">Customize →</span></div>
+      <div class="protocol mycp-weight-feature" data-value="Appetite & Food-Noise Monitoring"><span class="mycp-protocol-badge topic">POPULAR TOPIC</span><strong>Appetite &amp; Food-Noise Monitoring</strong><small>Structured appetite, satiety, craving, eating-pattern, adherence, and behavioral follow-up tracking to support comprehensive medical weight-management care.</small><span class="arrow">Customize →</span></div>
+      <a class="protocol-review protocol mycp-weight-feature" href="mailto:myclinicprotocols@gmail.com?subject=Protocol%20scope%20review%3A%20Retatrutide%20%2F%20Next-Generation%20Weight-Loss%20Therapies"><span class="mycp-protocol-badge investigate">INVESTIGATIONAL</span><strong>Retatrutide / Next-Generation Weight-Loss Therapies</strong><small>Regulatory and product review is required before any protocol scope is accepted. Investigational therapies are not presented as standard purchasable treatment protocols.</small><span class="arrow">Request review →</span></a>'''
+          if old not in text:
+              raise SystemExit('Index Weight Loss block not found')
+          text = text.replace(old, new, 1)
+          text = text.replace('assets/mycp-search-support.css?v=20260916b','assets/mycp-search-support.css?v=20260916c')
+          index.write_text(text, encoding='utf-8')
+
+          order = Path('order.html')
+          text = order.read_text(encoding='utf-8')
+          old_treat = '''      ["Medical Weight Management / GLP-1","Weight Loss"],["Peptide Therapies","Wellness & Medical Treatments"]'''
+          new_treat = '''      ["Injectable GLP-1 / GIP Weight Management","Weight Loss"],["Oral GLP-1 Weight Management","Weight Loss"],["GLP-1 Maintenance & Weight-Regain Prevention","Weight Loss"],["Muscle Preservation & Body Composition","Weight Loss"],["GLP-1 Side-Effect & Nutrition Support","Weight Loss"],["Menopause & Metabolic Weight Management","Weight Loss"],["PCOS / Insulin-Resistance Weight Management","Weight Loss"],["Appetite & Food-Noise Monitoring","Weight Loss"],["Peptide Therapies","Wellness & Medical Treatments"]'''
+          if old_treat not in text:
+              raise SystemExit('Order treatment block not found')
+          text = text.replace(old_treat, new_treat, 1)
+
+          old_labels = '''    const treatmentLabels={"Medical Weight Management / GLP-1":"Weight Loss Injections / GLP-1","EMSCULPT / Body Contouring":"Body Sculpting / EMSCULPT","Chemical Peel":"Chemical Peels","IM / SQ Wellness Injections":"Vitamin B12 / Lipo-B / Wellness Injections"};
+    const treatmentSummaries={"Medical Weight Management / GLP-1":"Medication-specific weight-management protocols","EMSCULPT / Body Contouring":"Device-specific body contouring and aftercare","Chemical Peel":"Product, peel depth, screening, and aftercare","IM / SQ Wellness Injections":"Vitamin B12 injections and Lipo-B / MIC-B12 formulations; product-specific review"};'''
+          new_labels = '''    const treatmentLabels={"EMSCULPT / Body Contouring":"Body Sculpting / EMSCULPT","Chemical Peel":"Chemical Peels","IM / SQ Wellness Injections":"Vitamin B12 / Lipo-B / Wellness Injections"};
+    const treatmentSummaries={
+      "Injectable GLP-1 / GIP Weight Management":"Semaglutide, tirzepatide, and clinic-selected injectable workflows: eligibility, titration, monitoring, adverse effects, maintenance, and escalation.",
+      "Oral GLP-1 Weight Management":"FDA-approved oral incretin-based weight-management workflows with dosing and timing considerations, monitoring, adverse effects, and follow-up.",
+      "GLP-1 Maintenance & Weight-Regain Prevention":"Goal-weight transition, individualized maintenance planning, follow-up cadence, lifestyle reinforcement, and weight-regain response pathways.",
+      "Muscle Preservation & Body Composition":"Protein and nutrition support, resistance training, lean-mass and functional monitoring, and body-composition tracking.",
+      "GLP-1 Side-Effect & Nutrition Support":"GI symptom screening, hydration, nutrition adequacy, common side-effect guidance, micronutrient-risk review, and escalation criteria.",
+      "Menopause & Metabolic Weight Management":"Peri- and post-menopausal weight-management workflow with cardiometabolic risk review, body-composition goals, medication considerations, and monitoring.",
+      "PCOS / Insulin-Resistance Weight Management":"Metabolic assessment, lifestyle support, medication considerations, monitoring, and referral or escalation for PCOS or insulin resistance.",
+      "Appetite & Food-Noise Monitoring":"Appetite, satiety, craving, eating-pattern, adherence, and behavioral follow-up tracking for comprehensive weight-management care.",
+      "EMSCULPT / Body Contouring":"Device-specific body contouring and aftercare",
+      "Chemical Peel":"Product, peel depth, screening, and aftercare",
+      "IM / SQ Wellness Injections":"Vitamin B12 injections and Lipo-B / MIC-B12 formulations; product-specific review"
+    };
+    const treatmentBadges={
+      "Injectable GLP-1 / GIP Weight Management":"CORE",
+      "Oral GLP-1 Weight Management":"NEW 2026",
+      "GLP-1 Maintenance & Weight-Regain Prevention":"TRENDING",
+      "Muscle Preservation & Body Composition":"TRENDING",
+      "GLP-1 Side-Effect & Nutrition Support":"SUPPORT",
+      "Menopause & Metabolic Weight Management":"SPECIALTY",
+      "PCOS / Insulin-Resistance Weight Management":"SPECIALTY",
+      "Appetite & Food-Noise Monitoring":"POPULAR TOPIC"
+    };'''
+          if old_labels not in text:
+              raise SystemExit('Order labels block not found')
+          text = text.replace(old_labels, new_labels, 1)
+
+          old_reviews = '''    const reviewRequests=[{"name":"Liquid Lipo Package","category":"Body & Pelvic Floor","description":"Specify the product, ingredients, route, and treatment area. Scope review required before purchase."},{"name":"Hair Growth with Exosomes","category":"Regenerative, Skin & Scalp","description":"Product and regulatory review required before any protocol scope is accepted."},{"name":"Detox Pills","category":"Wellness & Medical Treatments","description":"Provide the exact oral product and ingredients for review. No detoxification benefit is assumed."}];'''
+          new_reviews = '''    const reviewRequests=[{"name":"Retatrutide / Next-Generation Weight-Loss Therapies","category":"Weight Loss","badge":"INVESTIGATIONAL","description":"Regulatory and product review required before any protocol scope is accepted. Investigational therapies are not standard purchasable protocols."},{"name":"Liquid Lipo Package","category":"Body & Pelvic Floor","description":"Specify the product, ingredients, route, and treatment area. Scope review required before purchase."},{"name":"Hair Growth with Exosomes","category":"Regenerative, Skin & Scalp","description":"Product and regulatory review required before any protocol scope is accepted."},{"name":"Detox Pills","category":"Wellness & Medical Treatments","description":"Provide the exact oral product and ingredients for review. No detoxification benefit is assumed."}];'''
+          if old_reviews not in text:
+              raise SystemExit('Order review block not found')
+          text = text.replace(old_reviews, new_reviews, 1)
+
+          old_render = '''      $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span><strong>${treatmentLabels[name]||name}</strong><span>${treatmentSummaries[name]||type}</span></span></button>`);'''
+          new_render = '''      const badge=treatmentBadges[name]?`<span class="mycp-treatment-badge">${treatmentBadges[name]}</span>`:"";
+      $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span>${badge}<strong>${treatmentLabels[name]||name}</strong><span>${treatmentSummaries[name]||type}</span></span></button>`);'''
+          if old_render not in text:
+              raise SystemExit('Order treatment render block not found')
+          text = text.replace(old_render, new_render, 1)
+
+          old_review_render = '''          $("#treatmentGrid").insertAdjacentHTML("beforeend",`<a class="treatment treatment-review" href="${href}"><span><strong>${item.name}</strong><span>${item.description}</span><span>Request review →</span></span></a>`);'''
+          new_review_render = '''          const reviewBadge=item.badge?`<span class="mycp-treatment-badge investigate">${item.badge}</span>`:"";
+          $("#treatmentGrid").insertAdjacentHTML("beforeend",`<a class="treatment treatment-review" href="${href}"><span>${reviewBadge}<strong>${item.name}</strong><span>${item.description}</span><span>Request review →</span></span></a>`);'''
+          if old_review_render not in text:
+              raise SystemExit('Order review render block not found')
+          text = text.replace(old_review_render, new_review_render, 1)
+          text = text.replace('assets/mycp-search-support.css?v=20260916b','assets/mycp-search-support.css?v=20260916c')
+          order.write_text(text, encoding='utf-8')
+
+          css = Path('assets/mycp-search-support.css')
+          styles = css.read_text(encoding='utf-8')
+          marker = '/* 2026 weight management catalog */'
+          if marker not in styles:
+              styles += r'''
+
+/* 2026 weight management catalog */
+.mycp-weight-feature{position:relative;overflow:hidden;border-color:#d4e9ea!important;background:linear-gradient(180deg,#fff 0%,#fbfefe 100%)!important}
+.mycp-weight-feature:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,#06999f,#75d2d5)}
+.mycp-weight-feature strong{line-height:1.3}
+.mycp-weight-feature small{line-height:1.48;margin-top:7px}
+.mycp-protocol-badge,.mycp-treatment-badge{display:inline-flex!important;align-items:center!important;width:max-content!important;margin:0 0 9px!important;padding:5px 8px!important;border-radius:999px!important;background:#e8f7f7!important;color:#057e83!important;font-size:9px!important;line-height:1!important;font-weight:900!important;letter-spacing:.07em!important;text-transform:uppercase!important}
+.mycp-protocol-badge.new,.mycp-treatment-badge.new{background:#e8f7f7!important;color:#057e83!important}
+.mycp-protocol-badge.trend{background:#eef3ff!important;color:#385fa3!important}
+.mycp-protocol-badge.core{background:#edf8f1!important;color:#1c7550!important}
+.mycp-protocol-badge.support{background:#fff6e5!important;color:#8b6500!important}
+.mycp-protocol-badge.focus{background:#f2edff!important;color:#6550a5!important}
+.mycp-protocol-badge.topic{background:#fff0f6!important;color:#9b4168!important}
+.mycp-protocol-badge.investigate,.mycp-treatment-badge.investigate{background:#fff1ec!important;color:#a44e2d!important}
+.treatment .mycp-treatment-badge{margin-bottom:7px!important}
+.treatment .mycp-treatment-badge+strong{margin-top:0}
+@media(max-width:620px){.mycp-weight-feature small{font-size:12px!important}.mycp-protocol-badge,.mycp-treatment-badge{font-size:9px!important}}
+'''
+              css.write_text(styles, encoding='utf-8')
+
+      - name: Commit upgrade and remove helper
+        shell: bash
+        run: |
+          git config user.name "MyClinicProtocols Automation"
+          git config user.email "myclinicprotocols@gmail.com"
+          git rm .github/workflows/upgrade-weightloss-library.yml
+          git add index.html order.html assets/mycp-search-support.css
+          git commit -m "Expand 2026 weight management protocol library"
+          git push origin main
