@@ -561,7 +561,7 @@ The website then matches the intake to the verified payment before files are rel
         <button class="mycp-support-close" type="button" aria-label="Close support">×</button>
       </div>
       <div class="mycp-support-body" id="mycpSupportBody" aria-live="polite">
-        <div class="mycp-message bot">Hi! I can answer almost anything about the MYCP website — protocols, pricing, packages, state-specific customization, documents, ordering, delivery, revisions, PayPal checkout, Guides, and support. You can also type a treatment or medication name to see whether we have a matching protocol. Please don’t include patient names or protected health information.</div>
+        <div class="mycp-message bot">Hi! How can I help? Ask me anything about MyClinicProtocols, or type a treatment name to find a protocol.</div>
         <div class="mycp-quick-actions">
           <button type="button" data-q="Help me find a protocol">Find a protocol</button>
           <button type="button" data-q="What are the packages and prices?">Packages &amp; pricing</button>
