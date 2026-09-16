@@ -2,8 +2,8 @@
 
 The public website must never decide that an order is paid. It creates an
 order here, sends the buyer to PayPal, and asks this service to capture it.
-Only a verified COMPLETED capture at the server-calculated price releases a
-draft package.
+Only a verified COMPLETED capture at the server-calculated price releases an
+Initial Version package generated from a connected production clinical master.
 
 Order/payment state is persisted in Supabase so it survives Render restarts.
 Generated packages are uploaded to the private Supabase Storage bucket when
@@ -31,7 +31,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, EmailStr, Field
 
-from fulfillment.documents import make_package
+from fulfillment.documents import make_package, validate_production_treatments
 
 
 OWNER_EMAIL = "myclinicprotocols@gmail.com"
@@ -308,6 +308,11 @@ async def _send_email(to: list[str], subject: str, html: str) -> bool:
 
 @app.post("/api/checkout/create")
 async def create_checkout(checkout: Checkout):
+    try:
+        validate_production_treatments(checkout.treatments)
+    except ValueError as error:
+        raise HTTPException(status_code=409, detail=str(error)) from error
+
     count = len(checkout.treatments)
     amount = f"{_price(checkout.package, count):.2f}"
     reference = "MYCP-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(4).upper()
@@ -396,11 +401,15 @@ async def capture_checkout(capture: Capture):
         if isinstance(order, str):
             order = json.loads(order)
         order["orderReference"] = row["order_reference"]
-        package_bytes = make_package(order)
-        storage_path = f"{row['order_reference']}/draft-package.zip"
+        try:
+            package_bytes = make_package(order)
+        except ValueError as error:
+            logging.error("Production master validation failed after payment for %s: %s", row["order_reference"], error)
+            raise HTTPException(status_code=409, detail="The paid order needs manual fulfillment review before files can be released") from error
+        storage_path = f"{row['order_reference']}/initial-version-package.zip"
         stored_in_supabase = await _storage_upload(client, storage_path, package_bytes)
         if not stored_in_supabase:
-            local_path = ROOT / row["order_reference"] / "draft-package.zip"
+            local_path = ROOT / row["order_reference"] / "initial-version-package.zip"
             local_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
             local_path.write_bytes(package_bytes)
             storage_path = "local:" + str(local_path)
@@ -415,8 +424,8 @@ async def capture_checkout(capture: Capture):
     url = _download_url(row["order_reference"])
     customer_email_sent = await _send_email(
         [row["customer_email"]],
-        f"Your MyClinicProtocols draft — {row['order_reference']}",
-        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your draft DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>DRAFT — Qualified Provider Review Required.</strong></p><p>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set.</p>",
+        f"Your MyClinicProtocols Initial Version — {row['order_reference']}",
+        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>INITIAL VERSION — Prepared for Qualified Provider Review.</strong></p><p>This package is generated from the connected production clinical master and customized using the clinic, provider, product and applicable state information supplied with the order.</p><p>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set.</p>",
     )
     owner_email_sent = await _send_email(
         [OWNER_EMAIL], f"Paid MYCP order — {row['order_reference']}",
@@ -448,13 +457,13 @@ async def download(reference: str, expires: int, signature: str):
             local_path = Path(storage_path[6:])
             if not local_path.is_file():
                 raise HTTPException(status_code=404, detail="Package not found")
-            return FileResponse(local_path, filename=f"{reference}-DRAFT.zip", media_type="application/zip")
+            return FileResponse(local_path, filename=f"{reference}-INITIAL-VERSION.zip", media_type="application/zip")
         package_bytes = await _storage_download(client, storage_path)
 
     return Response(
         package_bytes,
         media_type="application/zip",
-        headers={"Content-Disposition": f'attachment; filename="{reference}-DRAFT.zip"'},
+        headers={"Content-Disposition": f'attachment; filename="{reference}-INITIAL-VERSION.zip"'},
     )
 
 
