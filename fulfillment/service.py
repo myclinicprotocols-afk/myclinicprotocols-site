@@ -4,25 +4,31 @@ The public website must never decide that an order is paid. It creates an
 order here, sends the buyer to PayPal, and asks this service to capture it.
 Only a verified COMPLETED capture at the server-calculated price releases a
 draft package.
+
+Order/payment state is persisted in Supabase so it survives Render restarts.
+Generated packages are uploaded to the private Supabase Storage bucket when
+available, with a local fallback so a verified payment is never stranded by a
+transient storage error.
 """
 
 from __future__ import annotations
 
 import base64
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 import hashlib
 import hmac
 import json
 import logging
 import os
 from pathlib import Path
+from urllib.parse import quote
 import secrets
-import sqlite3
 
 import httpx
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel, EmailStr, Field
 
 from fulfillment.documents import make_package
@@ -35,8 +41,8 @@ PRICES = {
 }
 ROOT = Path(os.environ.get("MYCP_PRIVATE_ROOT", "private-orders")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
-DB = ROOT / "orders.sqlite3"
 DOWNLOAD_TTL = timedelta(hours=24)
+DEFAULT_STORAGE_BUCKET = "order-packages"
 
 
 class Checkout(BaseModel):
@@ -65,23 +71,147 @@ app.add_middleware(
 )
 
 
-def _connect() -> sqlite3.Connection:
-    db = sqlite3.connect(DB)
-    db.row_factory = sqlite3.Row
-    db.execute("""CREATE TABLE IF NOT EXISTS orders (
-        reference TEXT PRIMARY KEY, paypal_id TEXT UNIQUE NOT NULL,
-        email TEXT NOT NULL, amount TEXT NOT NULL, currency TEXT NOT NULL,
-        status TEXT NOT NULL, intake TEXT NOT NULL, package_path TEXT,
-        created_at TEXT NOT NULL, paid_at TEXT
-    )""")
-    return db
-
-
 def _price(package: str, count: int) -> int:
     try:
         return PRICES[package][count]
     except KeyError as error:
         raise HTTPException(status_code=400, detail="Unsupported package or treatment quantity") from error
+
+
+def _supabase_config() -> tuple[str, str]:
+    url = os.environ.get("SUPABASE_URL", "").rstrip("/")
+    key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", "")
+    if not url or not key:
+        raise HTTPException(status_code=503, detail="Order database is not configured")
+    return url, key
+
+
+def _storage_bucket() -> str:
+    return os.environ.get("SUPABASE_STORAGE_BUCKET", DEFAULT_STORAGE_BUCKET).strip() or DEFAULT_STORAGE_BUCKET
+
+
+def _first(mapping: dict, *keys: str) -> str | None:
+    for key in keys:
+        value = mapping.get(key)
+        if value is not None and str(value).strip():
+            return str(value).strip()
+    return None
+
+
+async def _supabase_request(
+    client: httpx.AsyncClient,
+    method: str,
+    path: str,
+    *,
+    params: dict | None = None,
+    payload: dict | None = None,
+    prefer: str | None = None,
+) -> httpx.Response:
+    url, key = _supabase_config()
+    headers = {"apikey": key, "Content-Type": "application/json"}
+    if prefer:
+        headers["Prefer"] = prefer
+    response = await client.request(
+        method,
+        f"{url}{path}",
+        params=params,
+        json=payload,
+        headers=headers,
+    )
+    if response.status_code >= 400:
+        logging.error("Supabase request failed: %s %s -> %s", method, path, response.status_code)
+        raise HTTPException(status_code=503, detail="Order database is temporarily unavailable")
+    return response
+
+
+async def _insert_order(client: httpx.AsyncClient, checkout: Checkout, reference: str, paypal_id: str, amount: str) -> None:
+    clinic = checkout.clinic or {}
+    details = checkout.details or {}
+    row = {
+        "order_reference": reference,
+        "paypal_order_id": paypal_id,
+        "payment_status": "CREATED",
+        "payment_amount": amount,
+        "currency": "USD",
+        "customer_email": str(checkout.customerEmail),
+        "clinic_name": _first(clinic, "name", "clinicName", "clinic_name", "businessName", "practiceName"),
+        "clinic_state": _first(clinic, "state", "primaryState", "primary_state"),
+        "provider_role": ", ".join(checkout.providers) if checkout.providers else None,
+        "package_type": checkout.package,
+        "treatment": " | ".join(checkout.treatments),
+        "document_type": " | ".join(checkout.documents) if checkout.documents else None,
+        "customer_notes": _first(details, "notes", "customerNotes", "specialInstructions", "instructions"),
+        "intake": checkout.model_dump(mode="json"),
+    }
+    await _supabase_request(
+        client,
+        "POST",
+        "/rest/v1/orders",
+        payload=row,
+        prefer="return=minimal",
+    )
+
+
+async def _get_order(client: httpx.AsyncClient, *, reference: str | None = None, paypal_id: str | None = None) -> dict | None:
+    params: dict[str, str] = {"select": "*", "limit": "1"}
+    if reference:
+        params["order_reference"] = f"eq.{reference}"
+    if paypal_id:
+        params["paypal_order_id"] = f"eq.{paypal_id}"
+    response = await _supabase_request(client, "GET", "/rest/v1/orders", params=params)
+    rows = response.json()
+    return rows[0] if rows else None
+
+
+async def _update_order(client: httpx.AsyncClient, reference: str, values: dict) -> None:
+    values = {**values, "updated_at": datetime.now(timezone.utc).isoformat()}
+    await _supabase_request(
+        client,
+        "PATCH",
+        "/rest/v1/orders",
+        params={"order_reference": f"eq.{reference}"},
+        payload=values,
+        prefer="return=minimal",
+    )
+
+
+async def _storage_upload(client: httpx.AsyncClient, storage_path: str, package_bytes: bytes) -> bool:
+    """Upload to the private Supabase bucket. Return False for a safe local fallback."""
+    try:
+        url, key = _supabase_config()
+        bucket = quote(_storage_bucket(), safe="")
+        object_path = quote(storage_path, safe="/")
+        response = await client.post(
+            f"{url}/storage/v1/object/{bucket}/{object_path}",
+            content=package_bytes,
+            headers={
+                "apikey": key,
+                "Authorization": f"Bearer {key}",
+                "Content-Type": "application/zip",
+                "x-upsert": "true",
+            },
+        )
+        if response.status_code >= 400:
+            logging.error("Supabase Storage upload failed with status %s", response.status_code)
+            return False
+        return True
+    except (HTTPException, httpx.HTTPError):
+        logging.exception("Supabase Storage upload failed; using local fallback")
+        return False
+
+
+async def _storage_download(client: httpx.AsyncClient, storage_path: str) -> bytes:
+    url, key = _supabase_config()
+    bucket = quote(_storage_bucket(), safe="")
+    object_path = quote(storage_path, safe="/")
+    response = await client.get(
+        f"{url}/storage/v1/object/authenticated/{bucket}/{object_path}",
+        headers={"apikey": key, "Authorization": f"Bearer {key}"},
+    )
+    if response.status_code >= 400:
+        logging.error("Supabase Storage download failed with status %s", response.status_code)
+        raise HTTPException(status_code=404, detail="Package not found")
+    return response.content
 
 
 def _paypal_base() -> str:
@@ -172,25 +302,24 @@ async def create_checkout(checkout: Checkout):
     }
     async with httpx.AsyncClient(timeout=25) as client:
         paypal = await _paypal(client, "POST", "/v2/checkout/orders", payload)
-    with _connect() as db:
-        db.execute(
-            "INSERT INTO orders VALUES (?,?,?,?,?,?,?,?,?,?)",
-            (reference, paypal["id"], str(checkout.customerEmail), amount, "USD", "CREATED",
-             checkout.model_dump_json(), None, datetime.now(timezone.utc).isoformat(), None),
-        )
+        await _insert_order(client, checkout, reference, paypal["id"], amount)
     approval = next(link["href"] for link in paypal.get("links", []) if link.get("rel") == "payer-action")
     return {"orderReference": reference, "paypalOrderId": paypal["id"], "approvalUrl": approval}
 
 
-def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
+def _row_amount(row: dict) -> str:
+    return f"{Decimal(str(row['payment_amount'])):.2f}"
+
+
+def _verify_paypal_order(result: dict, row: dict, *, require_capture: bool) -> None:
     """Verify the full order fetched from PayPal, never a minimal POST response."""
     units = result.get("purchase_units") or []
     unit = units[0] if len(units) == 1 else {}
-    expected_amount = {"value": row["amount"], "currency_code": row["currency"]}
-    valid = (result.get("id") == row["paypal_id"]
+    expected_amount = {"value": _row_amount(row), "currency_code": row["currency"]}
+    valid = (result.get("id") == row["paypal_order_id"]
              and result.get("intent") == "CAPTURE"
-             and unit.get("custom_id") == row["reference"]
-             and unit.get("invoice_id") == row["reference"]
+             and unit.get("custom_id") == row["order_reference"]
+             and unit.get("invoice_id") == row["order_reference"]
              and all(unit.get("amount", {}).get(k) == v for k, v in expected_amount.items()))
     if require_capture:
         captures = unit.get("payments", {}).get("captures") or []
@@ -201,82 +330,119 @@ def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
                  and all(payment.get("amount", {}).get(k) == v for k, v in expected_amount.items()))
     if not valid:
         logging.warning("PayPal verification failed for %s (order status %s)",
-                        row["reference"], result.get("status"))
+                        row["order_reference"], result.get("status"))
         raise HTTPException(status_code=409, detail="Payment could not be verified")
 
 
 @app.post("/api/checkout/capture")
 async def capture_checkout(capture: Capture):
-    with _connect() as db:
-        if capture.orderReference:
-            row = db.execute(
-                "SELECT * FROM orders WHERE reference=? AND paypal_id=?",
-                (capture.orderReference, capture.paypalOrderId),
-            ).fetchone()
-        else:
-            row = db.execute(
-                "SELECT * FROM orders WHERE paypal_id=?",
-                (capture.paypalOrderId,),
-            ).fetchone()
-    if not row:
-        raise HTTPException(status_code=404, detail="Order not found")
-    if row["status"] == "COMPLETED":
-        return {
-            "status": "COMPLETED",
-            "orderReference": row["reference"],
-            "downloadUrl": _download_url(row["reference"]),
-        }
     async with httpx.AsyncClient(timeout=25) as client:
-        path = f"/v2/checkout/orders/{row['paypal_id']}"
+        row = await _get_order(
+            client,
+            reference=capture.orderReference,
+            paypal_id=capture.paypalOrderId,
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Order not found")
+        if row["payment_status"] == "COMPLETED":
+            return {
+                "status": "COMPLETED",
+                "orderReference": row["order_reference"],
+                "downloadUrl": _download_url(row["order_reference"]),
+            }
+
+        path = f"/v2/checkout/orders/{row['paypal_order_id']}"
         result = await _paypal(client, "GET", path)
         _verify_paypal_order(result, row, require_capture=False)
         if result.get("status") == "APPROVED":
             try:
                 await _paypal(client, "POST", path + "/capture")
             except (HTTPException, httpx.TransportError):
-                logging.warning("Reconciling capture response for %s", row["reference"])
+                logging.warning("Reconciling capture response for %s", row["order_reference"])
             result = await _paypal(client, "GET", path)
         _verify_paypal_order(result, row, require_capture=True)
-    order = json.loads(row["intake"])
-    order["orderReference"] = row["reference"]
-    package_path = ROOT / row["reference"] / "draft-package.zip"
-    package_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-    package_path.write_bytes(make_package(order))
-    paid_at = datetime.now(timezone.utc).isoformat()
-    with _connect() as db:
-        db.execute("UPDATE orders SET status='COMPLETED', package_path=?, paid_at=? WHERE reference=?",
-                   (str(package_path), paid_at, row["reference"]))
-    url = _download_url(row["reference"])
+
+        order = row.get("intake") or {}
+        if isinstance(order, str):
+            order = json.loads(order)
+        order["orderReference"] = row["order_reference"]
+        package_bytes = make_package(order)
+        storage_path = f"{row['order_reference']}/draft-package.zip"
+        stored_in_supabase = await _storage_upload(client, storage_path, package_bytes)
+        if not stored_in_supabase:
+            local_path = ROOT / row["order_reference"] / "draft-package.zip"
+            local_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+            local_path.write_bytes(package_bytes)
+            storage_path = "local:" + str(local_path)
+
+        paid_at = datetime.now(timezone.utc).isoformat()
+        await _update_order(client, row["order_reference"], {
+            "payment_status": "COMPLETED",
+            "package_storage_path": storage_path,
+            "paid_at": paid_at,
+        })
+
+    url = _download_url(row["order_reference"])
     customer_email_sent = await _send_email(
-        [row["email"]],
-        f"Your MyClinicProtocols draft — {row['reference']}",
+        [row["customer_email"]],
+        f"Your MyClinicProtocols draft — {row['order_reference']}",
         f"<p>Payment confirmed.</p><p><a href='{url}'>Download your draft DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>DRAFT — Qualified Provider Review Required.</strong></p><p>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set.</p>",
     )
     owner_email_sent = await _send_email(
-        [OWNER_EMAIL], f"Paid MYCP order — {row['reference']}",
-        f"<p>A verified payment of ${row['amount']} USD was received.</p><p>Customer: {row['email']}</p><p>Order: {row['reference']}</p>",
+        [OWNER_EMAIL], f"Paid MYCP order — {row['order_reference']}",
+        f"<p>A verified payment of ${_row_amount(row)} USD was received.</p><p>Customer: {row['customer_email']}</p><p>Order: {row['order_reference']}</p>",
     )
+    async with httpx.AsyncClient(timeout=15) as client:
+        await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
     return {
         "status": "COMPLETED",
-        "orderReference": row["reference"],
+        "orderReference": row["order_reference"],
         "downloadUrl": url,
         "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},
     }
 
 
 @app.get("/api/download/{reference}")
-async def download(reference: str, expires: int, signature: str, request: Request):
+async def download(reference: str, expires: int, signature: str):
     if expires < int(datetime.now(timezone.utc).timestamp()):
         raise HTTPException(status_code=410, detail="Download link expired")
     if not hmac.compare_digest(signature, _sign(reference, expires)):
         raise HTTPException(status_code=403, detail="Invalid download link")
-    with _connect() as db:
-        row = db.execute("SELECT * FROM orders WHERE reference=? AND status='COMPLETED'", (reference,)).fetchone()
-    if not row or not row["package_path"] or not Path(row["package_path"]).is_file():
-        raise HTTPException(status_code=404, detail="Package not found")
-    return FileResponse(row["package_path"], filename=f"{reference}-DRAFT.zip", media_type="application/zip")
+
+    async with httpx.AsyncClient(timeout=25) as client:
+        row = await _get_order(client, reference=reference)
+        if not row or row["payment_status"] != "COMPLETED" or not row.get("package_storage_path"):
+            raise HTTPException(status_code=404, detail="Package not found")
+        storage_path = row["package_storage_path"]
+        if storage_path.startswith("local:"):
+            local_path = Path(storage_path[6:])
+            if not local_path.is_file():
+                raise HTTPException(status_code=404, detail="Package not found")
+            return FileResponse(local_path, filename=f"{reference}-DRAFT.zip", media_type="application/zip")
+        package_bytes = await _storage_download(client, storage_path)
+
+    return Response(
+        package_bytes,
+        media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{reference}-DRAFT.zip"'},
+    )
 
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    configured = bool(os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_SERVICE_ROLE_KEY"))
+    database = "not-configured"
+    if configured:
+        try:
+            async with httpx.AsyncClient(timeout=8) as client:
+                response = await _supabase_request(
+                    client,
+                    "GET",
+                    "/rest/v1/orders",
+                    params={"select": "id", "limit": "1"},
+                )
+                database = "ok" if response.status_code < 400 else "unavailable"
+        except Exception:
+            logging.exception("Supabase health check failed")
+            database = "unavailable"
+    return {"status": "ok", "supabaseConfigured": configured, "database": database}
