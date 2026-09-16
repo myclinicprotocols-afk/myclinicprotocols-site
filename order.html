@@ -38,18 +38,8 @@
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     "itemListElement": [
-      {
-        "@type": "ListItem",
-        "position": 1,
-        "name": "Home",
-        "item": "https://myclinicprotocols.com/"
-      },
-      {
-        "@type": "ListItem",
-        "position": 2,
-        "name": "Build Your Protocol Package",
-        "item": "https://myclinicprotocols.com/order.html"
-      }
+      {"@type":"ListItem","position":1,"name":"Home","item":"https://myclinicprotocols.com/"},
+      {"@type":"ListItem","position":2,"name":"Build Your Protocol Package","item":"https://myclinicprotocols.com/order.html"}
     ]
   }
   </script>
@@ -66,12 +56,13 @@
     .package-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.package{border:1.5px solid var(--line);border-radius:18px;padding:20px;background:#fff;text-align:left;position:relative;color:var(--ink)}.package:hover,.package.selected{border-color:var(--teal);box-shadow:0 0 0 4px rgba(6,153,159,.08)}.package.selected:after{content:"✓";position:absolute;right:16px;top:16px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:var(--teal);color:#fff;font-weight:900}.package h3{margin:0 36px 5px 0;font-size:19px}.package .price{font-size:27px;font-weight:800;color:var(--navy);margin:10px 0}.package .price small{font-size:12px;color:var(--muted);font-weight:600}.package p{font-size:13px;color:var(--muted);margin:0}.package .popular{display:inline-block;background:#e7f7f7;color:var(--teal-dark);font-size:10px;font-weight:800;border-radius:999px;padding:5px 8px;margin-bottom:10px}
     .treatment-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.treatment-group-title{grid-column:1/-1;margin:18px 0 0;padding:9px 12px;border-radius:10px;background:var(--mint);color:var(--teal-dark);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase}.treatment-group-title:first-child{margin-top:0}.treatment{border:1px solid var(--line);border-radius:14px;background:#fff;padding:14px;text-align:left;color:var(--ink);display:flex;align-items:flex-start;gap:11px}.treatment:hover,.treatment.selected{border-color:var(--teal);background:#f7ffff}.check{width:21px;height:21px;border:1.5px solid #b5c5d1;border-radius:6px;display:grid;place-items:center;flex:none;margin-top:1px;color:transparent}.treatment.selected .check{background:var(--teal);border-color:var(--teal);color:#fff}.treatment strong{display:block;font-size:14px}.treatment span{display:block;color:var(--muted);font-size:11px;margin-top:2px}.custom-add{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}.custom-add button{border:0;background:var(--navy);color:#fff;border-radius:12px;padding:0 17px;font-weight:700}.chips{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.chip{background:var(--mint);color:var(--teal-dark);border-radius:999px;padding:6px 10px;font-size:12px;font-weight:700}.chip button{border:0;background:transparent;color:inherit;padding:0 0 0 6px;font-weight:900}
     label{display:block;font-size:13px;font-weight:750;margin:0 0 7px}.required:after{content:" *";color:#d05050}.field{margin-bottom:15px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.full{grid-column:1/-1}input,select,textarea{width:100%;border:1px solid #cbd9e1;border-radius:12px;background:#fff;color:var(--ink);padding:12px 13px;outline:none}textarea{resize:vertical;min-height:96px}input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(6,153,159,.08)}.help{color:var(--muted);font-size:11px;margin-top:5px}.provider-grid,.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.choice{border:1px solid var(--line);border-radius:13px;padding:12px;background:#fff;text-align:left;color:var(--ink);font-weight:700}.choice.selected{border-color:var(--teal);background:var(--mint)}.choice small{display:block;color:var(--muted);font-weight:500;margin-top:3px}.inline-check{display:flex;align-items:flex-start;gap:9px;font-size:13px;color:#445b76}.inline-check input{width:18px;height:18px;margin-top:1px;accent-color:var(--teal);flex:none}
+    .multi-state{position:relative}.multi-state-trigger{width:100%;min-height:49px;border:1px solid #cbd9e1;border-radius:12px;background:#fff;color:var(--ink);padding:12px 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left}.multi-state-trigger:hover,.multi-state-trigger:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(6,153,159,.08);outline:none}.multi-state-trigger .placeholder{color:#7a8797;font-weight:400}.multi-state-menu{position:absolute;left:0;right:0;top:calc(100% + 7px);z-index:45;background:#fff;border:1px solid #cbd9e1;border-radius:14px;box-shadow:0 18px 40px rgba(8,40,93,.14);padding:10px}.multi-state-menu[hidden]{display:none}.multi-state-search{margin-bottom:8px}.multi-state-list{max-height:260px;overflow:auto;border-top:1px solid #edf2f4}.multi-state-option{display:flex;align-items:center;gap:9px;padding:9px 6px;margin:0;border-bottom:1px solid #f2f5f7;font-size:13px;font-weight:600;cursor:pointer}.multi-state-option input{width:17px;height:17px;margin:0;accent-color:var(--teal)}.multi-state-option.is-primary{opacity:.45;cursor:not-allowed}.multi-state-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.multi-state-chip{display:inline-flex;align-items:center;gap:5px;background:var(--mint);color:var(--teal-dark);border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800}.multi-state-chip button{border:0;background:transparent;color:inherit;padding:0;font-weight:900;line-height:1}.multi-state-note{display:block;color:var(--muted);font-size:11px;margin-top:6px}
     .upload{border:1.5px dashed #b6cbd4;border-radius:14px;background:var(--soft);padding:16px;display:flex;align-items:center;gap:13px;cursor:pointer}.upload-preview{width:48px;height:48px;background:#fff;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;overflow:hidden;color:#91a0ad;font-size:10px}.upload-preview img{width:100%;height:100%;object-fit:contain}.color-row{display:flex;gap:10px;align-items:center}.color-row input[type=color]{width:54px;height:45px;padding:4px}.treatment-details{display:grid;gap:13px}.detail-card{border:1px solid var(--line);border-radius:16px;padding:18px;background:#fbfdfd}.detail-card h3{margin:0 0 14px;font-size:17px}.detail-card .form-grid{grid-template-columns:1fr 1fr}.privacy{background:var(--warn);border:1px solid #f0dfb4;border-radius:13px;padding:13px 15px;color:#6f644e;font-size:12px;margin-top:18px}
     .review-box{border:1px solid var(--line);border-radius:17px;overflow:hidden}.review-row{display:flex;justify-content:space-between;gap:24px;padding:13px 16px;border-bottom:1px solid #edf2f4;font-size:14px}.review-row:last-child{border-bottom:0}.review-row span{color:var(--muted)}.review-row strong{text-align:right}.total-row{background:var(--navy);color:#fff}.total-row span{color:#c1d2e6}.total-row strong{font-size:22px}.terms{display:grid;gap:10px;margin:18px 0}.checkout-area{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:18px}.checkout-area h3{margin:0 0 4px}.checkout-area p{font-size:12px;color:var(--muted);margin:0 0 14px}.checkout-note,.checkout-status{display:none;margin-top:12px;padding:12px;border-radius:11px;font-size:12px}.checkout-note{background:#fff8e8;border:1px solid #ecd9a6;color:#6d6040}.checkout-status{background:#edf9f5;border:1px solid #c8e7da;color:#176a4b}.checkout-note.show,.checkout-status.show{display:block}
     .actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:28px}.btn{border:0;border-radius:13px;padding:13px 18px;font-weight:800}.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal-dark)}.btn-secondary{background:#fff;color:var(--navy);border:1px solid #cbd9e1}.btn:disabled{opacity:.45;cursor:not-allowed}.error{display:none;background:#fff0f0;border:1px solid #efc7c7;color:#9f3838;border-radius:11px;padding:10px 12px;font-size:12px;margin-top:15px}.error.show{display:block}.saved{display:none;color:#19764f;font-weight:700;font-size:12px;margin-top:10px}.saved.show{display:block}
     .what-next{margin:22px 0 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.what-next div{background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center;font-size:11px;color:var(--muted)}.what-next b{display:block;color:var(--navy);font-size:12px;margin-bottom:3px}.footer{border-top:1px solid var(--line);background:#fff;padding:28px 0;color:var(--muted);font-size:12px}.footer-inner{display:flex;justify-content:space-between;gap:20px;align-items:center}
     @media(max-width:900px){.layout{grid-template-columns:1fr}.progress{position:static;display:flex;overflow:auto;gap:16px;padding:16px}.progress small,.mini-total{display:none}.progress-step{white-space:nowrap;padding:0}.card{padding:26px}.provider-grid{grid-template-columns:repeat(2,1fr)}}
-    @media(max-width:620px){.shell{width:min(100% - 22px,1180px)}.topbar-inner{height:72px}.logo img{width:215px}.back-link span{display:none}.intro{padding:38px 0 20px}.intro h1{font-size:40px}.intro p{font-size:16px}.layout{padding-bottom:45px}.card{padding:20px;border-radius:18px}.package-grid,.treatment-grid,.form-grid,.detail-card .form-grid,.provider-grid,.doc-grid{grid-template-columns:1fr}.full{grid-column:auto}.actions{align-items:stretch;flex-direction:column-reverse}.actions .btn{width:100%}.review-row{display:block}.review-row strong{display:block;text-align:left;margin-top:3px}.what-next{grid-template-columns:1fr 1fr}.footer-inner{display:block;text-align:center}.footer-inner div+div{margin-top:7px}}
+    @media(max-width:620px){.shell{width:min(100% - 22px,1180px)}.topbar-inner{height:72px}.logo img{width:215px}.back-link span{display:none}.intro{padding:38px 0 20px}.intro h1{font-size:40px}.intro p{font-size:16px}.layout{padding-bottom:45px}.card{padding:20px;border-radius:18px}.package-grid,.treatment-grid,.form-grid,.detail-card .form-grid,.provider-grid,.doc-grid{grid-template-columns:1fr}.full{grid-column:auto}.actions{align-items:stretch;flex-direction:column-reverse}.actions .btn{width:100%}.review-row{display:block}.review-row strong{display:block;text-align:left;margin-top:3px}.what-next{grid-template-columns:1fr 1fr}.footer-inner{display:block;text-align:center}.footer-inner div+div{margin-top:7px}.multi-state-menu{position:fixed;left:12px;right:12px;top:18vh;max-height:64vh}}
   </style>
   <link rel="stylesheet" href="assets/mycp-search-support.css?v=20260916f">
 </head>
@@ -121,7 +112,19 @@
             <div class="field"><label for="phone">Phone</label><input id="phone" type="tel" autocomplete="tel"></div>
             <div class="field"><label for="website">Website</label><input id="website" type="url" placeholder="https://"></div>
             <div class="field"><label class="required" for="state">Primary clinic state</label><select id="state"><option value="">Select a state</option></select></div>
-            <div class="field"><label for="additionalStates">Additional states served</label><input id="additionalStates" placeholder="If applicable"></div>
+            <div class="field">
+              <label for="additionalStatesButton">Additional states served</label>
+              <div class="multi-state" id="additionalStatesPicker">
+                <button type="button" class="multi-state-trigger" id="additionalStatesButton" aria-haspopup="listbox" aria-expanded="false"><span class="placeholder">Select one or more states</span><span>⌄</span></button>
+                <div class="multi-state-menu" id="additionalStatesMenu" hidden>
+                  <input class="multi-state-search" id="additionalStatesSearch" type="search" placeholder="Search states…" autocomplete="off">
+                  <div class="multi-state-list" id="additionalStatesList" role="listbox" aria-multiselectable="true"></div>
+                </div>
+                <input id="additionalStates" type="hidden" value="">
+                <div class="multi-state-chips" id="additionalStatesChips"></div>
+                <span class="multi-state-note">Choose every additional state where this clinic provides the selected services. The primary state is excluded automatically.</span>
+              </div>
+            </div>
             <div class="field full"><label for="address">Clinic address</label><input id="address" autocomplete="street-address"></div>
             <div class="field"><label for="clinicType">Practice type</label><select id="clinicType"><option value="">Select one</option><option>Medical spa / aesthetics</option><option>IV hydration / wellness</option><option>Weight management / GLP-1</option><option>Primary care / medical clinic</option><option>Dermatology / plastic surgery</option><option>Other</option></select></div>
             <div class="field"><label for="brandColor">Preferred brand color</label><div class="color-row"><input id="brandColor" type="color" value="#06999f"><input id="brandHex" value="#06999f" maxlength="7"></div></div>
@@ -162,8 +165,8 @@
             <label class="inline-check"><input type="checkbox" id="approveClinical"> I understand that final clinical approval remains the responsibility of my clinic’s appropriately qualified medical director or supervising provider.</label>
             <label class="inline-check"><input type="checkbox" id="approveScope"> I confirm that this order contains no patient-identifying or protected health information.</label>
           </div>
-          <div class="checkout-area"><h3>Secure checkout</h3><p>Your intake is securely matched to the verified PayPal payment before any files are released.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure PayPal Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-status" id="checkoutStatus" role="status"></div><div class="checkout-note" id="checkoutNote">Online checkout is available for packages containing exactly 1, 3, 5, or 10 treatments. Please adjust the quantity or contact us for a custom order.</div><div class="saved" id="saved">Draft saved.</div></div>
-          <div class="what-next"><div><b>1. Payment</b>Secure PayPal checkout</div><div><b>2. Instant draft</b>Website download + email backup</div><div><b>3. RN-reviewed version</b>Usually 1–2 hours; up to 24 hours</div><div><b>4. Revisions</b>Two rounds within 14 days</div></div>
+          <div class="checkout-area"><h3>Secure checkout</h3><p>Your intake is securely matched to the verified PayPal payment before any files are released.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure PayPal Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-status" id="checkoutStatus" role="status"></div><div class="checkout-note" id="checkoutNote">Online checkout is available for packages containing exactly 1, 3, 5, or 10 treatments. Please adjust the quantity or contact us for a custom order.</div><div class="saved" id="saved">Order saved.</div></div>
+          <div class="what-next"><div><b>1. Payment</b>Secure PayPal checkout</div><div><b>2. Initial Version</b>Website download + email backup</div><div><b>3. RN-reviewed version</b>Usually 1–2 hours; up to 24 hours</div><div><b>4. Revisions</b>Two rounds within 14 days</div></div>
           <div class="actions"><button class="btn btn-secondary back" type="button" data-back="4">← Edit details</button><span></span></div>
         </div>
       </section>
@@ -195,78 +198,59 @@
       "Menopause & Metabolic Weight Management":"Peri- and post-menopausal weight-management workflow with cardiometabolic risk review, body-composition goals, medication considerations, and monitoring.",
       "PCOS / Insulin-Resistance Weight Management":"Metabolic assessment, lifestyle support, medication considerations, monitoring, and referral or escalation for PCOS or insulin resistance.",
       "Appetite & Food-Noise Monitoring":"Appetite, satiety, craving, eating-pattern, adherence, and behavioral follow-up tracking for comprehensive weight-management care.",
-      "EMSCULPT / Body Contouring":"Device-specific body contouring and aftercare",
-      "Chemical Peel":"Product, peel depth, screening, and aftercare",
-      "IM / SQ Wellness Injections":"Vitamin B12 injections and Lipo-B / MIC-B12 formulations; product-specific review"
+      "EMSCULPT / Body Contouring":"Device-specific body contouring and aftercare","Chemical Peel":"Product, peel depth, screening, and aftercare","IM / SQ Wellness Injections":"Vitamin B12 injections and Lipo-B / MIC-B12 formulations; product-specific review"
     };
-    const treatmentBadges={
-      "Injectable GLP-1 / GIP Weight Management":"CORE",
-      "Oral GLP-1 Weight Management":"NEW 2026",
-      "GLP-1 Maintenance & Weight-Regain Prevention":"TRENDING",
-      "Muscle Preservation & Body Composition":"TRENDING",
-      "GLP-1 Side-Effect & Nutrition Support":"SUPPORT",
-      "Menopause & Metabolic Weight Management":"SPECIALTY",
-      "PCOS / Insulin-Resistance Weight Management":"SPECIALTY",
-      "Appetite & Food-Noise Monitoring":"POPULAR TOPIC"
-    };
+    const treatmentBadges={"Injectable GLP-1 / GIP Weight Management":"CORE","Oral GLP-1 Weight Management":"NEW 2026","GLP-1 Maintenance & Weight-Regain Prevention":"TRENDING","Muscle Preservation & Body Composition":"TRENDING","GLP-1 Side-Effect & Nutrition Support":"SUPPORT","Menopause & Metabolic Weight Management":"SPECIALTY","PCOS / Insulin-Resistance Weight Management":"SPECIALTY","Appetite & Food-Noise Monitoring":"POPULAR TOPIC"};
     const providerRoles=[["MD / DO","Physician"],["NP","Nurse practitioner"],["PA","Physician assistant"],["RN","Registered nurse"],["LPN / LVN","Practical / vocational nurse"],["Aesthetician","Licensed aesthetician"],["Other","Add details below"]];
     const docs=["Clinical protocol / SOP","Patient consent","Intake / eligibility","Treatment record","Pre- and post-care","Room / safety checklist","Emergency / adverse-event guide"];
     const pricing={protocol:{label:"Customized Protocol",units:{1:99,3:249,5:379,10:699}},complete:{label:"Complete Treatment Package",units:{1:149,3:399,5:625,10:1099}}};
     const model={step:1,package:"complete",treatments:[],custom:[],providers:[],documents:[],details:{},logoName:"",orderReference:"",paymentStatus:"Not started"};
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     states.forEach(s=>$("#state").insertAdjacentHTML("beforeend",`<option>${s}</option>`));
+
+    const additionalSelected=new Set();
+    const additionalList=$("#additionalStatesList"),additionalHidden=$("#additionalStates"),additionalButton=$("#additionalStatesButton"),additionalMenu=$("#additionalStatesMenu"),additionalSearch=$("#additionalStatesSearch"),additionalChips=$("#additionalStatesChips");
+    function renderAdditionalOptions(filter=""){
+      const q=filter.trim().toLowerCase(),primary=$("#state").value;
+      additionalList.innerHTML=states.filter(s=>!q||s.toLowerCase().includes(q)).map(s=>`<label class="multi-state-option ${s===primary?'is-primary':''}"><input type="checkbox" value="${s}" ${additionalSelected.has(s)?'checked':''} ${s===primary?'disabled':''}> <span>${s}${s===primary?' (Primary)':''}</span></label>`).join("");
+      additionalList.querySelectorAll('input[type="checkbox"]').forEach(cb=>cb.onchange=()=>{cb.checked?additionalSelected.add(cb.value):additionalSelected.delete(cb.value);syncAdditionalStates();});
+    }
+    function syncAdditionalStates(){
+      const primary=$("#state").value;if(primary)additionalSelected.delete(primary);
+      const selected=[...additionalSelected];additionalHidden.value=selected.join(", ");
+      additionalButton.innerHTML=`<span class="${selected.length?'':'placeholder'}">${selected.length?`${selected.length} state${selected.length===1?'':'s'} selected`:'Select one or more states'}</span><span>⌄</span>`;
+      additionalChips.innerHTML=selected.map(s=>`<span class="multi-state-chip">${s}<button type="button" data-remove-state="${s}" aria-label="Remove ${s}">×</button></span>`).join("");
+      additionalChips.querySelectorAll('[data-remove-state]').forEach(btn=>btn.onclick=()=>{additionalSelected.delete(btn.dataset.removeState);renderAdditionalOptions(additionalSearch.value);syncAdditionalStates();});
+      save();
+    }
+    additionalButton.onclick=()=>{const opening=additionalMenu.hidden;additionalMenu.hidden=!opening;additionalButton.setAttribute('aria-expanded',String(opening));if(opening){renderAdditionalOptions(additionalSearch.value);setTimeout(()=>additionalSearch.focus(),0)}};
+    additionalSearch.oninput=e=>renderAdditionalOptions(e.target.value);
+    $("#state").onchange=()=>{renderAdditionalOptions(additionalSearch.value);syncAdditionalStates()};
+    document.addEventListener('click',e=>{if(!$("#additionalStatesPicker").contains(e.target)){additionalMenu.hidden=true;additionalButton.setAttribute('aria-expanded','false')}});
+
     const reviewRequests=[{"name":"Retatrutide / Next-Generation Weight-Loss Therapies","category":"Weight Loss","badge":"INVESTIGATIONAL","description":"Regulatory and product review required before any protocol scope is accepted. Investigational therapies are not standard purchasable protocols."},{"name":"Liquid Lipo Package","category":"Body & Pelvic Floor","description":"Specify the product, ingredients, route, and treatment area. Scope review required before purchase."},{"name":"Hair Growth with Exosomes","category":"Regenerative, Skin & Scalp","description":"Product and regulatory review required before any protocol scope is accepted."},{"name":"Detox Pills","category":"Wellness & Medical Treatments","description":"Provide the exact oral product and ingredients for review. No detoxification benefit is assumed."}];
     let currentTreatmentGroup="";
     treatments.forEach(([name,type],index)=>{
-      if(type!==currentTreatmentGroup){
-        currentTreatmentGroup=type;
-        $("#treatmentGrid").insertAdjacentHTML("beforeend",`<h3 class="treatment-group-title">${type}</h3>`);
-      }
+      if(type!==currentTreatmentGroup){currentTreatmentGroup=type;$("#treatmentGrid").insertAdjacentHTML("beforeend",`<h3 class="treatment-group-title">${type}</h3>`)}
       const badge=treatmentBadges[name]?`<span class="mycp-treatment-badge">${treatmentBadges[name]}</span>`:"";
       $("#treatmentGrid").insertAdjacentHTML("beforeend",`<button type="button" class="treatment" data-name="${name}"><span class="check">✓</span><span>${badge}<strong>${treatmentLabels[name]||name}</strong><span>${treatmentSummaries[name]||type}</span></span></button>`);
-      if(treatments[index+1]?.[1]!==type){
-        reviewRequests.filter(item=>item.category===type).forEach(item=>{
-          const href="mailto:myclinicprotocols@gmail.com?subject="+encodeURIComponent("Protocol scope review: "+item.name);
-          const reviewBadge=item.badge?`<span class="mycp-treatment-badge investigate">${item.badge}</span>`:"";
-          $("#treatmentGrid").insertAdjacentHTML("beforeend",`<a class="treatment treatment-review" href="${href}"><span>${reviewBadge}<strong>${item.name}</strong><span>${item.description}</span><span>Request review →</span></span></a>`);
-        });
-      }
+      if(treatments[index+1]?.[1]!==type){reviewRequests.filter(item=>item.category===type).forEach(item=>{const href="mailto:myclinicprotocols@gmail.com?subject="+encodeURIComponent("Protocol scope review: "+item.name);const reviewBadge=item.badge?`<span class="mycp-treatment-badge investigate">${item.badge}</span>`:"";$("#treatmentGrid").insertAdjacentHTML("beforeend",`<a class="treatment treatment-review" href="${href}"><span>${reviewBadge}<strong>${item.name}</strong><span>${item.description}</span><span>Request review →</span></span></a>`)})}
     });
     providerRoles.forEach(([name,type])=>$("#providerGrid").insertAdjacentHTML("beforeend",`<button type="button" class="choice" data-provider="${name}">${name}<small>${type}</small></button>`));
 
     function allTreatments(){return [...model.treatments,...model.custom]}
-    function total(){
-      const count=allTreatments().length;if(!count)return 0;const units=pricing[model.package].units,dp=Array(count+1).fill(Infinity);dp[0]=0;
-      for(let i=1;i<=count;i++)Object.keys(units).map(Number).forEach(n=>{if(n<=i)dp[i]=Math.min(dp[i],dp[i-n]+units[n])});return dp[count];
-    }
+    function total(){const count=allTreatments().length;if(!count)return 0;const units=pricing[model.package].units,dp=Array(count+1).fill(Infinity);dp[0]=0;for(let i=1;i<=count;i++)Object.keys(units).map(Number).forEach(n=>{if(n<=i)dp[i]=Math.min(dp[i],dp[i-n]+units[n])});return dp[count]}
     function refreshTotal(){$("#sideTotal").textContent=`$${total()}`}
     function renderCustom(){$("#customChips").innerHTML=model.custom.map((x,i)=>`<span class="chip">${escapeHTML(x)}<button type="button" data-remove="${i}" aria-label="Remove ${escapeHTML(x)}">×</button></span>`).join("");$$("[data-remove]").forEach(b=>b.onclick=()=>{model.custom.splice(+b.dataset.remove,1);renderCustom();refreshTotal()})}
     function escapeHTML(v){return String(v||"").replace(/[&<>\"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-    function show(n){
-      model.step=n;$$('.panel').forEach(p=>p.classList.toggle('active',+p.dataset.panel===n));$$('.progress-step').forEach(p=>{const v=+p.dataset.progress;p.classList.toggle('active',v===n);p.classList.toggle('done',v<n)});window.scrollTo({top:0,behavior:'smooth'});if(n===3)renderDocs();if(n===4)renderDetails();if(n===5)renderReview();save();
-    }
-    function validate(step){
-      const err=$("#error"+step);if(err)err.classList.remove("show");
-      if(step===1&&!allTreatments().length){err.classList.add("show");return false}
-      if(step===2){const ok=$("#clinicName").value.trim()&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("#email").value.trim())&&$("#state").value;if(!ok){err.classList.add("show");return false}}
-      if(step===3&&!model.providers.length){err.classList.add("show");return false}return true;
-    }
-    function renderDocs(){
-      if(!model.documents.length)model.documents=model.package==='complete'?[...docs]:[docs[0]];
-      $("#docGrid").innerHTML=docs.map((d,i)=>`<label class="inline-check"><input type="checkbox" class="doc-choice" value="${d}" ${model.documents.includes(d)?'checked':''} ${i===0?'disabled':''}> ${d}</label>`).join("");
-      $$('.doc-choice').forEach(x=>x.onchange=()=>{model.documents=getDocs();save()});
-    }
-    function renderDetails(){
-      allTreatments().forEach(name=>{if(!model.details[name])model.details[name]={product:"",dose:"",method:"",workflow:""}});
-      $("#treatmentDetails").innerHTML=allTreatments().map((name,i)=>{const d=model.details[name]||{};return `<article class="detail-card"><h3>${i+1}. ${escapeHTML(name)}</h3><div class="form-grid"><div class="field"><label>Product, medication, formula, or device</label><input data-detail="${escapeHTML(name)}" data-key="product" value="${escapeHTML(d.product)}" placeholder="Brand, manufacturer, device model"></div><div class="field"><label>Concentration, dose, rate, or treatment settings</label><input data-detail="${escapeHTML(name)}" data-key="dose" value="${escapeHTML(d.dose)}" placeholder="When applicable"></div><div class="field"><label>Technique or method</label><textarea data-detail="${escapeHTML(name)}" data-key="method" placeholder="How your clinic performs this service">${escapeHTML(d.method)}</textarea></div><div class="field"><label>Workflow or special instructions</label><textarea data-detail="${escapeHTML(name)}" data-key="workflow" placeholder="Screening, aftercare, escalation, or notes">${escapeHTML(d.workflow)}</textarea></div></div></article>`}).join("");
-      $$('[data-detail]').forEach(el=>el.oninput=()=>{model.details[el.dataset.detail][el.dataset.key]=el.value;save()});
-    }
+    function show(n){model.step=n;$$('.panel').forEach(p=>p.classList.toggle('active',+p.dataset.panel===n));$$('.progress-step').forEach(p=>{const v=+p.dataset.progress;p.classList.toggle('active',v===n);p.classList.toggle('done',v<n)});window.scrollTo({top:0,behavior:'smooth'});if(n===3)renderDocs();if(n===4)renderDetails();if(n===5)renderReview();save()}
+    function validate(step){const err=$("#error"+step);if(err)err.classList.remove("show");if(step===1&&!allTreatments().length){err.classList.add("show");return false}if(step===2){const ok=$("#clinicName").value.trim()&&/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test($("#email").value.trim())&&$("#state").value;if(!ok){err.classList.add("show");return false}}if(step===3&&!model.providers.length){err.classList.add("show");return false}return true}
+    function renderDocs(){if(!model.documents.length)model.documents=model.package==='complete'?[...docs]:[docs[0]];$("#docGrid").innerHTML=docs.map((d,i)=>`<label class="inline-check"><input type="checkbox" class="doc-choice" value="${d}" ${model.documents.includes(d)?'checked':''} ${i===0?'disabled':''}> ${d}</label>`).join("");$$('.doc-choice').forEach(x=>x.onchange=()=>{model.documents=getDocs();save()})}
+    function renderDetails(){allTreatments().forEach(name=>{if(!model.details[name])model.details[name]={product:"",dose:"",method:"",workflow:""}});$("#treatmentDetails").innerHTML=allTreatments().map((name,i)=>{const d=model.details[name]||{};return `<article class="detail-card"><h3>${i+1}. ${escapeHTML(name)}</h3><div class="form-grid"><div class="field"><label>Product, medication, formula, or device</label><input data-detail="${escapeHTML(name)}" data-key="product" value="${escapeHTML(d.product)}" placeholder="Brand, manufacturer, device model"></div><div class="field"><label>Concentration, dose, rate, or treatment settings</label><input data-detail="${escapeHTML(name)}" data-key="dose" value="${escapeHTML(d.dose)}" placeholder="When applicable"></div><div class="field"><label>Technique or method</label><textarea data-detail="${escapeHTML(name)}" data-key="method" placeholder="How your clinic performs this service">${escapeHTML(d.method)}</textarea></div><div class="field"><label>Workflow or special instructions</label><textarea data-detail="${escapeHTML(name)}" data-key="workflow" placeholder="Screening, aftercare, escalation, or notes">${escapeHTML(d.workflow)}</textarea></div></div></article>`}).join("");$$('[data-detail]').forEach(el=>el.oninput=()=>{model.details[el.dataset.detail][el.dataset.key]=el.value;save()})}
     function getDocs(){const selected=$$('.doc-choice:checked').map(x=>x.value);return selected.length?selected:model.documents}
     function field(id){return $("#"+id)?.value.trim()||""}
     function orderData(){return {...model,clinic:{name:field('clinicName'),email:field('email'),phone:field('phone'),website:field('website'),state:field('state'),additionalStates:field('additionalStates'),address:field('address'),type:field('clinicType'),brandColor:field('brandHex'),logoName:model.logoName},oversight:{director:field('directorName'),licensingStates:field('directorState'),facility:field('facility'),ownership:field('ownership'),notes:field('providerNotes')},documents:getDocs(),estimatedTotal:total(),updatedAt:new Date().toISOString()}}
-    function renderReview(){
-      const d=orderData(),list=allTreatments().map(escapeHTML).join(', '),docList=d.documents.map(escapeHTML).join(', ');$("#reviewBox").innerHTML=`<div class="review-row"><span>Clinic</span><strong>${escapeHTML(d.clinic.name)}</strong></div><div class="review-row"><span>Primary state</span><strong>${escapeHTML(d.clinic.state)}</strong></div><div class="review-row"><span>Treatments (${allTreatments().length})</span><strong>${list}</strong></div><div class="review-row"><span>Treating provider(s)</span><strong>${model.providers.map(escapeHTML).join(', ')}</strong></div><div class="review-row"><span>Package</span><strong>${pricing[model.package].label}</strong></div><div class="review-row"><span>Documents</span><strong>${docList}</strong></div><div class="review-row"><span>Revisions</span><strong>Two consolidated rounds</strong></div><div class="review-row total-row"><span>Estimated founding total</span><strong>$${d.estimatedTotal}</strong></div>`;
-    }
+    function renderReview(){const d=orderData(),list=allTreatments().map(escapeHTML).join(', '),docList=d.documents.map(escapeHTML).join(', '),additional=d.clinic.additionalStates||'None';$("#reviewBox").innerHTML=`<div class="review-row"><span>Clinic</span><strong>${escapeHTML(d.clinic.name)}</strong></div><div class="review-row"><span>Primary state</span><strong>${escapeHTML(d.clinic.state)}</strong></div><div class="review-row"><span>Additional states</span><strong>${escapeHTML(additional)}</strong></div><div class="review-row"><span>Treatments (${allTreatments().length})</span><strong>${list}</strong></div><div class="review-row"><span>Treating provider(s)</span><strong>${model.providers.map(escapeHTML).join(', ')}</strong></div><div class="review-row"><span>Package</span><strong>${pricing[model.package].label}</strong></div><div class="review-row"><span>Documents</span><strong>${docList}</strong></div><div class="review-row"><span>Revisions</span><strong>Two consolidated rounds</strong></div><div class="review-row total-row"><span>Estimated founding total</span><strong>$${d.estimatedTotal}</strong></div>`}
     function save(){try{localStorage.setItem('myclinicprotocols_order',JSON.stringify(orderData()))}catch(e){}}
     function summary(){const d=orderData();return `MYCLINICPROTOCOLS ORDER SUMMARY\n\nOrder reference: ${d.orderReference||'Assigned at checkout'}\nPayment status: ${d.paymentStatus}\n\nClinic: ${d.clinic.name}\nEmail: ${d.clinic.email}\nPhone: ${d.clinic.phone}\nWebsite: ${d.clinic.website}\nPrimary state: ${d.clinic.state}\nAdditional states: ${d.clinic.additionalStates}\nAddress: ${d.clinic.address}\nPractice type: ${d.clinic.type}\nBrand color: ${d.clinic.brandColor}\nLogo file: ${d.clinic.logoName}\n\nPackage: ${pricing[model.package].label}\nTreatments: ${allTreatments().join(', ')}\nRequested documents: ${d.documents.join(', ')}\nEstimated founding total: $${d.estimatedTotal}\n\nProviders: ${model.providers.join(', ')}\nMedical director / supervising provider: ${d.oversight.director}\nLicensing state(s): ${d.oversight.licensingStates}\nTreatment setting: ${d.oversight.facility}\nOwnership structure: ${d.oversight.ownership}\nOversight notes: ${d.oversight.notes}\n\nTREATMENT DETAILS\n${allTreatments().map(x=>`\n${x}\nProduct/device: ${d.details[x]?.product||''}\nDose/settings: ${d.details[x]?.dose||''}\nMethod: ${d.details[x]?.method||''}\nWorkflow: ${d.details[x]?.workflow||''}`).join('\n')}\n\nPayment must be verified in PayPal. Final clinical approval remains with the purchasing clinic's qualified medical director or supervising provider.`}
 
@@ -280,29 +264,20 @@
     $('#logo').onchange=e=>{const f=e.target.files?.[0];if(!f)return;model.logoName=f.name;const reader=new FileReader();reader.onload=x=>$('#logoPreview').innerHTML=`<img src="${x.target.result}" alt="Logo preview">`;reader.readAsDataURL(f)};
     function toggleCheckout(){$('#checkout').disabled=!($('#approveClinical').checked&&$('#approveScope').checked)}$('#approveClinical').onchange=toggleCheckout;$('#approveScope').onchange=toggleCheckout;
     $('#checkout').onclick=async()=>{
-      const count=allTreatments().length;
-      if(!pricing[model.package].units[count]){$('#checkoutNote').classList.add('show');$('#saved').classList.add('show');return}
-      const button=$('#checkout'),status=$('#checkoutStatus');
-      button.disabled=true;button.textContent="Opening secure checkout…";status.textContent="Creating your verified PayPal order…";status.classList.add('show');
+      const count=allTreatments().length;if(!pricing[model.package].units[count]){$('#checkoutNote').classList.add('show');$('#saved').classList.add('show');return}
+      const button=$('#checkout'),status=$('#checkoutStatus');button.disabled=true;button.textContent="Opening secure checkout…";status.textContent="Creating your verified PayPal order…";status.classList.add('show');
       try{
         const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments()};
         const response=await fetch(`${FULFILLMENT_API}/api/checkout/create`,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
-        if(!response.ok)throw new Error("Unable to create checkout");
-        const created=await response.json();
-        model.orderReference=created.orderReference;model.paymentStatus="PayPal checkout created";save();
-        localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:created.orderReference,paypalOrderId:created.paypalOrderId}));
-        status.textContent="Opening PayPal…";
-        location.href=created.approvalUrl;
-      }catch(error){
-        status.textContent="Secure checkout is temporarily unavailable. Nothing was charged. Please try again or contact myclinicprotocols@gmail.com.";
-        button.disabled=false;button.textContent="Try Secure Checkout Again";
-      }
+        const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||"Unable to create checkout");
+        model.orderReference=result.orderReference;model.paymentStatus="PayPal checkout created";save();localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId}));status.textContent="Opening PayPal…";location.href=result.approvalUrl;
+      }catch(error){status.textContent=error.message||"Secure checkout is temporarily unavailable. Nothing was charged. Please try again or contact myclinicprotocols@gmail.com.";button.disabled=false;button.textContent="Try Secure Checkout Again"}
     };
     $('#download').onclick=()=>{const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
 
     const qp=new URLSearchParams(location.search),t=qp.get('treatment'),p=qp.get('package');if(p&&pricing[p]){model.package=p;$$('.package').forEach(x=>x.classList.toggle('selected',x.dataset.package===p))}if(t){const btn=$$('.treatment').find(x=>x.dataset.name===t);if(btn)btn.click();else{model.custom.push(t);renderCustom()}}
-    try{const prior=JSON.parse(localStorage.getItem('myclinicprotocols_draft')||'null');if(prior?.clinic&&!field('clinicName')){$('#clinicName').value=prior.clinic||'';$('#email').value=prior.email||'';$('#state').value=prior.state||'';$('#website').value=prior.website||'';$('#directorName').value=prior.reviewer||'';prior.treatments?.forEach(name=>{const b=$$('.treatment').find(x=>x.dataset.name===name);if(b&&!model.treatments.includes(name))b.click()})}}catch(e){}
-    renderDocs();refreshTotal();
+    try{const prior=JSON.parse(localStorage.getItem('myclinicprotocols_order')||'null');if(prior?.clinic&&!field('clinicName')){$('#clinicName').value=prior.clinic.name||prior.clinic||'';$('#email').value=prior.clinic.email||prior.email||'';$('#state').value=prior.clinic.state||prior.state||'';$('#website').value=prior.clinic.website||prior.website||'';$('#directorName').value=prior.oversight?.director||prior.reviewer||'';(prior.clinic.additionalStates||'').split(',').map(x=>x.trim()).filter(Boolean).forEach(s=>{if(states.includes(s)&&s!==$('#state').value)additionalSelected.add(s)});syncAdditionalStates();prior.treatments?.forEach(name=>{const b=$$('.treatment').find(x=>x.dataset.name===name);if(b&&!model.treatments.includes(name))b.click()})}}catch(e){}
+    renderAdditionalOptions();syncAdditionalStates();renderDocs();refreshTotal();
   })();
   </script>
   <script src="assets/mycp-search-support.js?v=20260916g" defer></script>
