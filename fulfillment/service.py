@@ -175,21 +175,21 @@ async def _update_order(client: httpx.AsyncClient, reference: str, values: dict)
     )
 
 
+def _storage_headers() -> dict[str, str]:
+    _, key = _supabase_config()
+    return {"apikey": key, "Authorization": f"Bearer {key}"}
+
+
 async def _storage_upload(client: httpx.AsyncClient, storage_path: str, package_bytes: bytes) -> bool:
     """Upload to the private Supabase bucket. Return False for a safe local fallback."""
     try:
-        url, key = _supabase_config()
+        url, _ = _supabase_config()
         bucket = quote(_storage_bucket(), safe="")
         object_path = quote(storage_path, safe="/")
         response = await client.post(
             f"{url}/storage/v1/object/{bucket}/{object_path}",
             content=package_bytes,
-            headers={
-                "apikey": key,
-                "Authorization": f"Bearer {key}",
-                "Content-Type": "application/zip",
-                "x-upsert": "true",
-            },
+            headers={**_storage_headers(), "Content-Type": "application/zip", "x-upsert": "true"},
         )
         if response.status_code >= 400:
             logging.error("Supabase Storage upload failed with status %s", response.status_code)
@@ -201,17 +201,47 @@ async def _storage_upload(client: httpx.AsyncClient, storage_path: str, package_
 
 
 async def _storage_download(client: httpx.AsyncClient, storage_path: str) -> bytes:
-    url, key = _supabase_config()
+    url, _ = _supabase_config()
     bucket = quote(_storage_bucket(), safe="")
     object_path = quote(storage_path, safe="/")
     response = await client.get(
         f"{url}/storage/v1/object/authenticated/{bucket}/{object_path}",
-        headers={"apikey": key, "Authorization": f"Bearer {key}"},
+        headers=_storage_headers(),
     )
     if response.status_code >= 400:
         logging.error("Supabase Storage download failed with status %s", response.status_code)
         raise HTTPException(status_code=404, detail="Package not found")
     return response.content
+
+
+@app.on_event("startup")
+async def verify_supabase_connectivity() -> None:
+    """Log safe connectivity status at deploy time without exposing credentials."""
+    if not os.environ.get("SUPABASE_URL") or not os.environ.get("SUPABASE_SERVICE_ROLE_KEY"):
+        logging.warning("Supabase is not configured in this Render environment")
+        return
+    try:
+        async with httpx.AsyncClient(timeout=10) as client:
+            await _supabase_request(
+                client,
+                "GET",
+                "/rest/v1/orders",
+                params={"select": "id", "limit": "1"},
+            )
+            logging.info("Supabase database connectivity OK")
+
+            url, _ = _supabase_config()
+            bucket = quote(_storage_bucket(), safe="")
+            storage = await client.get(
+                f"{url}/storage/v1/bucket/{bucket}",
+                headers=_storage_headers(),
+            )
+            if storage.status_code < 400:
+                logging.info("Supabase Storage connectivity OK for private bucket %s", _storage_bucket())
+            else:
+                logging.warning("Supabase Storage connectivity check returned status %s", storage.status_code)
+    except Exception:
+        logging.exception("Supabase startup connectivity check failed")
 
 
 def _paypal_base() -> str:
@@ -432,6 +462,7 @@ async def download(reference: str, expires: int, signature: str):
 async def health():
     configured = bool(os.environ.get("SUPABASE_URL") and os.environ.get("SUPABASE_SERVICE_ROLE_KEY"))
     database = "not-configured"
+    storage = "not-configured"
     if configured:
         try:
             async with httpx.AsyncClient(timeout=8) as client:
@@ -442,7 +473,20 @@ async def health():
                     params={"select": "id", "limit": "1"},
                 )
                 database = "ok" if response.status_code < 400 else "unavailable"
+                url, _ = _supabase_config()
+                bucket = quote(_storage_bucket(), safe="")
+                storage_response = await client.get(
+                    f"{url}/storage/v1/bucket/{bucket}",
+                    headers=_storage_headers(),
+                )
+                storage = "ok" if storage_response.status_code < 400 else "unavailable"
         except Exception:
             logging.exception("Supabase health check failed")
             database = "unavailable"
-    return {"status": "ok", "supabaseConfigured": configured, "database": database}
+            storage = "unavailable"
+    return {
+        "status": "ok",
+        "supabaseConfigured": configured,
+        "database": database,
+        "storage": storage,
+    }
