@@ -26,7 +26,7 @@ from fulfillment.neuromodulators import state_language as neuromodulator_state_l
 
 
 INITIAL_VERSION_LABEL = "INITIAL VERSION — Prepared for Qualified Provider Review"
-PRODUCTION_MASTER_TREATMENTS = {"Neuromodulators"}
+PRODUCTION_MASTER_TREATMENTS = {"neuromodulators": "Neuromodulators"}
 NAVY = RGBColor(8, 40, 93)
 TEAL = RGBColor(6, 153, 159)
 
@@ -44,21 +44,45 @@ def _first(mapping: dict, *keys: str, fallback: str = "Not provided") -> str:
     return fallback
 
 
+def _normalize_treatment(name: str) -> str:
+    return re.sub(r"\s+", " ", str(name or "").strip()).lower()
+
+
+def _canonical_treatment(name: str) -> str | None:
+    return PRODUCTION_MASTER_TREATMENTS.get(_normalize_treatment(name))
+
+
 def validate_production_treatments(treatments: list[str]) -> None:
-    unsupported = [name for name in treatments if name not in PRODUCTION_MASTER_TREATMENTS]
+    unsupported = [name for name in treatments if not _canonical_treatment(name)]
     if unsupported:
         joined = ", ".join(unsupported)
         raise ValueError(
             f"The production master package is not yet connected to automated fulfillment for: {joined}. "
-            "Keep this order in scope review until its approved clinical master is connected."
+            "This treatment needs scope review before secure checkout can continue."
         )
+
+
+def _selected_states(clinic: dict) -> list[str]:
+    primary = _first(clinic, "state", "primaryState", "primary_state", fallback="")
+    raw_additional = clinic.get("additionalStates") or clinic.get("additional_states") or ""
+    if isinstance(raw_additional, list):
+        additional = [str(item).strip() for item in raw_additional]
+    else:
+        additional = [part.strip() for part in re.split(r"[,;|]", str(raw_additional))]
+    result: list[str] = []
+    for state in [primary, *additional]:
+        if state and state not in result:
+            result.append(state)
+    return result
 
 
 def _context(order: dict, treatment: str) -> dict[str, str]:
     clinic = order.get("clinic") or {}
     oversight = order.get("oversight") or {}
     detail = (order.get("details") or {}).get(treatment) or {}
-    state = _first(clinic, "state", "primaryState", "primary_state")
+    states = _selected_states(clinic)
+    state = states[0] if states else "Not provided"
+    state_display = ", ".join(states) if states else "Not provided"
     clinic_name = _first(clinic, "name", "clinicName", "clinic_name", "businessName", "practiceName")
     address = _first(clinic, "address", "clinicAddress", "streetAddress", fallback="Address to be completed by clinic")
     phone = _first(clinic, "phone", "clinicPhone", "telephone", fallback="Clinic to complete before patient use")
@@ -68,11 +92,14 @@ def _context(order: dict, treatment: str) -> dict[str, str]:
     dose = _first(detail, "dose", "dosePlan", "settings", fallback="Patient-specific dose to be authorized by the qualified prescriber using the selected product's current prescribing information")
     areas = _first(detail, "areas", "plannedAreas", "method", fallback="Patient-specific treatment areas to be documented before treatment")
     indication = _first(detail, "indication", "goal", fallback="Cosmetic neuromodulator treatment based on individualized assessment")
-    state_text = neuromodulator_state_language(state)
+    state_blocks = []
+    for selected_state in states or [state]:
+        state_blocks.append(f"{selected_state}: {neuromodulator_state_language(selected_state)}")
+    state_text = "\n".join(state_blocks)
     return {
         "[[CLINIC_NAME]]": clinic_name,
-        "[[STATE]]": state,
-        "[[STATE / ADDRESS]]": f"{state} / {address}",
+        "[[STATE]]": state_display,
+        "[[STATE / ADDRESS]]": f"{state_display} / {address}",
         "[[MEDICAL_DIRECTOR_NAME, CREDENTIALS]]": director,
         "[[NAME, CREDENTIALS, LICENSE]]": director,
         "[[AUTHORIZED_CREDENTIALS]]": providers,
@@ -104,7 +131,6 @@ def _context(order: dict, treatment: str) -> dict[str, str]:
 def _customize(text: str, replacements: dict[str, str]) -> str:
     for key, value in replacements.items():
         text = text.replace(key, value)
-    # Never expose unresolved template tokens as if they were completed clinical content.
     return re.sub(r"\[\[[^\]]+\]\]", "To be completed during qualified-provider review", text)
 
 
@@ -169,12 +195,13 @@ def _make_docx(title: str, text: str, order: dict) -> bytes:
     run.font.color.rgb = TEAL
 
     clinic = order.get("clinic") or {}
+    states = _selected_states(clinic)
     meta = doc.add_table(rows=2, cols=2)
     meta.alignment = WD_TABLE_ALIGNMENT.CENTER
     meta.style = "Table Grid"
     values = [
         ("Clinic", _first(clinic, "name", "clinicName", "clinic_name", "businessName", "practiceName")),
-        ("State", _first(clinic, "state", "primaryState", "primary_state")),
+        ("State(s)", ", ".join(states) if states else "Not provided"),
         ("Order", _clean(order.get("orderReference"))),
         ("Generated", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")),
     ]
@@ -188,10 +215,8 @@ def _make_docx(title: str, text: str, order: dict) -> bytes:
     doc.add_paragraph()
 
     lines = [line.strip() for line in text.splitlines() if line.strip()]
-    # The first line is the internal source marker; the title is already rendered above.
     if lines and lines[0] == "CLINICAL MASTER TEMPLATE":
         lines = lines[1:]
-    # Skip duplicate source title/subtitle lines before the first substantive section.
     while lines and not _is_heading(lines[0]) and len(lines) > 1:
         if lines[0].lower() in title.lower() or title.lower() in lines[0].lower() or "•" in lines[0]:
             lines.pop(0)
@@ -245,13 +270,14 @@ def _make_pdf(title: str, text: str, order: dict) -> bytes:
     small_style = ParagraphStyle("Small", parent=body_style, textColor=colors.HexColor("#65758C"), alignment=TA_CENTER, fontSize=7.5, leading=10, spaceBefore=9)
 
     clinic = order.get("clinic") or {}
+    states = _selected_states(clinic)
     story = [
         Paragraph("<b>MYCLINIC</b><font color='#06999F'><b>PROTOCOLS</b></font>", brand_style),
         Paragraph(escape(title), title_style),
         Paragraph(escape(INITIAL_VERSION_LABEL), status_style),
         Paragraph(
             f"<b>Clinic:</b> {escape(_first(clinic, 'name', 'clinicName', 'clinic_name', 'businessName', 'practiceName'))} &nbsp;&nbsp; "
-            f"<b>State:</b> {escape(_first(clinic, 'state', 'primaryState', 'primary_state'))}<br/>"
+            f"<b>State(s):</b> {escape(', '.join(states) if states else 'Not provided')}<br/>"
             f"<b>Order:</b> {escape(_clean(order.get('orderReference')))} &nbsp;&nbsp; "
             f"<b>Generated:</b> {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}",
             meta_style,
@@ -304,7 +330,8 @@ def make_package(order: dict) -> bytes:
     stream = BytesIO()
     with ZipFile(stream, "w", ZIP_DEFLATED) as archive:
         for treatment in treatments:
-            if treatment == "Neuromodulators":
+            canonical = _canonical_treatment(treatment)
+            if canonical == "Neuromodulators":
                 for slug, docx_bytes, pdf_bytes in _neuromodulator_files(order):
                     archive.writestr(f"{slug}-INITIAL-VERSION.docx", docx_bytes)
                     archive.writestr(f"{slug}-INITIAL-VERSION.pdf", pdf_bytes)
