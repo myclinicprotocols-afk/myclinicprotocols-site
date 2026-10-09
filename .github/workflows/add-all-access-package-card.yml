@@ -1,0 +1,33 @@
+name: Add All Access package card
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/add_all_access_package_card.py
+      - .github/workflows/add-all-access-package-card.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Add All Access package card
+        run: python scripts/add_all_access_package_card.py
+      - name: Commit order page update
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add order.html
+          git commit -m "Show All Access in Package Level options"
+          git push
