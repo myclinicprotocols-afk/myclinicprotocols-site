@@ -1,4 +1,4 @@
-# Trigger final sitewide customer copy audit
+# Trigger final sitewide customer copy audit with latest rules
 name: Finalize simplified customer journey
 
 on:
