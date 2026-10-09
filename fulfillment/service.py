@@ -39,11 +39,11 @@ from fulfillment.documents import make_package, validate_production_treatments
 
 OWNER_EMAIL = "myclinicprotocols@gmail.com"
 PRICES = {
-    "protocol": {1: 29, 2: 58, 3: 87, 4: 116, 5: 145, 6: 174, 7: 203, 8: 232, 9: 261, 10: 290},
-    "complete": {1: 49, 2: 98, 3: 147, 4: 196, 5: 245, 6: 294, 7: 343, 8: 392, 9: 441, 10: 490},
+    "protocol": {1: 29, 2: 58, 3: 87, 4: 116, 5: 145, 6: 174, 7: 203, 8: 232},
+    "complete": {1: 49, 2: 98, 3: 147, 4: 196, 5: 245},
     "all_access": {1: 249},
 }
-PRICING_VERSION = "2026-10-10"
+PRICING_VERSION = "2026-10-10-2"
 ROOT = Path(os.environ.get("MYCP_PRIVATE_ROOT", "private-orders")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
 DOWNLOAD_TTL = timedelta(hours=24)
@@ -69,7 +69,7 @@ class Capture(BaseModel):
 
 
 class AllAccessRequest(BaseModel):
-    orderReference: str = Field(min_length=10, max_length=64, pattern=r"^MYCP-[A-Z0-9-]+$")
+    accessCode: str = Field(min_length=20, max_length=64, pattern=r"^MYCP-[A-Z0-9-]+$")
     customerEmail: EmailStr
     treatment: str = Field(min_length=2, max_length=200)
     requestType: str = Field(default="complete", pattern=r"^(protocol|complete)$")
@@ -103,6 +103,13 @@ def _fulfillment_mode(treatments: list[str]) -> str:
 
 def _email_configured() -> bool:
     return bool(os.environ.get("RESEND_API_KEY") and os.environ.get("ORDER_FROM_EMAIL"))
+
+
+def _new_access_code() -> str:
+    """Create a high-entropy, human-readable 30-day license code after verified payment."""
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    groups = ["".join(secrets.choice(alphabet) for _ in range(4)) for _ in range(4)]
+    return "MYCP-" + "-".join(groups)
 
 
 def _supabase_config() -> tuple[str, str]:
@@ -171,6 +178,17 @@ async def _get_order(client: httpx.AsyncClient, *, reference: str | None = None,
     if paypal_id:
         params["paypal_order_id"] = f"eq.{paypal_id}"
     response = await _supabase_request(client, "GET", "/rest/v1/orders", params=params)
+    rows = response.json()
+    return rows[0] if rows else None
+
+
+async def _get_all_access_order_by_code(client: httpx.AsyncClient, access_code: str) -> dict | None:
+    response = await _supabase_request(
+        client,
+        "GET",
+        "/rest/v1/orders",
+        params={"select": "*", "access_code": f"eq.{access_code}", "limit": "1"},
+    )
     rows = response.json()
     return rows[0] if rows else None
 
@@ -360,8 +378,9 @@ def _completed_response(row: dict) -> dict:
     if package_key == "all_access":
         response["accessStartsAt"] = row.get("access_starts_at") or row.get("paid_at")
         response["accessExpiresAt"] = row.get("access_expires_at")
+        response["accessCode"] = row.get("access_code")
         origin = os.environ.get("WEBSITE_ORIGIN", "https://myclinicprotocols.com").rstrip("/")
-        response["requestUrl"] = f"{origin}/all-access-request.html?ref={quote(row['order_reference'])}"
+        response["requestUrl"] = f"{origin}/all-access-request.html"
     return response
 
 
@@ -389,6 +408,17 @@ async def capture_checkout(capture: Capture):
         if not row:
             raise HTTPException(status_code=404, detail="Order not found")
         if row["payment_status"] == "COMPLETED":
+            intake = _order_intake(row)
+            if ((row.get("package_type") == "all_access" or intake.get("package") == "all_access")
+                    and not row.get("access_code")):
+                access_code = _new_access_code()
+                issued_at = datetime.now(timezone.utc).isoformat()
+                await _update_order(client, row["order_reference"], {
+                    "access_code": access_code,
+                    "access_code_issued_at": issued_at,
+                })
+                row["access_code"] = access_code
+                row["access_code_issued_at"] = issued_at
             return _completed_response(row)
 
         path = f"/v2/checkout/orders/{row['paypal_order_id']}"
@@ -409,23 +439,28 @@ async def capture_checkout(capture: Capture):
             expires_dt = paid_dt + timedelta(days=30)
             paid_at = paid_dt.isoformat()
             access_expires_at = expires_dt.isoformat()
+            access_code = row.get("access_code") or _new_access_code()
+            access_code_issued_at = datetime.now(timezone.utc).isoformat()
             order["_fulfillmentMode"] = "all_access"
             await _update_order(client, row["order_reference"], {
                 "payment_status": "COMPLETED",
                 "paid_at": paid_at,
                 "access_starts_at": paid_at,
                 "access_expires_at": access_expires_at,
+                "access_code": access_code,
+                "access_code_issued_at": access_code_issued_at,
                 "package_storage_path": None,
                 "intake": order,
             })
             row.update({"payment_status": "COMPLETED", "paid_at": paid_at, "access_starts_at": paid_at,
-                        "access_expires_at": access_expires_at, "package_storage_path": None, "intake": order})
+                        "access_expires_at": access_expires_at, "access_code": access_code,
+                        "access_code_issued_at": access_code_issued_at, "package_storage_path": None, "intake": order})
             origin = os.environ.get("WEBSITE_ORIGIN", "https://myclinicprotocols.com").rstrip("/")
-            request_url = f"{origin}/all-access-request.html?ref={quote(row['order_reference'])}"
+            request_url = f"{origin}/all-access-request.html"
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
                 f"Your MYCP 30-Day All Access is active — {row['order_reference']}",
-                f"<p>Payment confirmed — your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p><a href='{request_url}'>Submit a protocol request</a> any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>")
+                f"<p>Payment confirmed — your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p>Your 30-Day Access Code is <strong>{access_code}</strong>.</p><p><a href='{request_url}'>Open the All Access Request Portal</a> and use this code with your purchasing email any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>")
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
                 f"NEW $249 ALL ACCESS — {row['order_reference']}",
@@ -499,15 +534,15 @@ async def capture_checkout(capture: Capture):
 @app.post("/api/all-access/request")
 async def submit_all_access_request(request: AllAccessRequest):
     async with httpx.AsyncClient(timeout=20) as client:
-        row = await _get_order(client, reference=request.orderReference)
+        row = await _get_all_access_order_by_code(client, request.accessCode.strip().upper())
         if not row:
-            raise HTTPException(status_code=404, detail="All Access order not found")
+            raise HTTPException(status_code=404, detail="Access code not found")
         intake = _order_intake(row)
         if (row.get("payment_status") != "COMPLETED"
                 or (row.get("package_type") != "all_access" and intake.get("package") != "all_access")):
             raise HTTPException(status_code=409, detail="This order is not an active All Access pass")
         if str(row.get("customer_email") or "").strip().lower() != str(request.customerEmail).strip().lower():
-            raise HTTPException(status_code=403, detail="The order email does not match this All Access pass")
+            raise HTTPException(status_code=403, detail="The purchasing email does not match this 30-Day Access Code")
         expires_raw = row.get("access_expires_at")
         if not expires_raw:
             paid_raw = row.get("paid_at")
@@ -538,15 +573,15 @@ async def submit_all_access_request(request: AllAccessRequest):
     customer_email_sent = await _send_email(
         [str(request.customerEmail)],
         f"MYCP All Access request received — {request_reference}",
-        f"<p>We received your request for <strong>{request.treatment}</strong>.</p><p>Request: {request_reference}</p><p>All Access order: {request.orderReference}</p><p>We’ll prepare the requested documents using your clinic profile and submitted details. Please do not send PHI by email.</p>")
+        f"<p>We received your request for <strong>{request.treatment}</strong>.</p><p>Request: {request_reference}</p><p>All Access order: {row['order_reference']}</p><p>We’ll prepare the requested documents using your clinic profile and submitted details. Please do not send PHI by email.</p>")
     owner_email_sent = await _send_email(
         [OWNER_EMAIL],
         f"ALL ACCESS REQUEST — {request_reference}",
-        f"<p>New All Access request.</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Customer: {row['customer_email']}</p><p>Treatment: {request.treatment}</p><p>Type: {request.requestType}</p><p>All Access order: {request.orderReference}</p><p>Request: {request_reference}</p>")
+        f"<p>New All Access request.</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Customer: {row['customer_email']}</p><p>Treatment: {request.treatment}</p><p>Type: {request.requestType}</p><p>All Access order: {row['order_reference']}</p><p>Request: {request_reference}</p>")
     return {
         "status": "RECEIVED",
         "requestReference": request_reference,
-        "accessOrderReference": request.orderReference,
+        "accessOrderReference": row["order_reference"],
         "accessExpiresAt": expires_dt.isoformat(),
         "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},
     }
