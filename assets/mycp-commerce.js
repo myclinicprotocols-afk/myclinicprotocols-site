@@ -2,7 +2,7 @@
 (function () {
   'use strict';
   const VERSION = '2026-10-09';
-  const API = 'https://myclinicprotocols-fulfillment-sandbox.onrender.com';
+  const API = 'https://orders.myclinicprotocols.com';
   const names = {protocol: 'Customized Protocol', complete: 'Complete Treatment Package'};
   function eventData(result) {
     const value = Number(result.amount), quantity = Number(result.treatmentCount);
