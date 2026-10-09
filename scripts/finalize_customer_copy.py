@@ -32,7 +32,11 @@ update('order.html', [
     ('model.orderReference=result.orderReference;model.paymentStatus="PayPal checkout created";save();',
      'model.orderReference=result.orderReference;model.paymentStatus="Checkout created";save();'),
     ('status.textContent="Opening PayPal…";location.href=approvalUrl;',
-     'status.textContent="Opening checkout...";location.href=approvalUrl;')
+     'status.textContent="Opening checkout...";location.href=approvalUrl;'),
+    ('const FULFILLMENT_API=MYCPCommerce.API;\n    const states=',
+     "const FULFILLMENT_API=MYCPCommerce.API;\n    const TERMS_VERSION='2026-10-10';\n    const states="),
+    ('const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};',
+     "const d=orderData(),acceptedAt=new Date().toISOString(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),details:{...d.details,orderConsent:{termsAccepted:true,termsVersion:TERMS_VERSION,termsAcceptedAt:acceptedAt,finalClinicalApprovalAcknowledged:true,noPhiConfirmed:true}},expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};")
 ])
 
 update('editorial-standards.html', [
@@ -44,15 +48,14 @@ update('assets/mycp-search-support.js', [
      "if(hasAny(q,['immediate download','download after payment','download right away','instant download'])){")
 ])
 
-customer_files = [
-    Path('index.html'), Path('order.html'), Path('checkout-return.html'),
-    Path('all-access.html'), Path('all-access-request.html'),
-    Path('assets/mycp-search-support.js'), Path('terms-and-conditions.html')
+# Audit every public HTML page plus the customer-facing JavaScript.
+customer_files = list(Path('.').glob('*.html')) + [
+    Path('assets/mycp-search-support.js'), Path('assets/mycp-commerce.js')
 ]
 banned = [
     'Initial Version', 'RN-reviewed final version', 'instant draft',
     'Continue to Secure PayPal Checkout', 'Opening PayPal', 'Creating your verified PayPal order',
-    '1, 3, 5, or 10'
+    '1, 3, 5, or 10', 'review-not replace', 'roles-not individual', 'forms-prepared'
 ]
 failures = []
 for p in customer_files:
@@ -64,4 +67,4 @@ for p in customer_files:
             failures.append(f'{p}: {phrase}')
 if failures:
     raise SystemExit('Stale customer copy remains:\n' + '\n'.join(failures))
-print('Customer-facing copy audit passed.')
+print(f'Customer-facing copy audit passed across {len(customer_files)} public files.')
