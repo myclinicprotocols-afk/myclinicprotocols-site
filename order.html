@@ -11,7 +11,7 @@
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag("js", new Date());
-    gtag("config", "G-HF0KQ64NKL");
+    gtag("config", "G-HF0KQ64NKL", {page_location: location.origin + location.pathname, page_referrer: ''});
   </script>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -65,6 +65,7 @@
     @media(max-width:620px){.shell{width:min(100% - 22px,1180px)}.topbar-inner{height:72px}.logo img{width:215px}.back-link span{display:none}.intro{padding:38px 0 20px}.intro h1{font-size:40px}.intro p{font-size:16px}.layout{padding-bottom:45px}.card{padding:20px;border-radius:18px}.package-grid,.treatment-grid,.form-grid,.detail-card .form-grid,.provider-grid,.doc-grid{grid-template-columns:1fr}.full{grid-column:auto}.actions{align-items:stretch;flex-direction:column-reverse}.actions .btn{width:100%}.review-row{display:block}.review-row strong{display:block;text-align:left;margin-top:3px}.what-next{grid-template-columns:1fr 1fr}.footer-inner{display:block;text-align:center}.footer-inner div+div{margin-top:7px}.multi-state-menu{position:fixed;left:12px;right:12px;top:18vh;max-height:64vh}}
   </style>
   <link rel="stylesheet" href="assets/mycp-search-support.css?v=20260916f">
+  <script src="assets/mycp-commerce.js?v=20261009"></script>
 </head>
 <body>
   <header class="topbar"><div class="shell topbar-inner"><a class="logo" href="index.html"><img src="assets/logo.png" alt="MyClinicProtocols — Your Clinic. Your Protocols."></a><a class="back-link" href="index.html">← <span>Back to website</span></a></div></header>
@@ -85,7 +86,7 @@
         <div class="progress-step" data-progress="3"><span class="n">3</span>Providers</div>
         <div class="progress-step" data-progress="4"><span class="n">4</span>Treatment details</div>
         <div class="progress-step" data-progress="5"><span class="n">5</span>Review</div>
-        <div class="mini-total"><span>Estimated founding total</span><strong id="sideTotal">$149</strong></div>
+        <div class="mini-total"><span>Order total</span><strong id="sideTotal">$49</strong></div>
       </aside>
 
       <section class="card" aria-live="polite">
@@ -93,8 +94,8 @@
           <div class="panel-head"><h2>What would you like us to prepare?</h2><p>Select the package depth and every treatment your clinic needs.</p></div>
           <span class="section-label">Package level</span>
           <div class="package-grid">
-            <button class="package" type="button" data-package="protocol"><h3>Customized Protocol</h3><div class="price">$99 <small>one treatment</small></div><p>Customized SOP/protocol, clinic branding, editable Word file, PDF, and two revision rounds.</p></button>
-            <button class="package selected" type="button" data-package="complete"><span class="popular">MOST POPULAR</span><h3>Complete Treatment Package</h3><div class="price">$149 <small>one treatment</small></div><p>Protocol plus applicable consent, intake, treatment record, aftercare, checklists, and emergency guidance.</p></button>
+            <button class="package" type="button" data-package="protocol"><h3>Customized Protocol</h3><div class="price">$29 <small>one treatment</small></div><p>Customized SOP/protocol, clinic branding, editable Word file, PDF, and two revision rounds.</p></button>
+            <button class="package selected" type="button" data-package="complete"><span class="popular">MOST POPULAR</span><h3>Complete Treatment Package</h3><div class="price">$49 <small>one treatment</small></div><p>For $20 more, add applicable consent, intake, treatment record, aftercare, checklists, and emergency guidance.</p></button>
           </div>
           <span class="section-label">Treatments</span>
           <div class="treatment-grid" id="treatmentGrid"></div>
@@ -166,7 +167,7 @@
             <label class="inline-check"><input type="checkbox" id="approveScope"> I confirm that this order contains no patient-identifying or protected health information.</label>
           </div>
           <div class="checkout-area"><h3>Secure checkout</h3><p>Your intake is securely matched to the verified PayPal payment before any files are released.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Continue to Secure PayPal Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-status" id="checkoutStatus" role="status"></div><div class="checkout-note" id="checkoutNote">Online checkout is available for packages containing exactly 1, 3, 5, or 10 treatments. Please adjust the quantity or contact us for a custom order.</div><div class="saved" id="saved">Order saved.</div></div>
-          <div class="what-next"><div><b>1. Payment</b>Secure PayPal checkout</div><div><b>2. Initial Version</b>Website download + email backup</div><div><b>3. RN-reviewed version</b>Usually 1–2 hours; up to 24 hours</div><div><b>4. Revisions</b>Two rounds within 14 days</div></div>
+          <div class="what-next"><div><b>1. Payment</b>Secure PayPal checkout</div><div><b>2. Initial Version</b>Website download + email backup</div><div><b>3. RN-reviewed version</b>Usually 1–2 hours; up to 24 hours</div><div><b>4. Revisions</b>Two rounds within 14 days; normally 3–5 business days per round</div></div>
           <div class="actions"><button class="btn btn-secondary back" type="button" data-back="4">← Edit details</button><span></span></div>
         </div>
       </section>
@@ -177,7 +178,7 @@
 
   <script>
   (()=>{
-    const FULFILLMENT_API="https://myclinicprotocols-fulfillment-sandbox.onrender.com";
+    const FULFILLMENT_API=MYCPCommerce.API;
     const states=["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
     const treatments=[
       ["Neuromodulators","Injectables"],["Dermal Fillers","Injectables"],["Biostimulatory Injectables","Injectables"],["Hyaluronidase / Filler Dissolution","Injectables"],["PDO Thread Treatments","Injectables"],["Sclerotherapy","Injectables"],
@@ -203,7 +204,7 @@
     const treatmentBadges={"Injectable GLP-1 / GIP Weight Management":"CORE","Oral GLP-1 Weight Management":"NEW 2026","GLP-1 Maintenance & Weight-Regain Prevention":"TRENDING","Muscle Preservation & Body Composition":"TRENDING","GLP-1 Side-Effect & Nutrition Support":"SUPPORT","Menopause & Metabolic Weight Management":"SPECIALTY","PCOS / Insulin-Resistance Weight Management":"SPECIALTY","Appetite & Food-Noise Monitoring":"POPULAR TOPIC"};
     const providerRoles=[["MD / DO","Physician"],["NP","Nurse practitioner"],["PA","Physician assistant"],["RN","Registered nurse"],["LPN / LVN","Practical / vocational nurse"],["Aesthetician","Licensed aesthetician"],["Other","Add details below"]];
     const docs=["Clinical protocol / SOP","Patient consent","Intake / eligibility","Treatment record","Pre- and post-care","Room / safety checklist","Emergency / adverse-event guide"];
-    const pricing={protocol:{label:"Customized Protocol",units:{1:99,3:249,5:379,10:699}},complete:{label:"Complete Treatment Package",units:{1:149,3:399,5:625,10:1099}}};
+    const pricing={protocol:{label:"Customized Protocol",units:{1:29,3:87,5:145,10:290}},complete:{label:"Complete Treatment Package",units:{1:49,3:147,5:245,10:490}}};
     const model={step:1,package:"complete",treatments:[],custom:[],providers:[],documents:[],details:{},logoName:"",orderReference:"",paymentStatus:"Not started"};
     const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
     states.forEach(s=>$("#state").insertAdjacentHTML("beforeend",`<option>${s}</option>`));
@@ -250,9 +251,9 @@
     function getDocs(){const selected=$$('.doc-choice:checked').map(x=>x.value);return selected.length?selected:model.documents}
     function field(id){return $("#"+id)?.value.trim()||""}
     function orderData(){return {...model,clinic:{name:field('clinicName'),email:field('email'),phone:field('phone'),website:field('website'),state:field('state'),additionalStates:field('additionalStates'),address:field('address'),type:field('clinicType'),brandColor:field('brandHex'),logoName:model.logoName},oversight:{director:field('directorName'),licensingStates:field('directorState'),facility:field('facility'),ownership:field('ownership'),notes:field('providerNotes')},documents:getDocs(),estimatedTotal:total(),updatedAt:new Date().toISOString()}}
-    function renderReview(){const d=orderData(),list=allTreatments().map(escapeHTML).join(', '),docList=d.documents.map(escapeHTML).join(', '),additional=d.clinic.additionalStates||'None';$("#reviewBox").innerHTML=`<div class="review-row"><span>Clinic</span><strong>${escapeHTML(d.clinic.name)}</strong></div><div class="review-row"><span>Primary state</span><strong>${escapeHTML(d.clinic.state)}</strong></div><div class="review-row"><span>Additional states</span><strong>${escapeHTML(additional)}</strong></div><div class="review-row"><span>Treatments (${allTreatments().length})</span><strong>${list}</strong></div><div class="review-row"><span>Treating provider(s)</span><strong>${model.providers.map(escapeHTML).join(', ')}</strong></div><div class="review-row"><span>Package</span><strong>${pricing[model.package].label}</strong></div><div class="review-row"><span>Documents</span><strong>${docList}</strong></div><div class="review-row"><span>Revisions</span><strong>Two consolidated rounds</strong></div><div class="review-row total-row"><span>Estimated founding total</span><strong>$${d.estimatedTotal}</strong></div>`}
+    function renderReview(){const d=orderData(),list=allTreatments().map(escapeHTML).join(', '),docList=d.documents.map(escapeHTML).join(', '),additional=d.clinic.additionalStates||'None';$("#reviewBox").innerHTML=`<div class="review-row"><span>Clinic</span><strong>${escapeHTML(d.clinic.name)}</strong></div><div class="review-row"><span>Primary state</span><strong>${escapeHTML(d.clinic.state)}</strong></div><div class="review-row"><span>Additional states</span><strong>${escapeHTML(additional)}</strong></div><div class="review-row"><span>Treatments (${allTreatments().length})</span><strong>${list}</strong></div><div class="review-row"><span>Treating provider(s)</span><strong>${model.providers.map(escapeHTML).join(', ')}</strong></div><div class="review-row"><span>Package</span><strong>${pricing[model.package].label}</strong></div><div class="review-row"><span>Documents</span><strong>${docList}</strong></div><div class="review-row"><span>Revisions</span><strong>Two consolidated rounds</strong></div><div class="review-row total-row"><span>Order total</span><strong>$${d.estimatedTotal}</strong></div>`}
     function save(){try{localStorage.setItem('myclinicprotocols_order',JSON.stringify(orderData()))}catch(e){}}
-    function summary(){const d=orderData();return `MYCLINICPROTOCOLS ORDER SUMMARY\n\nOrder reference: ${d.orderReference||'Assigned at checkout'}\nPayment status: ${d.paymentStatus}\n\nClinic: ${d.clinic.name}\nEmail: ${d.clinic.email}\nPhone: ${d.clinic.phone}\nWebsite: ${d.clinic.website}\nPrimary state: ${d.clinic.state}\nAdditional states: ${d.clinic.additionalStates}\nAddress: ${d.clinic.address}\nPractice type: ${d.clinic.type}\nBrand color: ${d.clinic.brandColor}\nLogo file: ${d.clinic.logoName}\n\nPackage: ${pricing[model.package].label}\nTreatments: ${allTreatments().join(', ')}\nRequested documents: ${d.documents.join(', ')}\nEstimated founding total: $${d.estimatedTotal}\n\nProviders: ${model.providers.join(', ')}\nMedical director / supervising provider: ${d.oversight.director}\nLicensing state(s): ${d.oversight.licensingStates}\nTreatment setting: ${d.oversight.facility}\nOwnership structure: ${d.oversight.ownership}\nOversight notes: ${d.oversight.notes}\n\nTREATMENT DETAILS\n${allTreatments().map(x=>`\n${x}\nProduct/device: ${d.details[x]?.product||''}\nDose/settings: ${d.details[x]?.dose||''}\nMethod: ${d.details[x]?.method||''}\nWorkflow: ${d.details[x]?.workflow||''}`).join('\n')}\n\nPayment must be verified in PayPal. Final clinical approval remains with the purchasing clinic's qualified medical director or supervising provider.`}
+    function summary(){const d=orderData();return `MYCLINICPROTOCOLS ORDER SUMMARY\n\nOrder reference: ${d.orderReference||'Assigned at checkout'}\nPayment status: ${d.paymentStatus}\n\nClinic: ${d.clinic.name}\nEmail: ${d.clinic.email}\nPhone: ${d.clinic.phone}\nWebsite: ${d.clinic.website}\nPrimary state: ${d.clinic.state}\nAdditional states: ${d.clinic.additionalStates}\nAddress: ${d.clinic.address}\nPractice type: ${d.clinic.type}\nBrand color: ${d.clinic.brandColor}\nLogo file: ${d.clinic.logoName}\n\nPackage: ${pricing[model.package].label}\nTreatments: ${allTreatments().join(', ')}\nRequested documents: ${d.documents.join(', ')}\nOrder total: $${d.estimatedTotal}\n\nProviders: ${model.providers.join(', ')}\nMedical director / supervising provider: ${d.oversight.director}\nLicensing state(s): ${d.oversight.licensingStates}\nTreatment setting: ${d.oversight.facility}\nOwnership structure: ${d.oversight.ownership}\nOversight notes: ${d.oversight.notes}\n\nTREATMENT DETAILS\n${allTreatments().map(x=>`\n${x}\nProduct/device: ${d.details[x]?.product||''}\nDose/settings: ${d.details[x]?.dose||''}\nMethod: ${d.details[x]?.method||''}\nWorkflow: ${d.details[x]?.workflow||''}`).join('\n')}\n\nPayment must be verified in PayPal. Final clinical approval remains with the purchasing clinic's qualified medical director or supervising provider.`}
 
     $$('.package').forEach(b=>b.onclick=()=>{$$('.package').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');model.package=b.dataset.package;model.documents=[];refreshTotal()});
     $$('.treatment').forEach(b=>b.onclick=()=>{b.classList.toggle('selected');const n=b.dataset.name,idx=model.treatments.indexOf(n);idx<0?model.treatments.push(n):model.treatments.splice(idx,1);refreshTotal()});
@@ -267,10 +268,14 @@
       const count=allTreatments().length;if(!pricing[model.package].units[count]){$('#checkoutNote').classList.add('show');$('#saved').classList.add('show');return}
       const button=$('#checkout'),status=$('#checkoutStatus');button.disabled=true;button.textContent="Opening secure checkout…";status.textContent="Creating your verified PayPal order…";status.classList.add('show');
       try{
-        const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments()};
+        const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};
         const response=await fetch(`${FULFILLMENT_API}/api/checkout/create`,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
         const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||"Unable to create checkout");
-        model.orderReference=result.orderReference;model.paymentStatus="PayPal checkout created";save();localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId}));status.textContent="Opening PayPal…";location.href=result.approvalUrl;
+        const approvalUrl=MYCPCommerce.verifyQuote(result,d.estimatedTotal);
+        model.orderReference=result.orderReference;model.paymentStatus="PayPal checkout created";save();
+        try{localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId}))}catch(e){}
+        try{MYCPCommerce.trackCheckout(result,model.package,count)}catch(e){}
+        status.textContent="Opening PayPal…";location.href=approvalUrl;
       }catch(error){status.textContent=error.message||"Secure checkout is temporarily unavailable. Nothing was charged. Please try again or contact myclinicprotocols@gmail.com.";button.disabled=false;button.textContent="Try Secure Checkout Again"}
     };
     $('#download').onclick=()=>{const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
@@ -280,6 +285,6 @@
     renderAdditionalOptions();syncAdditionalStates();renderDocs();refreshTotal();
   })();
   </script>
-  <script src="assets/mycp-search-support.js?v=20260916g" defer></script>
+  <script src="assets/mycp-search-support.js?v=20261009-pricing" defer></script>
 </body>
 </html>
