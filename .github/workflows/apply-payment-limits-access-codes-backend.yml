@@ -1,0 +1,33 @@
+name: Apply payment limits and access code backend
+
+on:
+  push:
+    branches: [order-fulfillment]
+    paths:
+      - scripts/apply_payment_limits_access_codes_backend.py
+      - .github/workflows/apply-payment-limits-access-codes-backend.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply backend changes
+        run: python scripts/apply_payment_limits_access_codes_backend.py
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add fulfillment/service.py
+          git commit -m "Enforce package caps and issue 30-day access codes"
+          git push
