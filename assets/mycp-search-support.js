@@ -407,7 +407,7 @@ After payment is verified, your order is confirmed. MYCP then prepares the compl
       );
     }
 
-    if(hasAny(q,['initial version','instant draft','draft after payment','immediate download','download after payment'])){
+    if(hasAny(q,['immediate download','download after payment','download right away','instant download'])){
       return response(
         `After checkout, your order is confirmed and MYCP prepares the completed package from the appropriate master protocols. Your Word and PDF files are delivered by email with a private download link, usually within 1-2 hours and up to 24 hours depending on the package. Final clinical approval remains with your clinic’s qualified provider or medical director.`,
         links({label:'Start an order',href:ORDER_URL})

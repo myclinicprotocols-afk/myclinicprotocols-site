@@ -158,7 +158,7 @@
         <div class="panel" data-panel="4">
           <div class="panel-head"><h2>Treatment-specific details</h2><p>Add what you know. We will flag missing information during preparation rather than guessing.</p></div>
           <div class="treatment-details" id="treatmentDetails"></div>
-          <div class="privacy"><strong>Please do not enter patient information.</strong> This intake is for clinic workflows, products, devices, medications, formulas, and provider roles-not individual patient records.</div>
+          <div class="privacy"><strong>Please do not enter patient information.</strong> This intake is for clinic workflows, products, devices, medications, formulas, and provider roles, not individual patient records.</div>
           <div class="actions"><button class="btn btn-secondary back" type="button" data-back="3">← Back</button><button class="btn btn-primary next" type="button" data-next="5">Review package</button></div>
         </div>
 
@@ -166,7 +166,8 @@
           <div class="panel-head"><h2>Review your package</h2><p>Confirm the scope before payment. You can return to any previous step to make changes.</p></div>
           <div class="review-box" id="reviewBox"></div>
           <div class="terms">
-            <label class="inline-check"><input type="checkbox" id="approveClinical"> I understand that final clinical approval remains the responsibility of my clinic’s appropriately qualified medical director or supervising provider.</label>
+            <label class="inline-check"><input type="checkbox" id="approveTerms"> I agree to the <a href="terms-and-conditions.html" target="_blank" rel="noopener"><strong>Terms &amp; Conditions</strong></a>.</label>
+            <label class="inline-check"><input type="checkbox" id="approveClinical"> I understand that final clinical approval remains with my clinic’s qualified provider or medical director.</label>
             <label class="inline-check"><input type="checkbox" id="approveScope"> I confirm that this order contains no patient-identifying or protected health information.</label>
           </div>
           <div class="checkout-area"><h3>Checkout</h3><p>Complete checkout to confirm your order. We will email your confirmation, then prepare your customized package from the appropriate MYCP master protocols.</p><button class="btn btn-primary" type="button" id="checkout" disabled>Checkout</button><button class="btn btn-secondary" type="button" id="download" style="margin-left:8px">Download order summary</button><div class="checkout-status" id="checkoutStatus" role="status"></div><div class="checkout-note" id="checkoutNote">Customized Protocol orders are limited to 8 treatments and Complete Treatment Package orders are limited to 5. For larger orders, <a href="all-access.html#payment"><strong>get 30-Day All Access for $249</strong></a>.</div><div class="saved" id="saved">Order saved.</div></div>
@@ -269,19 +270,19 @@
     $$('.next').forEach(b=>b.onclick=()=>{if(validate(model.step))show(+b.dataset.next)});$$('.back').forEach(b=>b.onclick=()=>show(+b.dataset.back));
     $('#brandColor').oninput=e=>$('#brandHex').value=e.target.value;$('#brandHex').oninput=e=>{if(/^#[0-9a-f]{6}$/i.test(e.target.value))$('#brandColor').value=e.target.value};
     $('#logo').onchange=e=>{const f=e.target.files?.[0];if(!f)return;model.logoName=f.name;const reader=new FileReader();reader.onload=x=>$('#logoPreview').innerHTML=`<img src="${x.target.result}" alt="Logo preview">`;reader.readAsDataURL(f)};
-    function toggleCheckout(){$('#checkout').disabled=!($('#approveClinical').checked&&$('#approveScope').checked)}$('#approveClinical').onchange=toggleCheckout;$('#approveScope').onchange=toggleCheckout;
+    function toggleCheckout(){$('#checkout').disabled=!($('#approveTerms').checked&&$('#approveClinical').checked&&$('#approveScope').checked)}$('#approveTerms').onchange=toggleCheckout;$('#approveClinical').onchange=toggleCheckout;$('#approveScope').onchange=toggleCheckout;
     $('#checkout').onclick=async()=>{
       const count=allTreatments().length;if(!pricing[model.package].units[count]){$('#checkoutNote').classList.add('show');$('#saved').classList.add('show');return}
-      const button=$('#checkout'),status=$('#checkoutStatus');button.disabled=true;button.textContent="Opening secure checkout…";status.textContent="Creating your verified PayPal order…";status.classList.add('show');
+      const button=$('#checkout'),status=$('#checkoutStatus');button.disabled=true;button.textContent="Opening checkout...";status.textContent="Preparing checkout...";status.classList.add('show');
       try{
         const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};
         const response=await fetch(`${FULFILLMENT_API}/api/checkout/create`,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
         const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||"Unable to create checkout");
         const approvalUrl=MYCPCommerce.verifyQuote(result,d.estimatedTotal);
-        model.orderReference=result.orderReference;model.paymentStatus="PayPal checkout created";save();
+        model.orderReference=result.orderReference;model.paymentStatus="Checkout created";save();
         try{localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId}))}catch(e){}
         try{MYCPCommerce.trackCheckout(result,model.package,count)}catch(e){}
-        status.textContent="Opening PayPal…";location.href=approvalUrl;
+        status.textContent="Opening checkout...";location.href=approvalUrl;
       }catch(error){status.textContent=error.message||"Checkout is temporarily unavailable. Nothing was charged. Please try again or contact myclinicprotocols@gmail.com.";button.disabled=false;button.textContent="Try Checkout Again"}
     };
     $('#download').onclick=()=>{const blob=new Blob([summary()],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='MyClinicProtocols_Order_Summary.txt';a.click();URL.revokeObjectURL(a.href)};
