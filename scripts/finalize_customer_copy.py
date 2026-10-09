@@ -48,6 +48,21 @@ update('assets/mycp-search-support.js', [
      "if(hasAny(q,['immediate download','download after payment','download right away','instant download'])){")
 ])
 
+update('med-spa-protocol-templates.html', [
+    ('<tr><td>Review process</td><td>Usually instant download only</td><td>RN-reviewed final version plus up to two consolidated revision rounds</td></tr>',
+     '<tr><td>Preparation process</td><td>Often a generic download</td><td>Customized preparation from the appropriate MYCP master protocols plus up to two consolidated revision rounds</td></tr>'),
+    ('<p><strong>Ordering several treatments?</strong> Order 1, 3, 5, or 10 treatments at $29 per customized protocol or $49 per complete package. Your clinic profile is collected once and carried across the order.</p>',
+     '<p><strong>Ordering several treatments?</strong> Customized Protocol orders can include up to 8 treatments and Complete Treatment Package orders can include up to 5. For larger or ongoing needs, choose 30-Day All Access for $249.</p>'),
+    ('<section class="step"><div class="step-number">3</div><div><h3>Receive the Initial Version and RN review</h3><p>The Initial Version is available after verified payment. The RN-reviewed final version normally follows within 1–2 hours and may take up to 24 hours depending on the document set and customization.</p></div></section>',
+     '<section class="step"><div class="step-number">3</div><div><h3>Review and checkout</h3><p>Confirm your order details and complete checkout.</p></div></section>'),
+    ('<section class="step"><div class="step-number">4</div><div><h3>Review and return consolidated comments</h3><p>If changes are needed, return the documents with clear comments. Up to two consolidated revision rounds are included.</p></div></section>',
+     '<section class="step"><div class="step-number">4</div><div><h3>Receive your completed package</h3><p>We prepare your package from the appropriate MYCP master protocols and deliver the completed Word and PDF files by email with a private download link, usually within 1-2 hours and up to 24 hours depending on the package and customization.</p></div></section>'),
+    ('<section class="step"><div class="step-number">5</div><div><h3>Complete provider approval and implementation</h3><p>Your qualified medical director or supervising provider reviews the clinical content, resolves outstanding decisions, and approves the final documents before use.</p></div></section>',
+     '<section class="step"><div class="step-number">5</div><div><h3>Provider approval and revisions</h3><p>Your qualified provider or medical director reviews the clinical content before use. If changes are needed, up to two consolidated revision rounds are included.</p></div></section>'),
+    ('<h2 id="quality">Prepared for review-not presented as automatic approval</h2>',
+     '<h2 id="quality">Prepared for review, not presented as automatic approval</h2>')
+])
+
 # Audit every public HTML page plus the customer-facing JavaScript.
 customer_files = list(Path('.').glob('*.html')) + [
     Path('assets/mycp-search-support.js'), Path('assets/mycp-commerce.js')
