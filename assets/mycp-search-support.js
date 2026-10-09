@@ -9,7 +9,8 @@
 
   const PRICING={
     protocol:{label:'Customized Protocol',prices:{1:29,3:87,5:145,10:290}},
-    complete:{label:'Complete Treatment Package',prices:{1:49,3:147,5:245,10:490}}
+    complete:{label:'Complete Treatment Package',prices:{1:49,3:147,5:245,10:490}},
+    allAccess:{label:'30-Day All Access',price:249}
   };
 
   const CATALOG=[
@@ -299,10 +300,11 @@
 
   function priceText(){
     return `Current pricing in USD is:
-Customized Protocol — 1 treatment $29, 3 treatments $87, 5 treatments $145, or 10 treatments $290.
-Complete Treatment Package — 1 treatment $49, 3 treatments $147, 5 treatments $245, or 10 treatments $490.
+Customized Protocol — $29 per treatment.
+Complete Treatment Package — $49 per treatment.
+30-Day All Access — $249 one-time for 30 days for one clinic/legal practice.
 
-For $20 more per treatment, the Complete Treatment Package includes the clinical protocol plus applicable consent, intake/eligibility, treatment record, pre/post-care, safety checklist, and emergency/adverse-event guidance.`;
+All Access lets the purchasing clinic submit as many eligible protocol and Complete Treatment Package requests as needed during the active 30-day period. It does not automatically renew.`;
   }
 
   function answerFor(question){
@@ -367,6 +369,13 @@ The website then matches the intake to the verified payment before files are rel
       return response(
         `Online checkout is currently set up for packages containing exactly 1, 3, 5, or 10 treatments. For another quantity, contact MYCP for a custom order rather than forcing the checkout.`,
         links({label:'Email for custom quantity',href:`mailto:${SUPPORT_EMAIL}?subject=Custom%20multi-treatment%20order`},{label:'View order page',href:ORDER_URL})
+      );
+    }
+
+    if(hasAny(q,['all access','all-access','unlimited protocols','unlimited protocol','249','subscription','30-day','30 day access'])){
+      return response(
+        `MYCP offers a 30-Day All Access pass for $249. It is a one-time purchase, not an automatic renewal. One clinic/legal practice can submit as many eligible Customized Protocol or Complete Treatment Package requests as needed during the active 30-day period. Specialty or investigational requests may require scope review, and final clinical approval remains with the clinic’s qualified reviewer.`,
+        links({label:'Get 30-Day All Access',href:'all-access.html'},{label:'View pricing',href:`${HOME_URL}#pricing`})
       );
     }
 
@@ -463,8 +472,8 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['multiple treatments','more than one treatment','several treatments','bundle','combine protocols','multi treatment'])){
       return response(
-        `Yes. You can select multiple treatments in one order and keep them together in a single clinic intake. Orders support 1, 3, 5, or 10 treatments at the same $29 per protocol or $49 per complete-package rate.`,
-        links({label:'Build a multi-treatment package',href:ORDER_URL},{label:'See bundle pricing',href:`${HOME_URL}#pricing`})
+        `Yes. You can select multiple treatments in one order at the regular $29 per protocol or $49 per Complete Treatment Package rate. If your clinic expects to request several protocols during the month, the $249 30-Day All Access pass is usually the better value and allows repeated eligible requests throughout the active period.`,
+        links({label:'Get 30-Day All Access',href:'all-access.html'},{label:'Build a standard order',href:ORDER_URL})
       );
     }
 

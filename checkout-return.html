@@ -20,7 +20,7 @@
   <style>
     :root{--navy:#062765;--teal:#079ba2;--muted:#5f718d;--line:#d7e2e8;--soft:#eef9f9}*{box-sizing:border-box}body{margin:0;background:#f7fafb;color:var(--navy);font-family:Figtree,Arial,sans-serif}.wrap{max-width:760px;margin:8vh auto;padding:24px}.card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:38px;box-shadow:0 18px 55px rgba(6,39,101,.08)}.brand{font-weight:800;font-size:20px;margin-bottom:30px}.brand span{color:var(--teal)}h1{font-size:38px;line-height:1.08;margin:0 0 14px}p{color:var(--muted);font-size:17px;line-height:1.6}.status{margin:24px 0;padding:18px;border-radius:14px;background:var(--soft);font-weight:700}.btn{display:none;padding:15px 22px;border-radius:12px;background:var(--teal);color:#fff;font-weight:800;text-decoration:none}.btn.show{display:inline-block}.details{margin-top:28px;border-top:1px solid var(--line);padding-top:22px;font-size:14px;line-height:1.6;color:var(--muted)}.error{background:#fff4f2;color:#962f24}@media(max-width:600px){.wrap{padding:14px}.card{padding:26px}h1{font-size:31px}}
   </style>
-  <script src="assets/mycp-commerce.js?v=20261009b"></script>
+  <script src="assets/mycp-commerce.js?v=20261010"></script>
 </head>
 <body>
   <main class="wrap"><section class="card">
@@ -47,7 +47,14 @@
       const result=await response.json();
       if(!response.ok||!['COMPLETED','PROCESSING'].includes(result.status))throw new Error(result.detail||'Verification failed');
       const reference=result.orderReference||capture.orderReference||'confirmed order';
-      if(result.status==='COMPLETED'&&result.downloadUrl){
+      if(result.package==='all_access'){
+        title.textContent="Your 30-Day All Access is active";
+        const expiry=result.accessExpiresAt?new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'30 days from activation';
+        message.textContent=`Payment confirmed. Your clinic can submit eligible protocol requests through ${expiry}.`;
+        status.textContent=`Order ${reference} — All Access active`;
+        download.textContent="Submit a Protocol Request";download.href=result.requestUrl||`all-access-request.html?ref=${encodeURIComponent(reference)}`;download.classList.add('show');
+        const details=document.querySelector('.details');if(details)details.innerHTML='<strong>30-DAY ALL ACCESS</strong><br>Submit as many eligible Customized Protocol or Complete Treatment Package requests as your clinic needs during the active 30-day period. This pass is for one clinic/legal practice, is non-transferable, and does not auto-renew. Specialty or investigational requests may require scope review. Final clinical approval remains with your clinic’s appropriately qualified medical director or supervising provider.';
+      }else if(result.status==='COMPLETED'&&result.downloadUrl){
         title.textContent="Payment confirmed — your Initial Version is ready";
         message.textContent=result.emailDelivery?.customer?"Download your files below. We also sent a backup link to the order email address.":"Download your files below and save them now. Email delivery has not been confirmed.";
         status.textContent=`Order ${reference} completed`;download.href=result.downloadUrl;download.classList.add('show');

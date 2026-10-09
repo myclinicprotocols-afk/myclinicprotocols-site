@@ -1,9 +1,9 @@
 /* Shared checkout verification and privacy-safe ecommerce events. */
 (function () {
   'use strict';
-  const VERSION = '2026-10-09-2';
+  const VERSION = '2026-10-10';
   const API = 'https://orders.myclinicprotocols.com';
-  const names = {protocol: 'Customized Protocol', complete: 'Complete Treatment Package'};
+  const names = {protocol: 'Customized Protocol', complete: 'Complete Treatment Package', all_access: '30-Day All Access'};
   function eventData(result) {
     const value = Number(result.amount), quantity = Number(result.treatmentCount);
     if (result.paymentMode !== 'live' || result.currency !== 'USD' ||
