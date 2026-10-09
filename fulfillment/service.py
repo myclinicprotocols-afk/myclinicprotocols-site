@@ -36,10 +36,10 @@ from fulfillment.documents import make_package, validate_production_treatments
 
 OWNER_EMAIL = "myclinicprotocols@gmail.com"
 PRICES = {
-    "protocol": {1: 29, 3: 87, 5: 145, 10: 290},
-    "complete": {1: 49, 3: 147, 5: 245, 10: 490},
+    "protocol": {1: 29, 2: 58, 3: 87, 4: 116, 5: 145, 6: 174, 7: 203, 8: 232, 9: 261, 10: 290},
+    "complete": {1: 49, 2: 98, 3: 147, 4: 196, 5: 245, 6: 294, 7: 343, 8: 392, 9: 441, 10: 490},
 }
-PRICING_VERSION = "2026-10-09"
+PRICING_VERSION = "2026-10-09-2"
 ROOT = Path(os.environ.get("MYCP_PRIVATE_ROOT", "private-orders")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
 DOWNLOAD_TTL = timedelta(hours=24)
@@ -223,6 +223,7 @@ async def _storage_download(client: httpx.AsyncClient, storage_path: str) -> byt
 @app.on_event("startup")
 async def verify_supabase_connectivity() -> None:
     """Log safe connectivity status at deploy time without exposing credentials."""
+    logging.info("PayPal payment mode: %s", os.environ.get("PAYPAL_MODE", "sandbox"))
     if not os.environ.get("SUPABASE_URL") or not os.environ.get("SUPABASE_SERVICE_ROLE_KEY"):
         logging.warning("Supabase is not configured in this Render environment")
         return
@@ -537,6 +538,7 @@ async def health():
     return {
         "status": "ok",
         "pricingVersion": PRICING_VERSION,
+        "paymentMode": os.environ.get("PAYPAL_MODE", "sandbox"),
         "supabaseConfigured": configured,
         "database": database,
         "storage": storage,
