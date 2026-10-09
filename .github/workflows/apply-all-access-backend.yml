@@ -1,0 +1,33 @@
+name: Apply All Access backend
+
+on:
+  push:
+    branches: [order-fulfillment]
+    paths:
+      - scripts/apply_all_access_backend.py
+      - .github/workflows/apply-all-access-backend.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply backend patch
+        run: python scripts/apply_all_access_backend.py
+      - name: Commit backend changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add fulfillment/service.py
+          git commit -m "Support 30-Day All Access checkout and requests"
+          git push
