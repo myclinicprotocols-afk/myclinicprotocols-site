@@ -36,9 +36,10 @@ from fulfillment.documents import make_package, validate_production_treatments
 
 OWNER_EMAIL = "myclinicprotocols@gmail.com"
 PRICES = {
-    "protocol": {1: 99, 3: 249, 5: 379, 10: 699},
-    "complete": {1: 149, 3: 399, 5: 625, 10: 1099},
+    "protocol": {1: 29, 3: 87, 5: 145, 10: 290},
+    "complete": {1: 49, 3: 147, 5: 245, 10: 490},
 }
+PRICING_VERSION = "2026-10-09"
 ROOT = Path(os.environ.get("MYCP_PRIVATE_ROOT", "private-orders")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
 DOWNLOAD_TTL = timedelta(hours=24)
@@ -54,11 +55,13 @@ class Checkout(BaseModel):
     providers: list[str] = Field(default_factory=list, max_length=20)
     oversight: dict = Field(default_factory=dict)
     details: dict = Field(default_factory=dict)
+    expectedTotal: Decimal | None = Field(default=None, ge=0)
+    pricingVersion: str | None = None
 
 
 class Capture(BaseModel):
     orderReference: str | None = None
-    paypalOrderId: str
+    paypalOrderId: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9-]+$")
 
 
 app = FastAPI(title="MyClinicProtocols Fulfillment", docs_url=None, redoc_url=None)
@@ -127,6 +130,9 @@ async def _supabase_request(
 async def _insert_order(client: httpx.AsyncClient, checkout: Checkout, reference: str, paypal_id: str, amount: str) -> None:
     clinic = checkout.clinic or {}
     details = checkout.details or {}
+    intake = checkout.model_dump(mode="json")
+    intake["_paymentMode"] = os.environ.get("PAYPAL_MODE", "sandbox")
+    intake["_pricingVersion"] = PRICING_VERSION
     row = {
         "order_reference": reference,
         "paypal_order_id": paypal_id,
@@ -141,7 +147,7 @@ async def _insert_order(client: httpx.AsyncClient, checkout: Checkout, reference
         "treatment": " | ".join(checkout.treatments),
         "document_type": " | ".join(checkout.documents) if checkout.documents else None,
         "customer_notes": _first(details, "notes", "customerNotes", "specialInstructions", "instructions"),
-        "intake": checkout.model_dump(mode="json"),
+        "intake": intake,
     }
     await _supabase_request(
         client,
@@ -315,6 +321,10 @@ async def create_checkout(checkout: Checkout):
 
     count = len(checkout.treatments)
     amount = f"{_price(checkout.package, count):.2f}"
+    if ((checkout.expectedTotal is not None and checkout.expectedTotal != Decimal(amount))
+            or (checkout.pricingVersion is not None and checkout.pricingVersion != PRICING_VERSION)):
+        raise HTTPException(status_code=409, detail="Pricing has changed. Refresh the order page and review your total before paying.")
+    payment_mode = os.environ.get("PAYPAL_MODE", "sandbox")
     reference = "MYCP-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(4).upper()
     return_url = os.environ.get("PAYPAL_RETURN_URL")
     cancel_url = os.environ.get("PAYPAL_CANCEL_URL")
@@ -339,11 +349,45 @@ async def create_checkout(checkout: Checkout):
         paypal = await _paypal(client, "POST", "/v2/checkout/orders", payload)
         await _insert_order(client, checkout, reference, paypal["id"], amount)
     approval = next(link["href"] for link in paypal.get("links", []) if link.get("rel") == "payer-action")
-    return {"orderReference": reference, "paypalOrderId": paypal["id"], "approvalUrl": approval}
+    return {
+        "orderReference": reference,
+        "paypalOrderId": paypal["id"],
+        "approvalUrl": approval,
+        "amount": amount,
+        "currency": "USD",
+        "paymentMode": payment_mode,
+        "pricingVersion": PRICING_VERSION,
+    }
 
 
 def _row_amount(row: dict) -> str:
     return f"{Decimal(str(row['payment_amount'])):.2f}"
+
+
+def _order_intake(row: dict) -> dict:
+    intake = row.get("intake") or {}
+    if isinstance(intake, str):
+        try:
+            intake = json.loads(intake)
+        except json.JSONDecodeError:
+            return {}
+    return intake if isinstance(intake, dict) else {}
+
+
+def _completed_response(row: dict) -> dict:
+    intake = _order_intake(row)
+    return {
+        "status": "COMPLETED",
+        "orderReference": row["order_reference"],
+        "downloadUrl": _download_url(row["order_reference"]),
+        "amount": _row_amount(row),
+        "currency": row.get("currency") or "USD",
+        "paymentMode": intake.get("_paymentMode", "unknown"),
+        "package": intake.get("package"),
+        "treatmentCount": len(intake.get("treatments") or []),
+        "pricingVersion": intake.get("_pricingVersion"),
+        "emailDelivery": {"customer": bool(row.get("email_delivery"))},
+    }
 
 
 def _verify_paypal_order(result: dict, row: dict, *, require_capture: bool) -> None:
@@ -380,11 +424,7 @@ async def capture_checkout(capture: Capture):
         if not row:
             raise HTTPException(status_code=404, detail="Order not found")
         if row["payment_status"] == "COMPLETED":
-            return {
-                "status": "COMPLETED",
-                "orderReference": row["order_reference"],
-                "downloadUrl": _download_url(row["order_reference"]),
-            }
+            return _completed_response(row)
 
         path = f"/v2/checkout/orders/{row['paypal_order_id']}"
         result = await _paypal(client, "GET", path)
@@ -397,9 +437,7 @@ async def capture_checkout(capture: Capture):
             result = await _paypal(client, "GET", path)
         _verify_paypal_order(result, row, require_capture=True)
 
-        order = row.get("intake") or {}
-        if isinstance(order, str):
-            order = json.loads(order)
+        order = _order_intake(row)
         order["orderReference"] = row["order_reference"]
         try:
             package_bytes = make_package(order)
@@ -420,12 +458,15 @@ async def capture_checkout(capture: Capture):
             "package_storage_path": storage_path,
             "paid_at": paid_at,
         })
+        row["payment_status"] = "COMPLETED"
+        row["package_storage_path"] = storage_path
+        row["paid_at"] = paid_at
 
     url = _download_url(row["order_reference"])
     customer_email_sent = await _send_email(
         [row["customer_email"]],
         f"Your MyClinicProtocols Initial Version — {row['order_reference']}",
-        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>INITIAL VERSION — Prepared for Qualified Provider Review.</strong></p><p>This package is generated from the connected production clinical master and customized using the clinic, provider, product and applicable state information supplied with the order.</p><p>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set.</p>",
+        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>Prepared for qualified provider review.</strong></p><p>Your RN-reviewed final version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set. Up to two consolidated revision rounds may be requested within 14 calendar days of delivery; revisions normally take 3–5 business days.</p>",
     )
     owner_email_sent = await _send_email(
         [OWNER_EMAIL], f"Paid MYCP order — {row['order_reference']}",
@@ -433,9 +474,9 @@ async def capture_checkout(capture: Capture):
     )
     async with httpx.AsyncClient(timeout=15) as client:
         await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
+    row["email_delivery"] = customer_email_sent
     return {
-        "status": "COMPLETED",
-        "orderReference": row["order_reference"],
+        **_completed_response(row),
         "downloadUrl": url,
         "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},
     }
@@ -495,6 +536,7 @@ async def health():
             storage = "unavailable"
     return {
         "status": "ok",
+        "pricingVersion": PRICING_VERSION,
         "supabaseConfigured": configured,
         "database": database,
         "storage": storage,
