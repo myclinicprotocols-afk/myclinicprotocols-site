@@ -17,7 +17,7 @@ Workflow:
    accepted, with a 3–5-business-day turnaround.
 
 The instant output is not the RN-reviewed version and must retain the label
-`DRAFT — Qualified Provider Review Required`.
+`DRAFT - Qualified Provider Review Required`.
 
 ## Local verification
 

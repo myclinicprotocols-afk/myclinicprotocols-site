@@ -487,12 +487,12 @@ async def capture_checkout(capture: Capture):
             request_url = f"{origin}/all-access-request.html?ref={quote(row['order_reference'])}"
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
-                f"Your MYCP 30-Day All Access is active — {row['order_reference']}",
-                f"<p>Payment confirmed — your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p><a href='{request_url}'>Submit a protocol request</a> any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>",
+                f"Your MYCP 30-Day All Access is active - {row['order_reference']}",
+                f"<p>Payment confirmed - your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p><a href='{request_url}'>Submit a protocol request</a> any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>",
             )
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
-                f"NEW $249 ALL ACCESS — {row['order_reference']}",
+                f"NEW $249 ALL ACCESS - {row['order_reference']}",
                 f"<p>A verified $249 30-Day All Access purchase was received.</p><p>Customer: {row['customer_email']}</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Order: {row['order_reference']}</p><p>Access expires: {expires_dt.strftime('%B %d, %Y')}</p>",
             )
             await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
@@ -512,12 +512,12 @@ async def capture_checkout(capture: Capture):
             row.update({"payment_status": "PROCESSING", "paid_at": paid_at, "package_storage_path": None})
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
-                f"Payment confirmed — we’re preparing your MYCP order {row['order_reference']}",
+                f"Payment confirmed - we’re preparing your MYCP order {row['order_reference']}",
                 "<p>Payment confirmed. We’re preparing your customized protocol package from the appropriate MyClinicProtocols master documents.</p><p>Your order is confirmed; you do not need to pay again. Most Initial Versions are delivered within 1–2 hours and may take up to 24 hours for larger or more complex requests.</p>",
             )
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
-                f"PAID MYCP ORDER — PREPARATION REQUIRED — {row['order_reference']}",
+                f"PAID MYCP ORDER - PREPARATION REQUIRED - {row['order_reference']}",
                 f"<p>A verified payment of ${_row_amount(row)} USD was received and this order needs prepared-after-payment fulfillment.</p><p>Customer: {row['customer_email']}</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Treatment(s): {row.get('treatment') or 'Not provided'}</p><p>Order: {row['order_reference']}</p>",
             )
             await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
@@ -544,11 +544,11 @@ async def capture_checkout(capture: Capture):
     url = _download_url(row["order_reference"])
     customer_email_sent = await _send_email(
         [row["customer_email"]],
-        f"Your MyClinicProtocols Initial Version — {row['order_reference']}",
+        f"Your MyClinicProtocols Initial Version - {row['order_reference']}",
         f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>Prepared for qualified provider review.</strong></p><p>Your RN-reviewed final version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set. Up to two consolidated revision rounds may be requested within 14 calendar days of delivery; revisions normally take 3–5 business days.</p>",
     )
     owner_email_sent = await _send_email(
-        [OWNER_EMAIL], f"Paid MYCP order — {row['order_reference']}",
+        [OWNER_EMAIL], f"Paid MYCP order - {row['order_reference']}",
         f"<p>A verified payment of ${_row_amount(row)} USD was received.</p><p>Customer: {row['customer_email']}</p><p>Order: {row['order_reference']}</p>",
     )
     async with httpx.AsyncClient(timeout=15) as client:
@@ -602,12 +602,12 @@ async def submit_all_access_request(request: AllAccessRequest):
 
     customer_email_sent = await _send_email(
         [str(request.customerEmail)],
-        f"MYCP All Access request received — {request_reference}",
+        f"MYCP All Access request received - {request_reference}",
         f"<p>We received your request for <strong>{request.treatment}</strong>.</p><p>Request: {request_reference}</p><p>All Access order: {request.orderReference}</p><p>We’ll prepare the requested documents using your clinic profile and submitted details. Please do not send PHI by email.</p>",
     )
     owner_email_sent = await _send_email(
         [OWNER_EMAIL],
-        f"ALL ACCESS REQUEST — {request_reference}",
+        f"ALL ACCESS REQUEST - {request_reference}",
         f"<p>New All Access request.</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Customer: {row['customer_email']}</p><p>Treatment: {request.treatment}</p><p>Type: {request.requestType}</p><p>All Access order: {request.orderReference}</p><p>Request: {request_reference}</p>",
     )
     return {

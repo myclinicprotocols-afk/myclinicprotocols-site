@@ -286,7 +286,7 @@
         );
       }
       return response(
-        `Yes — ${item.name} is available under ${item.category}. ${item.description} You can customize it around your clinic’s state, provider role, products/medications, concentrations or settings, equipment, methods, workflow, and branding.`,
+        `Yes - ${item.name} is available under ${item.category}. ${item.description} You can customize it around your clinic’s state, provider role, products/medications, concentrations or settings, equipment, methods, workflow, and branding.`,
         links(orderLink(item),{label:'Browse all protocols',href:`${HOME_URL}#protocols`})
       );
     }
@@ -300,9 +300,9 @@
 
   function priceText(){
     return `Current pricing in USD is:
-Customized Protocol — $29 per treatment.
-Complete Treatment Package — $49 per treatment.
-30-Day All Access — $249 one-time for 30 days for one clinic/legal practice.
+Customized Protocol - $29 per treatment.
+Complete Treatment Package - $49 per treatment.
+30-Day All Access - $249 one-time for 30 days for one clinic/legal practice.
 
 All Access lets the purchasing clinic submit as many eligible protocol and Complete Treatment Package requests as needed during the active 30-day period. It does not automatically renew.`;
   }
@@ -310,7 +310,7 @@ All Access lets the purchasing clinic submit as many eligible protocol and Compl
   function answerFor(question){
     const raw=(question||'').trim();
     const q=normalize(raw);
-    if(!q) return response('Ask me anything about MyClinicProtocols — pricing, protocols, ordering, customization, delivery, revisions, state-specific setup, documents, payment, or support.');
+    if(!q) return response('Ask me anything about MyClinicProtocols - pricing, protocols, ordering, customization, delivery, revisions, state-specific setup, documents, payment, or support.');
 
     if(hasAny(q,['hello','hi','hey','good morning','good afternoon','good evening'])){
       return response(
@@ -388,7 +388,7 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['which package','difference between packages','protocol vs complete','complete package','customized protocol'])){
       return response(
-        `Choose the Customized Protocol if you mainly need the treatment protocol/SOP itself. Choose the Complete Treatment Package if you want the broader clinic documentation set around that treatment — protocol plus applicable consent, intake/eligibility, treatment record, pre/post-care, room/safety checklist, and emergency/adverse-event guidance. Both are customized to the clinic information you provide.`,
+        `Choose the Customized Protocol if you mainly need the treatment protocol/SOP itself. Choose the Complete Treatment Package if you want the broader clinic documentation set around that treatment - protocol plus applicable consent, intake/eligibility, treatment record, pre/post-care, room/safety checklist, and emergency/adverse-event guidance. Both are customized to the clinic information you provide.`,
         links({label:'Compare pricing',href:`${HOME_URL}#pricing`},{label:'Choose a package',href:ORDER_URL})
       );
     }
@@ -409,7 +409,7 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['initial version','instant draft','draft after payment','immediate download','download after payment'])){
       return response(
-        `The order flow provides an Initial Version by website download with an email backup after verified payment. That is followed by the RN-reviewed final version, normally in 1–2 hours and up to 24 hours depending on the document set. The Initial Version does not replace final clinical approval — your clinic’s qualified reviewer still needs to review and approve the final content.`,
+        `The order flow provides an Initial Version by website download with an email backup after verified payment. That is followed by the RN-reviewed final version, normally in 1–2 hours and up to 24 hours depending on the document set. The Initial Version does not replace final clinical approval - your clinic’s qualified reviewer still needs to review and approve the final content.`,
         links({label:'Start an order',href:ORDER_URL})
       );
     }
@@ -479,7 +479,7 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['medication','concentration','dose','formula','equipment','device','technique','method','workflow','settings','brand of product'])){
       return response(
-        `Yes — those details are part of customization. The order form lets you enter the product/medication/formula/device, concentration or treatment settings when applicable, technique/method, and workflow or special instructions. That information helps MYCP prepare documents around how your clinic actually operates.`,
+        `Yes - those details are part of customization. The order form lets you enter the product/medication/formula/device, concentration or treatment settings when applicable, technique/method, and workflow or special instructions. That information helps MYCP prepare documents around how your clinic actually operates.`,
         links({label:'Enter treatment details',href:ORDER_URL})
       );
     }
@@ -545,7 +545,7 @@ The website then matches the intake to the verified payment before files are rel
     }
 
     return response(
-      `I can answer most questions about the MYCP website — protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, PayPal checkout, delivery, the Initial Version, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
+      `I can answer most questions about the MYCP website - protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, PayPal checkout, delivery, the Initial Version, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
       links({label:'Browse protocols',href:`${HOME_URL}#protocols`},{label:'Email support',href:`mailto:${SUPPORT_EMAIL}?subject=MyClinicProtocols%20Question`})
     );
   }
@@ -587,7 +587,7 @@ The website then matches the intake to the verified payment before files are rel
         <button class="mycp-support-send" type="submit">Send</button>
       </form>
       <a class="mycp-support-email" href="mailto:${SUPPORT_EMAIL}?subject=MyClinicProtocols%20Support">✉ Email ${SUPPORT_EMAIL}</a>
-      <div class="mycp-support-privacy">Website and ordering support only — do not send patient information.</div>`;
+      <div class="mycp-support-privacy">Website and ordering support only - do not send patient information.</div>`;
 
     document.body.appendChild(launcher);
     document.body.appendChild(panel);

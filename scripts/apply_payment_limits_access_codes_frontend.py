@@ -94,9 +94,9 @@ def index_transform(text: str) -> str:
 def all_access_transform(text: str) -> str:
     text = text.replace('assets/mycp-commerce.js?v=20261010', 'assets/mycp-commerce.js?v=20261010-2')
     text = replace_once(text, '<section class="form-card">', '<section class="form-card" id="payment">', 'payment anchor')
-    text = text.replace('<h2>Activate your All Access pass</h2>', '<h2>Secure payment — activate your 30-day license</h2>')
+    text = text.replace('<h2>Activate your All Access pass</h2>', '<h2>Secure payment. Activate your 30-day access</h2>')
     text = text.replace('We’ll use this clinic profile for your 30-day access. You can provide treatment-specific details each time you submit a request.', 'Pay first to activate access. After PayPal payment is verified, MYCP will issue a unique access code valid for 30 days. Treatment-specific details are submitted later when you use the code.')
-    text = text.replace('<div class="highlight"><strong>No need to choose all your protocols today.</strong> Your 30-day period starts only after your payment is verified.</div>', '<div class="highlight"><strong>Payment first — requests come after.</strong> Your 30-day period starts only after payment is verified. Your unique access code is then displayed on the confirmation page and can be used in the All Access Request Portal for the full 30 days.</div>')
+    text = text.replace('<div class="highlight"><strong>No need to choose all your protocols today.</strong> Your 30-day period starts only after your payment is verified.</div>', '<div class="highlight"><strong>Payment first. Requests come after.</strong> Your 30-day period starts only after payment is verified. Your unique access code is then displayed on the confirmation page and can be used in the All Access Request Portal for the full 30 days.</div>')
     text = text.replace("try{localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId}))}catch(e){}", "try{localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId,package:'all_access',customerEmail:document.getElementById('email').value.trim()}))}catch(e){}")
     return text
 
@@ -116,7 +116,7 @@ def request_transform(text: str) -> str:
     try{
       const response=await fetch(`${MYCPCommerce.API}/api/all-access/request`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({accessCode:code,customerEmail:email,treatment,requestType:document.getElementById('requestType').value,notes:document.getElementById('details').value.trim()})});
       const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||'Unable to submit request');
-      status.innerHTML=`<strong>Request received — ${result.requestReference}</strong><br>Your access code is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
+      status.innerHTML=`<strong>Request received - ${result.requestReference}</strong><br>Your access code is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
       try{localStorage.setItem('mycp_all_access_pass',JSON.stringify({accessCode:code,customerEmail:email,accessExpiresAt:result.accessExpiresAt}))}catch(e){}
       document.getElementById('treatment').value='';document.getElementById('details').value='';
     }catch(error){status.textContent=error.message||'We could not submit the request. Please verify your access code and purchasing email.'}
@@ -134,15 +134,15 @@ def checkout_return_transform(text: str) -> str:
         title.textContent=\"Your 30-Day All Access is active\";
         const expiry=result.accessExpiresAt?new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'30 days from activation';
         message.textContent=`Payment confirmed. Your clinic can submit eligible protocol requests through ${expiry}.`;
-        status.textContent=`Order ${reference} — All Access active`;
+        status.textContent=`Order ${reference} - All Access active`;
         download.textContent=\"Submit a Protocol Request\";download.href=result.requestUrl||`all-access-request.html?ref=${encodeURIComponent(reference)}`;download.classList.add('show');
         const details=document.querySelector('.details');if(details)details.innerHTML='<strong>30-DAY ALL ACCESS</strong><br>Submit as many eligible Customized Protocol or Complete Treatment Package requests as your clinic needs during the active 30-day period. This pass is for one clinic/legal practice, is non-transferable, and does not auto-renew. Specialty or investigational requests may require scope review. Final clinical approval remains with your clinic’s appropriately qualified medical director or supervising provider.';
       }"""
     new = """if(result.package==='all_access'){
         title.textContent=\"Your 30-Day All Access is active\";
         const expiry=result.accessExpiresAt?new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'30 days from activation';
-        message.textContent=`Payment confirmed. Your clinic can submit eligible protocol requests through ${expiry}. Save the access code below — it is your 30-day license.`;
-        status.textContent=`Order ${reference} — All Access active`;
+        message.textContent=`Payment confirmed. Your clinic can submit eligible protocol requests through ${expiry}. Save the access code below - it is your 30-day license.`;
+        status.textContent=`Order ${reference} - All Access active`;
         if(result.accessCode){accessCode.textContent=result.accessCode;license.classList.add('show');try{localStorage.setItem('mycp_all_access_pass',JSON.stringify({accessCode:result.accessCode,customerEmail:pending?.customerEmail||'',accessExpiresAt:result.accessExpiresAt}))}catch(e){}}
         copyCode.onclick=async()=>{try{await navigator.clipboard.writeText(accessCode.textContent);copyCode.textContent='Copied'}catch(e){copyCode.textContent='Select and copy the code'}};
         download.textContent=\"Open All Access Request Portal\";download.href=result.requestUrl||'all-access-request.html';download.classList.add('show');
@@ -160,8 +160,8 @@ def commerce_transform(text: str) -> str:
 def support_transform(text: str) -> str:
     text = text.replace("protocol:{label:'Customized Protocol',prices:{1:29,3:87,5:145,10:290}}", "protocol:{label:'Customized Protocol',prices:{1:29,2:58,3:87,4:116,5:145,6:174,7:203,8:232},max:8}")
     text = text.replace("complete:{label:'Complete Treatment Package',prices:{1:49,3:147,5:245,10:490}}", "complete:{label:'Complete Treatment Package',prices:{1:49,2:98,3:147,4:196,5:245},max:5}")
-    text = text.replace('Customized Protocol — 1 treatment $29, 3 treatments $87, 5 treatments $145, or 10 treatments $290.', 'Customized Protocol — $29 per treatment, up to 8 treatments per order. For 9 or more, 30-Day All Access at $249 is recommended.')
-    text = text.replace('Complete Treatment Package — 1 treatment $49, 3 treatments $147, 5 treatments $245, or 10 treatments $490.', 'Complete Treatment Package — $49 per treatment, up to 5 treatments per order. For 6 or more, 30-Day All Access at $249 is recommended.')
+    text = text.replace('Customized Protocol - 1 treatment $29, 3 treatments $87, 5 treatments $145, or 10 treatments $290.', 'Customized Protocol - $29 per treatment, up to 8 treatments per order. For 9 or more, 30-Day All Access at $249 is recommended.')
+    text = text.replace('Complete Treatment Package - 1 treatment $49, 3 treatments $147, 5 treatments $245, or 10 treatments $490.', 'Complete Treatment Package - $49 per treatment, up to 5 treatments per order. For 6 or more, 30-Day All Access at $249 is recommended.')
     return text
 
 

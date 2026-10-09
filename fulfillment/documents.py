@@ -25,7 +25,7 @@ from fulfillment.neuromodulators import DOCUMENTS as NEUROMODULATOR_DOCUMENTS
 from fulfillment.neuromodulators import state_language as neuromodulator_state_language
 
 
-INITIAL_VERSION_LABEL = "INITIAL VERSION — Prepared for Qualified Provider Review"
+INITIAL_VERSION_LABEL = "INITIAL VERSION - Prepared for Qualified Provider Review"
 PRODUCTION_MASTER_TREATMENTS = {"neuromodulators": "Neuromodulators"}
 NAVY = RGBColor(8, 40, 93)
 TEAL = RGBColor(6, 153, 159)
@@ -337,7 +337,7 @@ def make_package(order: dict) -> bytes:
                     archive.writestr(f"{slug}-INITIAL-VERSION.pdf", pdf_bytes)
         archive.writestr(
             "READ-ME.txt",
-            "MyClinicProtocols — Initial Version\n\n"
+            "MyClinicProtocols - Initial Version\n\n"
             "This package was generated from the production clinical master package and customized with the clinic, provider, product, and applicable state information supplied with the order.\n\n"
             "Final clinical approval remains with the purchasing clinic’s appropriately qualified medical director or supervising provider. MyClinicProtocols RN quality review follows the Initial Version and is normally completed within 1–2 hours, with up to 24 hours for larger or more complex document sets.\n"
             "Up to two consolidated revision rounds may be requested within 14 calendar days of the RN-reviewed delivery; revision requests normally take 3–5 business days.\n",

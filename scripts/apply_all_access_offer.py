@@ -35,7 +35,7 @@ must_replace(
 )
 must_replace(
     index,
-    '<div class="price"><h3>Multiple Treatments</h3><div class="amount">From $87</div><p>Choose different treatments at the same package level.</p><ul><li>3 Customized Protocols — $87</li><li>5 Customized Protocols — $145</li><li>10 Customized Protocols — $290</li><li>3 Complete Packages — $147</li><li>5 Complete Packages — $245</li><li>10 Complete Packages — $490</li></ul><button class="btn-secondary choose-plan" data-plan="Complete Treatment Package" data-price="49">Build a Bundle</button></div>',
+    '<div class="price"><h3>Multiple Treatments</h3><div class="amount">From $87</div><p>Choose different treatments at the same package level.</p><ul><li>3 Customized Protocols - $87</li><li>5 Customized Protocols - $145</li><li>10 Customized Protocols - $290</li><li>3 Complete Packages - $147</li><li>5 Complete Packages - $245</li><li>10 Complete Packages - $490</li></ul><button class="btn-secondary choose-plan" data-plan="Complete Treatment Package" data-price="49">Build a Bundle</button></div>',
     '<div class="price featured"><span class="badge">BEST VALUE</span><h3>30-Day All Access</h3><div class="amount">$249 <small>/ 30 days</small></div><p>One clinic can request as many eligible protocols and Complete Treatment Packages as needed during the active 30-day period.</p><ul><li>Any eligible protocol in the MYCP library</li><li>Complete Treatment Packages included</li><li>Multiple requests throughout the month</li><li>State, provider, product, device, workflow &amp; branding customization</li><li>Editable Word + polished PDF deliverables</li><li>RN-prepared and quality-checked</li><li>Up to two consolidated revision rounds per delivered request</li></ul><a class="btn-primary" href="all-access.html">Get 30-Day All Access</a></div>',
 )
 must_replace(
@@ -100,9 +100,9 @@ must_regex(
     r"  function priceText\(\)\{.*?\n  \}\n",
     """  function priceText(){
     return `Current pricing in USD is:
-Customized Protocol — $29 per treatment.
-Complete Treatment Package — $49 per treatment.
-30-Day All Access — $249 one-time for 30 days for one clinic/legal practice.
+Customized Protocol - $29 per treatment.
+Complete Treatment Package - $49 per treatment.
+30-Day All Access - $249 one-time for 30 days for one clinic/legal practice.
 
 All Access lets the purchasing clinic submit as many eligible protocol and Complete Treatment Package requests as needed during the active 30-day period. It does not automatically renew.`;
   }
@@ -273,12 +273,12 @@ must_replace(
             request_url = f"{origin}/all-access-request.html?ref={quote(row['order_reference'])}"
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
-                f"Your MYCP 30-Day All Access is active — {row['order_reference']}",
-                f"<p>Payment confirmed — your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p><a href='{request_url}'>Submit a protocol request</a> any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>",
+                f"Your MYCP 30-Day All Access is active - {row['order_reference']}",
+                f"<p>Payment confirmed - your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p><a href='{request_url}'>Submit a protocol request</a> any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>",
             )
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
-                f"NEW $249 ALL ACCESS — {row['order_reference']}",
+                f"NEW $249 ALL ACCESS - {row['order_reference']}",
                 f"<p>A verified $249 30-Day All Access purchase was received.</p><p>Customer: {row['customer_email']}</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Order: {row['order_reference']}</p><p>Access expires: {expires_dt.strftime('%B %d, %Y')}</p>",
             )
             await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
@@ -298,12 +298,12 @@ must_replace(
             row.update({"payment_status": "PROCESSING", "paid_at": paid_at, "package_storage_path": None})
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
-                f"Payment confirmed — we’re preparing your MYCP order {row['order_reference']}",
+                f"Payment confirmed - we’re preparing your MYCP order {row['order_reference']}",
                 "<p>Payment confirmed. We’re preparing your customized protocol package from the appropriate MyClinicProtocols master documents.</p><p>Your order is confirmed; you do not need to pay again. Most Initial Versions are delivered within 1–2 hours and may take up to 24 hours for larger or more complex requests.</p>",
             )
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
-                f"PAID MYCP ORDER — PREPARATION REQUIRED — {row['order_reference']}",
+                f"PAID MYCP ORDER - PREPARATION REQUIRED - {row['order_reference']}",
                 f"<p>A verified payment of ${_row_amount(row)} USD was received and this order needs prepared-after-payment fulfillment.</p><p>Customer: {row['customer_email']}</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Treatment(s): {row.get('treatment') or 'Not provided'}</p><p>Order: {row['order_reference']}</p>",
             )
             await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
@@ -312,7 +312,7 @@ must_replace(
 ''',
 )
 # All Access request endpoint, stored server-side and validated against the paid 30-day window.
-request_endpoint = '''\n\n@app.post("/api/all-access/request")\nasync def submit_all_access_request(request: AllAccessRequest):\n    async with httpx.AsyncClient(timeout=20) as client:\n        row = await _get_order(client, reference=request.orderReference)\n        if not row:\n            raise HTTPException(status_code=404, detail="All Access order not found")\n        intake = _order_intake(row)\n        if (row.get("payment_status") != "COMPLETED"\n                or (row.get("package_type") != "all_access" and intake.get("package") != "all_access")):\n            raise HTTPException(status_code=409, detail="This order is not an active All Access pass")\n        if str(row.get("customer_email") or "").strip().lower() != str(request.customerEmail).strip().lower():\n            raise HTTPException(status_code=403, detail="The order email does not match this All Access pass")\n        expires_raw = row.get("access_expires_at")\n        if not expires_raw:\n            paid_raw = row.get("paid_at")\n            if not paid_raw:\n                raise HTTPException(status_code=409, detail="This All Access pass does not have a valid activation date")\n            paid_dt = datetime.fromisoformat(str(paid_raw).replace("Z", "+00:00"))\n            expires_dt = paid_dt + timedelta(days=30)\n        else:\n            expires_dt = datetime.fromisoformat(str(expires_raw).replace("Z", "+00:00"))\n        if expires_dt.tzinfo is None:\n            expires_dt = expires_dt.replace(tzinfo=timezone.utc)\n        if datetime.now(timezone.utc) > expires_dt:\n            raise HTTPException(status_code=410, detail="This 30-Day All Access pass has expired")\n\n        request_reference = "MYCP-REQ-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(3).upper()\n        payload = {\n            "request_reference": request_reference,\n            "access_order_reference": row["order_reference"],\n            "customer_email": row["customer_email"],\n            "clinic_name": row.get("clinic_name"),\n            "treatment": request.treatment.strip(),\n            "request_type": request.requestType,\n            "request_details": {"notes": request.notes.strip()},\n            "status": "RECEIVED",\n        }\n        await _supabase_request(client, "POST", "/rest/v1/all_access_requests", payload=payload, prefer="return=minimal")\n\n    customer_email_sent = await _send_email(\n        [str(request.customerEmail)],\n        f"MYCP All Access request received — {request_reference}",\n        f"<p>We received your request for <strong>{request.treatment}</strong>.</p><p>Request: {request_reference}</p><p>All Access order: {request.orderReference}</p><p>We’ll prepare the requested documents using your clinic profile and submitted details. Please do not send PHI by email.</p>",\n    )\n    owner_email_sent = await _send_email(\n        [OWNER_EMAIL],\n        f"ALL ACCESS REQUEST — {request_reference}",\n        f"<p>New All Access request.</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Customer: {row['customer_email']}</p><p>Treatment: {request.treatment}</p><p>Type: {request.requestType}</p><p>All Access order: {request.orderReference}</p><p>Request: {request_reference}</p>",\n    )\n    return {\n        "status": "RECEIVED",\n        "requestReference": request_reference,\n        "accessOrderReference": request.orderReference,\n        "accessExpiresAt": expires_dt.isoformat(),\n        "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},\n    }\n'''
+request_endpoint = '''\n\n@app.post("/api/all-access/request")\nasync def submit_all_access_request(request: AllAccessRequest):\n    async with httpx.AsyncClient(timeout=20) as client:\n        row = await _get_order(client, reference=request.orderReference)\n        if not row:\n            raise HTTPException(status_code=404, detail="All Access order not found")\n        intake = _order_intake(row)\n        if (row.get("payment_status") != "COMPLETED"\n                or (row.get("package_type") != "all_access" and intake.get("package") != "all_access")):\n            raise HTTPException(status_code=409, detail="This order is not an active All Access pass")\n        if str(row.get("customer_email") or "").strip().lower() != str(request.customerEmail).strip().lower():\n            raise HTTPException(status_code=403, detail="The order email does not match this All Access pass")\n        expires_raw = row.get("access_expires_at")\n        if not expires_raw:\n            paid_raw = row.get("paid_at")\n            if not paid_raw:\n                raise HTTPException(status_code=409, detail="This All Access pass does not have a valid activation date")\n            paid_dt = datetime.fromisoformat(str(paid_raw).replace("Z", "+00:00"))\n            expires_dt = paid_dt + timedelta(days=30)\n        else:\n            expires_dt = datetime.fromisoformat(str(expires_raw).replace("Z", "+00:00"))\n        if expires_dt.tzinfo is None:\n            expires_dt = expires_dt.replace(tzinfo=timezone.utc)\n        if datetime.now(timezone.utc) > expires_dt:\n            raise HTTPException(status_code=410, detail="This 30-Day All Access pass has expired")\n\n        request_reference = "MYCP-REQ-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(3).upper()\n        payload = {\n            "request_reference": request_reference,\n            "access_order_reference": row["order_reference"],\n            "customer_email": row["customer_email"],\n            "clinic_name": row.get("clinic_name"),\n            "treatment": request.treatment.strip(),\n            "request_type": request.requestType,\n            "request_details": {"notes": request.notes.strip()},\n            "status": "RECEIVED",\n        }\n        await _supabase_request(client, "POST", "/rest/v1/all_access_requests", payload=payload, prefer="return=minimal")\n\n    customer_email_sent = await _send_email(\n        [str(request.customerEmail)],\n        f"MYCP All Access request received - {request_reference}",\n        f"<p>We received your request for <strong>{request.treatment}</strong>.</p><p>Request: {request_reference}</p><p>All Access order: {request.orderReference}</p><p>We’ll prepare the requested documents using your clinic profile and submitted details. Please do not send PHI by email.</p>",\n    )\n    owner_email_sent = await _send_email(\n        [OWNER_EMAIL],\n        f"ALL ACCESS REQUEST - {request_reference}",\n        f"<p>New All Access request.</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Customer: {row['customer_email']}</p><p>Treatment: {request.treatment}</p><p>Type: {request.requestType}</p><p>All Access order: {request.orderReference}</p><p>Request: {request_reference}</p>",\n    )\n    return {\n        "status": "RECEIVED",\n        "requestReference": request_reference,\n        "accessOrderReference": request.orderReference,\n        "accessExpiresAt": expires_dt.isoformat(),\n        "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},\n    }\n'''
 service_text = service.read_text(encoding="utf-8")
 if '@app.post("/api/all-access/request")' not in service_text:
     marker = '\n\n@app.get("/api/download/{reference}")'
@@ -325,16 +325,16 @@ must_replace(checkout_return, 'assets/mycp-commerce.js?v=20261009b', 'assets/myc
 must_replace(
     checkout_return,
     '''      if(result.status==='COMPLETED'&&result.downloadUrl){
-        title.textContent="Payment confirmed — your Initial Version is ready";''',
+        title.textContent="Payment confirmed. Your Initial Version is ready";''',
     '''      if(result.package==='all_access'){
         title.textContent="Your 30-Day All Access is active";
         const expiry=result.accessExpiresAt?new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'}):'30 days from activation';
         message.textContent=`Payment confirmed. Your clinic can submit eligible protocol requests through ${expiry}.`;
-        status.textContent=`Order ${reference} — All Access active`;
+        status.textContent=`Order ${reference} - All Access active`;
         download.textContent="Submit a Protocol Request";download.href=result.requestUrl||`all-access-request.html?ref=${encodeURIComponent(reference)}`;download.classList.add('show');
         const details=document.querySelector('.details');if(details)details.innerHTML='<strong>30-DAY ALL ACCESS</strong><br>Submit as many eligible Customized Protocol or Complete Treatment Package requests as your clinic needs during the active 30-day period. This pass is for one clinic/legal practice, is non-transferable, and does not auto-renew. Specialty or investigational requests may require scope review. Final clinical approval remains with your clinic’s appropriately qualified medical director or supervising provider.';
       }else if(result.status==='COMPLETED'&&result.downloadUrl){
-        title.textContent="Payment confirmed — your Initial Version is ready";''',
+        title.textContent="Payment confirmed. Your Initial Version is ready";''',
 )
 
 print("All Access rollout patches applied successfully")

@@ -42,7 +42,7 @@
     try{
       const response=await fetch(`${MYCPCommerce.API}/api/all-access/request`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({accessCode:code,customerEmail:email,treatment,requestType:document.getElementById('requestType').value,notes:document.getElementById('details').value.trim()})});
       const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||'Unable to submit request');
-      status.innerHTML=`<strong>Request received — ${result.requestReference}</strong><br>Your access code is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
+      status.innerHTML=`<strong>Request received - ${result.requestReference}</strong><br>Your access code is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
       try{localStorage.setItem('mycp_all_access_pass',JSON.stringify({accessCode:code,customerEmail:email,accessExpiresAt:result.accessExpiresAt}))}catch(e){}
       document.getElementById('treatment').value='';document.getElementById('details').value='';
     }catch(error){status.textContent=error.message||'We could not submit the request. Please verify your access code and purchasing email.'}

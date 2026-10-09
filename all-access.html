@@ -45,23 +45,23 @@
       </section>
 
       <section class="form-card" id="payment">
-        <h2>Secure payment — activate your 30-day license</h2>
+        <h2>Secure payment. Activate your 30-day access</h2>
         <p>Pay first to activate access. After PayPal payment is verified, MYCP will issue a unique access code valid for 30 days. Treatment-specific details are submitted later when you use the code.</p>
-        <div class="highlight"><strong>Payment first — requests come after.</strong> Your 30-day period starts only after payment is verified. Your unique access code is then displayed on the confirmation page and can be used in the All Access Request Portal for the full 30 days.</div>
+        <div class="highlight"><strong>Payment first. Requests come after.</strong> Your 30-day period starts only after payment is verified. Your unique access code is then displayed on the confirmation page and can be used in the All Access Request Portal for the full 30 days.</div>
         <div class="grid">
           <div class="field"><label class="req" for="clinicName">Clinic name</label><input id="clinicName" autocomplete="organization"></div>
           <div class="field"><label class="req" for="email">Order email</label><input id="email" type="email" autocomplete="email"></div>
           <div class="field"><label for="phone">Phone</label><input id="phone" autocomplete="tel"></div>
           <div class="field"><label for="website">Website</label><input id="website" type="url" placeholder="https://"></div>
           <div class="field"><label class="req" for="state">Primary clinic state</label><select id="state"><option value="">Select state</option></select></div>
-          <div class="field"><label for="additionalStates">Additional states served</label><input id="additionalStates" placeholder="Optional — e.g. Georgia, Alabama"></div>
+          <div class="field"><label for="additionalStates">Additional states served</label><input id="additionalStates" placeholder="Optional. Example: Georgia, Alabama"></div>
           <div class="field full"><label for="practiceType">Practice type</label><select id="practiceType"><option value="">Select one</option><option>Medical Spa / Aesthetic Clinic</option><option>Wellness Clinic</option><option>Weight Management Clinic</option><option>IV Therapy Clinic</option><option>Dermatology / Medical Practice</option><option>Multi-Service Practice</option><option>Other</option></select></div>
         </div>
         <label class="checkline"><input id="singleClinic" type="checkbox"><span>I understand this All Access pass is for one clinic/legal practice and may not be shared, transferred, or resold.</span></label>
         <label class="checkline"><input id="noPhi" type="checkbox"><span>I will not submit patient names or protected health information through MYCP request forms.</span></label>
         <label class="checkline"><input id="approval" type="checkbox"><span>I understand final clinical approval remains with my clinic’s appropriately qualified medical director or supervising provider.</span></label>
         <div class="checkout">
-          <button class="paybtn" id="checkout" disabled>Continue to Secure PayPal Checkout — $249</button>
+          <button class="paybtn" id="checkout" disabled>Continue to Secure PayPal Checkout: $249</button>
           <div class="status" id="status" role="status"></div>
           <div class="fine">One-time 30-day access. This is not an automatically renewing subscription. PayPal securely processes payment; MYCP verifies the payment server-side before activating access.</div>
         </div>
@@ -78,7 +78,7 @@
     checkout.addEventListener('click',async()=>{
       if(!valid())return;
       checkout.disabled=true;checkout.textContent='Opening secure checkout…';status.textContent='Creating your verified PayPal order…';status.classList.add('show');
-      const payload={customerEmail:document.getElementById('email').value.trim(),package:'all_access',treatments:['30-Day All Access'],documents:[],clinic:{name:document.getElementById('clinicName').value.trim(),email:document.getElementById('email').value.trim(),phone:document.getElementById('phone').value.trim(),website:document.getElementById('website').value.trim(),state:state.value,additionalStates:document.getElementById('additionalStates').value.trim(),practiceType:document.getElementById('practiceType').value},providers:[],oversight:{},details:{accessTerms:'30-Day All Access — one clinic/legal practice'},expectedTotal:249,pricingVersion:MYCPCommerce.VERSION};
+      const payload={customerEmail:document.getElementById('email').value.trim(),package:'all_access',treatments:['30-Day All Access'],documents:[],clinic:{name:document.getElementById('clinicName').value.trim(),email:document.getElementById('email').value.trim(),phone:document.getElementById('phone').value.trim(),website:document.getElementById('website').value.trim(),state:state.value,additionalStates:document.getElementById('additionalStates').value.trim(),practiceType:document.getElementById('practiceType').value},providers:[],oversight:{},details:{accessTerms:'30-Day All Access. One clinic/legal practice'},expectedTotal:249,pricingVersion:MYCPCommerce.VERSION};
       try{
         const response=await fetch(`${MYCPCommerce.API}/api/checkout/create`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
         const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||'Unable to create checkout');
@@ -86,7 +86,7 @@
         try{localStorage.setItem('mycp_pending_payment',JSON.stringify({orderReference:result.orderReference,paypalOrderId:result.paypalOrderId,package:'all_access',customerEmail:document.getElementById('email').value.trim()}))}catch(e){}
         try{MYCPCommerce.trackCheckout(result,'all_access',1)}catch(e){}
         location.assign(approvalUrl);
-      }catch(error){status.textContent=error.message||'Secure checkout is temporarily unavailable. Nothing was charged.';checkout.disabled=false;checkout.textContent='Continue to Secure PayPal Checkout — $249';}
+      }catch(error){status.textContent=error.message||'Secure checkout is temporarily unavailable. Nothing was charged.';checkout.disabled=false;checkout.textContent='Continue to Secure PayPal Checkout: $249';}
     });
   </script>
 </body>
