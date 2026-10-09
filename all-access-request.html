@@ -8,7 +8,7 @@
   <title>All Access Request Portal | MyClinicProtocols</title>
   <meta name="robots" content="noindex,nofollow">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="assets/mycp-commerce.js?v=20261010"></script>
+  <script src="assets/mycp-commerce.js?v=20261010-2"></script>
   <style>
     :root{--navy:#071f57;--teal:#07969b;--ink:#102d55;--muted:#65758c;--line:#dbe6eb;--soft:#f7fafb;--mint:#e9f7f7}*{box-sizing:border-box}body{margin:0;font-family:Figtree,"Segoe UI",Arial,sans-serif;background:#f6fafb;color:var(--ink);line-height:1.55}.shell{width:min(900px,calc(100% - 28px));margin:auto}.top{height:88px;display:flex;align-items:center;justify-content:space-between}.top img{width:300px;max-width:58vw}.top a{text-decoration:none;color:var(--navy);font-weight:700;font-size:14px}.card{background:#fff;border:1px solid var(--line);border-radius:26px;padding:36px;box-shadow:0 22px 60px rgba(7,31,87,.08);margin:20px auto 70px}.eyebrow{display:inline-flex;padding:8px 13px;border-radius:10px;background:var(--mint);color:#087f86;font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.06em}h1{color:var(--navy);font-size:42px;line-height:1.05;letter-spacing:-.035em;margin:18px 0 10px}.lead{color:var(--muted);font-size:17px;margin:0 0 28px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{margin-bottom:15px}.full{grid-column:1/-1}label{display:block;font-weight:750;font-size:13px;margin-bottom:7px}.req:after{content:' *';color:#c94d4d}input,select,textarea{width:100%;padding:12px 13px;border:1px solid #cbd9e1;border-radius:12px;color:var(--ink);background:#fff;outline:none}textarea{min-height:120px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(7,150,155,.09)}.note{background:#fff8e8;border:1px solid #ead9ad;border-radius:13px;padding:13px;color:#6d6040;font-size:12px;margin:15px 0}.btn{width:100%;border:0;border-radius:14px;background:var(--teal);color:#fff;padding:15px;font-size:16px;font-weight:800;cursor:pointer}.btn:disabled{opacity:.55;cursor:not-allowed}.status{display:none;margin-top:16px;padding:15px;border-radius:13px;background:#edf9f5;border:1px solid #c8e7da;color:#176a4b}.status.show{display:block}.small{font-size:11px;color:var(--muted);margin-top:12px}@media(max-width:680px){.grid{grid-template-columns:1fr}.full{grid-column:auto}.card{padding:24px}h1{font-size:34px}.top{height:72px}}
   </style>
@@ -18,9 +18,9 @@
 <main class="shell"><section class="card">
   <span class="eyebrow">30-Day All Access</span>
   <h1>Submit a protocol request</h1>
-  <p class="lead">Use the same All Access order reference and email for every request during your active 30-day period.</p>
+  <p class="lead">Enter the unique access code issued after payment and the purchasing email. The same code works for the full active 30-day period.</p>
   <div class="grid">
-    <div class="field"><label class="req" for="reference">All Access order reference</label><input id="reference" placeholder="MYCP-20261010-XXXXXXXX" autocomplete="off"></div>
+    <div class="field"><label class="req" for="accessCode">30-Day Access Code</label><input id="accessCode" placeholder="MYCP-XXXX-XXXX-XXXX-XXXX" autocomplete="off" autocapitalize="characters"></div>
     <div class="field"><label class="req" for="email">Order email</label><input id="email" type="email" autocomplete="email"></div>
     <div class="field"><label class="req" for="treatment">Protocol / treatment requested</label><input id="treatment" placeholder="e.g. Neuromodulators, Microneedling, GLP-1"></div>
     <div class="field"><label for="requestType">What would you like?</label><select id="requestType"><option value="complete">Complete Treatment Package</option><option value="protocol">Customized Protocol / SOP only</option></select></div>
@@ -32,18 +32,20 @@
   <div class="small">Each request is tied to the clinic that purchased the All Access pass. Requests must be submitted before the 30-day access period expires. Final clinical approval remains with the clinic’s appropriately qualified medical director or supervising provider.</div>
 </section></main>
 <script>
-  const params=new URLSearchParams(location.search),ref=document.getElementById('reference');if(params.get('ref'))ref.value=params.get('ref');
+  const accessCode=document.getElementById('accessCode'),emailField=document.getElementById('email');
+  try{const saved=JSON.parse(localStorage.getItem('mycp_all_access_pass')||'null');if(saved?.accessCode)accessCode.value=saved.accessCode;if(saved?.customerEmail)emailField.value=saved.customerEmail}catch(e){}
   const submit=document.getElementById('submit'),status=document.getElementById('status');
   submit.addEventListener('click',async()=>{
-    const email=document.getElementById('email').value.trim(),treatment=document.getElementById('treatment').value.trim();
-    if(!ref.value.trim()||!email||!document.getElementById('email').validity.valid||!treatment){status.textContent='Please enter your All Access order reference, order email, and requested protocol.';status.classList.add('show');return;}
-    submit.disabled=true;submit.textContent='Submitting request…';status.textContent='Verifying your active All Access pass…';status.classList.add('show');
+    const email=emailField.value.trim(),treatment=document.getElementById('treatment').value.trim(),code=accessCode.value.trim().toUpperCase();
+    if(!code||!email||!emailField.validity.valid||!treatment){status.textContent='Please enter your 30-Day Access Code, purchasing email, and requested protocol.';status.classList.add('show');return;}
+    submit.disabled=true;submit.textContent='Submitting request…';status.textContent='Verifying your active 30-Day Access Code…';status.classList.add('show');
     try{
-      const response=await fetch(`${MYCPCommerce.API}/api/all-access/request`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({orderReference:ref.value.trim(),customerEmail:email,treatment,requestType:document.getElementById('requestType').value,notes:document.getElementById('details').value.trim()})});
+      const response=await fetch(`${MYCPCommerce.API}/api/all-access/request`,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({accessCode:code,customerEmail:email,treatment,requestType:document.getElementById('requestType').value,notes:document.getElementById('details').value.trim()})});
       const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||'Unable to submit request');
-      status.innerHTML=`<strong>Request received — ${result.requestReference}</strong><br>Your All Access pass is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
+      status.innerHTML=`<strong>Request received — ${result.requestReference}</strong><br>Your access code is active through ${new Date(result.accessExpiresAt).toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})}. You can submit another request anytime during the active period.`;
+      try{localStorage.setItem('mycp_all_access_pass',JSON.stringify({accessCode:code,customerEmail:email,accessExpiresAt:result.accessExpiresAt}))}catch(e){}
       document.getElementById('treatment').value='';document.getElementById('details').value='';
-    }catch(error){status.textContent=error.message||'We could not submit the request. Please verify your order reference and email.'}
+    }catch(error){status.textContent=error.message||'We could not submit the request. Please verify your access code and purchasing email.'}
     finally{submit.disabled=false;submit.textContent='Submit All Access Request'}
   });
 </script>

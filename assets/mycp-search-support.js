@@ -8,8 +8,8 @@
   const GUIDES_URL='resources.html';
 
   const PRICING={
-    protocol:{label:'Customized Protocol',prices:{1:29,3:87,5:145,10:290}},
-    complete:{label:'Complete Treatment Package',prices:{1:49,3:147,5:245,10:490}},
+    protocol:{label:'Customized Protocol',prices:{1:29,2:58,3:87,4:116,5:145,6:174,7:203,8:232},max:8},
+    complete:{label:'Complete Treatment Package',prices:{1:49,2:98,3:147,4:196,5:245},max:5},
     allAccess:{label:'30-Day All Access',price:249}
   };
 
