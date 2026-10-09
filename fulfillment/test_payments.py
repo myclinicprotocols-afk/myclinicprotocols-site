@@ -1,6 +1,7 @@
 """Payment verification regression tests; no network or real payments."""
 import copy
 import json
+from decimal import Decimal
 from pathlib import Path
 import tempfile
 import unittest
@@ -59,6 +60,36 @@ class CaptureTests(unittest.IsolatedAsyncioTestCase):
         paypal.assert_not_called()
         package.assert_not_called()
 
+    async def test_return_without_browser_storage_recovers_by_paypal_token(self):
+        self.request = service.Capture(paypalOrderId="PAYPAL123")
+        result, _, _ = await self.run_capture([self.order])
+        self.assertEqual(result["orderReference"], "MYCP-TEST")
+        # A price change must never reprice an already-created PayPal order.
+        self.assertEqual(result["amount"], "149.00")
+        self.assertEqual(result["paymentMode"], "unknown")
+
+    async def test_wrong_supplied_reference_is_rejected(self):
+        self.request = service.Capture(orderReference="MYCP-OTHER", paypalOrderId="PAYPAL123")
+        with self.assertRaises(HTTPException) as raised:
+            await self.run_capture([])
+        self.assertEqual(raised.exception.status_code, 404)
+
+    async def test_current_price_and_recorded_mode_survive_repeated_return(self):
+        self.order["purchase_units"][0]["amount"]["value"] = "49.00"
+        self.order["purchase_units"][0]["payments"]["captures"][0]["amount"]["value"] = "49.00"
+        with service._connect() as db:
+            db.execute("UPDATE orders SET amount=?, intake=?", ("49.00", json.dumps({
+                "package": "complete", "treatments": ["Example treatment"], "_paymentMode": "sandbox"})))
+        with patch.dict(service.os.environ, {"PAYPAL_MODE": "live"}):
+            first, _, _ = await self.run_capture([self.order])
+            again, _, _ = await self.run_capture([])
+        for result in (first, again):
+            self.assertEqual(result["amount"], "49.00")
+            self.assertEqual(result["currency"], "USD")
+            self.assertEqual(result["paymentMode"], "sandbox")
+            self.assertEqual(result["package"], "complete")
+            self.assertEqual(result["treatmentCount"], 1)
+
     async def test_lost_capture_response_reconciles(self):
         approved = copy.deepcopy(self.order)
         approved["status"] = "APPROVED"
@@ -87,6 +118,59 @@ class CaptureTests(unittest.IsolatedAsyncioTestCase):
                 self.package_mock.assert_not_called()
                 with service._connect() as db:
                     self.assertEqual(db.execute("SELECT status FROM orders").fetchone()[0], "CREATED")
+
+
+class PricingTests(unittest.IsolatedAsyncioTestCase):
+    async def asyncSetUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        patcher = patch.object(service, "DB", Path(self.temp.name) / "orders.sqlite3")
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def checkout(self, package="complete", count=1, **extra):
+        return service.Checkout(customerEmail="buyer@example.com", package=package,
+            treatments=[f"Treatment {n}" for n in range(count)], clinic={}, **extra)
+
+    async def test_new_prices_sent_to_paypal_and_stored_for_each_quantity(self):
+        with patch.dict(service.os.environ, {"PAYPAL_MODE": "sandbox",
+                    "PAYPAL_RETURN_URL": "https://example.com/return",
+                    "PAYPAL_CANCEL_URL": "https://example.com/cancel"}):
+            for package, unit in (("protocol", 29), ("complete", 49)):
+                for count in (1, 3, 5, 10):
+                    with self.subTest(package=package, count=count):
+                        amount = f"{unit * count:.2f}"
+                        payment = {"id": f"{package}{count}", "links": [{"rel": "payer-action",
+                            "href": "https://www.sandbox.paypal.com/checkoutnow?token=TEST"}]}
+                        with patch.object(service, "_paypal", AsyncMock(return_value=payment)) as paypal, \
+                             patch.object(service.httpx, "AsyncClient"):
+                            result = await service.create_checkout(self.checkout(package, count,
+                                expectedTotal=Decimal(amount), pricingVersion=service.PRICING_VERSION))
+                        payload = paypal.call_args.args[3]
+                        self.assertEqual(payload["purchase_units"][0]["amount"]["value"], amount)
+                        self.assertEqual(result["amount"], amount)
+                        self.assertEqual(result["currency"], "USD")
+                        self.assertEqual(result["pricingVersion"], service.PRICING_VERSION)
+                        with service._connect() as db:
+                            row = db.execute("SELECT * FROM orders WHERE reference=?", (result["orderReference"],)).fetchone()
+                        self.assertEqual(row["amount"], amount)
+                        self.assertEqual(json.loads(row["intake"])["_paymentMode"], "sandbox")
+
+    async def test_stale_or_tampered_quote_never_creates_paypal_order(self):
+        for extra in ({"expectedTotal": 149}, {"expectedTotal": 1},
+                      {"expectedTotal": 49, "pricingVersion": "old"}):
+            with self.subTest(extra=extra), patch.object(service, "_paypal", AsyncMock()) as paypal:
+                with self.assertRaises(HTTPException) as raised:
+                    await service.create_checkout(self.checkout(**extra))
+                self.assertEqual(raised.exception.status_code, 409)
+                paypal.assert_not_called()
+
+    async def test_unsupported_quantity_never_creates_paypal_order(self):
+        with patch.object(service, "_paypal", AsyncMock()) as paypal:
+            with self.assertRaises(HTTPException) as raised:
+                await service.create_checkout(self.checkout(count=2))
+            self.assertEqual(raised.exception.status_code, 400)
+            paypal.assert_not_called()
 
 
 if __name__ == "__main__":

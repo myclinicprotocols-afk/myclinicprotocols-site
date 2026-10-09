@@ -8,8 +8,8 @@
   const GUIDES_URL='resources.html';
 
   const PRICING={
-    protocol:{label:'Customized Protocol',prices:{1:99,3:249,5:379,10:699}},
-    complete:{label:'Complete Treatment Package',prices:{1:149,3:399,5:625,10:1099}}
+    protocol:{label:'Customized Protocol',prices:{1:29,3:87,5:145,10:290}},
+    complete:{label:'Complete Treatment Package',prices:{1:49,3:147,5:245,10:490}}
   };
 
   const CATALOG=[
@@ -298,11 +298,11 @@
   }
 
   function priceText(){
-    return `Current founding pricing on the website is:
-Customized Protocol — 1 treatment $99, 3 treatments $249, 5 treatments $379, or 10 treatments $699.
-Complete Treatment Package — 1 treatment $149, 3 treatments $399, 5 treatments $625, or 10 treatments $1,099.
+    return `Current pricing in USD is:
+Customized Protocol — 1 treatment $29, 3 treatments $87, 5 treatments $145, or 10 treatments $290.
+Complete Treatment Package — 1 treatment $49, 3 treatments $147, 5 treatments $245, or 10 treatments $490.
 
-The Complete Treatment Package is the broader option because it includes the clinical protocol plus applicable consent, intake/eligibility, treatment record, pre/post-care, safety checklist, and emergency/adverse-event guidance.`;
+For $20 more per treatment, the Complete Treatment Package includes the clinical protocol plus applicable consent, intake/eligibility, treatment record, pre/post-care, safety checklist, and emergency/adverse-event guidance.`;
   }
 
   function answerFor(question){
@@ -370,7 +370,7 @@ The website then matches the intake to the verified payment before files are rel
       );
     }
 
-    if(hasAny(q,['price','pricing','cost','how much','bundle price','founding price','99','149','399','625','1099','699'])){
+    if(hasAny(q,['price','pricing','cost','how much','bundle price','founding price','29','49','87','145','290','147','245','490'])){
       return response(
         priceText(),
         links({label:'View pricing',href:`${HOME_URL}#pricing`},{label:'Build my package',href:ORDER_URL})
@@ -398,16 +398,16 @@ The website then matches the intake to the verified payment before files are rel
       );
     }
 
-    if(hasAny(q,['instant draft','draft after payment','immediate download','download after payment'])){
+    if(hasAny(q,['initial version','instant draft','draft after payment','immediate download','download after payment'])){
       return response(
-        `The order flow provides an instant draft by website download with an email backup after verified payment. That draft is followed by the RN-reviewed version. The draft is not the final clinical approval — your clinic’s qualified reviewer still needs to review and approve the final content.`,
+        `The order flow provides an Initial Version by website download with an email backup after verified payment. That is followed by the RN-reviewed final version, normally in 1–2 hours and up to 24 hours depending on the document set. The Initial Version does not replace final clinical approval — your clinic’s qualified reviewer still needs to review and approve the final content.`,
         links({label:'Start an order',href:ORDER_URL})
       );
     }
 
     if(hasAny(q,['delivery','turnaround','how long','when will i get','receive my files','rn reviewed','reviewed version'])){
       return response(
-        `The website’s current workflow is: verified payment → instant draft by website download and email backup → RN-reviewed version, usually in about 1–2 hours and up to 24 hours depending on the documents/customization → revision period if needed.`,
+        `The website’s current workflow is: verified payment → Initial Version by website download and email backup → RN-reviewed version, usually in about 1–2 hours and up to 24 hours depending on the documents/customization → revision period if needed.`,
         links({label:'Start an order',href:ORDER_URL},{label:'Time-sensitive question',href:`mailto:${SUPPORT_EMAIL}?subject=Delivery%20timing%20question`})
       );
     }
@@ -463,7 +463,7 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['multiple treatments','more than one treatment','several treatments','bundle','combine protocols','multi treatment'])){
       return response(
-        `Yes. You can select multiple treatments in one order and keep them together in a single clinic intake. The site has bundle pricing for 3, 5, and 10 treatments, in addition to a single-treatment option.`,
+        `Yes. You can select multiple treatments in one order and keep them together in a single clinic intake. Orders support 1, 3, 5, or 10 treatments at the same $29 per protocol or $49 per complete-package rate.`,
         links({label:'Build a multi-treatment package',href:ORDER_URL},{label:'See bundle pricing',href:`${HOME_URL}#pricing`})
       );
     }
@@ -536,7 +536,7 @@ The website then matches the intake to the verified payment before files are rel
     }
 
     return response(
-      `I can answer most questions about the MYCP website — protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, PayPal checkout, delivery, instant drafts, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
+      `I can answer most questions about the MYCP website — protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, PayPal checkout, delivery, the Initial Version, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
       links({label:'Browse protocols',href:`${HOME_URL}#protocols`},{label:'Email support',href:`mailto:${SUPPORT_EMAIL}?subject=MyClinicProtocols%20Question`})
     );
   }

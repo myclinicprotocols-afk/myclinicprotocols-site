@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import base64
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 import hashlib
 import hmac
 import json
@@ -30,9 +31,10 @@ from fulfillment.documents import make_package
 
 OWNER_EMAIL = "myclinicprotocols@gmail.com"
 PRICES = {
-    "protocol": {1: 99, 3: 249, 5: 379, 10: 699},
-    "complete": {1: 149, 3: 399, 5: 625, 10: 1099},
+    "protocol": {1: 29, 3: 87, 5: 145, 10: 290},
+    "complete": {1: 49, 3: 147, 5: 245, 10: 490},
 }
+PRICING_VERSION = "2026-10-09"
 ROOT = Path(os.environ.get("MYCP_PRIVATE_ROOT", "private-orders")).resolve()
 ROOT.mkdir(parents=True, exist_ok=True)
 DB = ROOT / "orders.sqlite3"
@@ -48,11 +50,13 @@ class Checkout(BaseModel):
     providers: list[str] = Field(default_factory=list, max_length=20)
     oversight: dict = Field(default_factory=dict)
     details: dict = Field(default_factory=dict)
+    expectedTotal: Decimal | None = Field(default=None, ge=0)
+    pricingVersion: str | None = None
 
 
 class Capture(BaseModel):
-    orderReference: str
-    paypalOrderId: str
+    orderReference: str | None = None
+    paypalOrderId: str = Field(min_length=1, max_length=128, pattern=r"^[A-Za-z0-9-]+$")
 
 
 app = FastAPI(title="MyClinicProtocols Fulfillment", docs_url=None, redoc_url=None)
@@ -150,6 +154,14 @@ async def _send_email(to: list[str], subject: str, html: str) -> bool:
 async def create_checkout(checkout: Checkout):
     count = len(checkout.treatments)
     amount = f"{_price(checkout.package, count):.2f}"
+    if ((checkout.expectedTotal is not None and checkout.expectedTotal != Decimal(amount))
+            or (checkout.pricingVersion is not None and checkout.pricingVersion != PRICING_VERSION)):
+        raise HTTPException(409, "Pricing has changed. Refresh the order page and review your total before paying.")
+    payment_mode = os.environ.get("PAYPAL_MODE", "sandbox")
+    # Store mode with the order so sandbox orders cannot become revenue if
+    # this service later switches to live. Never accept mode from the browser.
+    intake = checkout.model_dump(mode="json")
+    intake["_paymentMode"] = payment_mode
     reference = "MYCP-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(4).upper()
     return_url = os.environ.get("PAYPAL_RETURN_URL")
     cancel_url = os.environ.get("PAYPAL_CANCEL_URL")
@@ -176,10 +188,25 @@ async def create_checkout(checkout: Checkout):
         db.execute(
             "INSERT INTO orders VALUES (?,?,?,?,?,?,?,?,?,?)",
             (reference, paypal["id"], str(checkout.customerEmail), amount, "USD", "CREATED",
-             checkout.model_dump_json(), None, datetime.now(timezone.utc).isoformat(), None),
+             json.dumps(intake), None, datetime.now(timezone.utc).isoformat(), None),
         )
     approval = next(link["href"] for link in paypal.get("links", []) if link.get("rel") == "payer-action")
-    return {"orderReference": reference, "paypalOrderId": paypal["id"], "approvalUrl": approval}
+    return {"orderReference": reference, "paypalOrderId": paypal["id"], "approvalUrl": approval,
+            "amount": amount, "currency": "USD", "paymentMode": payment_mode,
+            "pricingVersion": PRICING_VERSION}
+
+
+def _completed_response(row) -> dict:
+    """Report stored payment facts, never reprice an existing order."""
+    intake = json.loads(row["intake"])
+    return {
+        "status": "COMPLETED", "orderReference": row["reference"],
+        "downloadUrl": _download_url(row["reference"]),
+        "amount": row["amount"], "currency": row["currency"],
+        "paymentMode": intake.get("_paymentMode", "unknown"),
+        "package": intake.get("package"),
+        "treatmentCount": len(intake.get("treatments") or []),
+    }
 
 
 def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
@@ -208,11 +235,15 @@ def _verify_paypal_order(result: dict, row, *, require_capture: bool) -> None:
 @app.post("/api/checkout/capture")
 async def capture_checkout(capture: Capture):
     with _connect() as db:
-        row = db.execute("SELECT * FROM orders WHERE reference=? AND paypal_id=?", (capture.orderReference, capture.paypalOrderId)).fetchone()
+        # PayPal's opaque order token also works when the buyer returns in a
+        # different browser. A supplied reference must still match exactly.
+        row = db.execute("SELECT * FROM orders WHERE paypal_id=?", (capture.paypalOrderId,)).fetchone()
+    if row and capture.orderReference and capture.orderReference != row["reference"]:
+        row = None
     if not row:
         raise HTTPException(status_code=404, detail="Order not found")
     if row["status"] == "COMPLETED":
-        return {"status": "COMPLETED", "downloadUrl": _download_url(row["reference"])}
+        return _completed_response(row)
     async with httpx.AsyncClient(timeout=25) as client:
         path = f"/v2/checkout/orders/{row['paypal_id']}"
         result = await _paypal(client, "GET", path)
@@ -238,15 +269,15 @@ async def capture_checkout(capture: Capture):
     url = _download_url(row["reference"])
     customer_email_sent = await _send_email(
         [row["email"]],
-        f"Your MyClinicProtocols draft — {row['reference']}",
-        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your draft DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>DRAFT — Qualified Provider Review Required.</strong></p><p>Your RN-reviewed version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set.</p>",
+        f"Your MyClinicProtocols Initial Version — {row['reference']}",
+        f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. This private link expires in 24 hours.</p><p><strong>Prepared for qualified provider review.</strong></p><p>Your RN-reviewed final version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set. Up to two consolidated revision rounds may be requested within 14 calendar days of delivery; revisions normally take 3–5 business days.</p>",
     )
     owner_email_sent = await _send_email(
         [OWNER_EMAIL], f"Paid MYCP order — {row['reference']}",
         f"<p>A verified payment of ${row['amount']} USD was received.</p><p>Customer: {row['email']}</p><p>Order: {row['reference']}</p>",
     )
     return {
-        "status": "COMPLETED",
+        **_completed_response(row),
         "downloadUrl": url,
         "emailDelivery": {"customer": customer_email_sent, "owner": owner_email_sent},
     }
@@ -267,4 +298,4 @@ async def download(reference: str, expires: int, signature: str, request: Reques
 
 @app.get("/health")
 async def health():
-    return {"status": "ok"}
+    return {"status": "ok", "pricingVersion": PRICING_VERSION}
