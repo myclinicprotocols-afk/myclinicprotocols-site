@@ -351,9 +351,9 @@ All Access lets the purchasing clinic submit as many eligible protocol and Compl
 2) Select one or more treatments.
 3) Enter your clinic, state, provider, and oversight details.
 4) Add treatment-specific products, medications, formulas, devices, methods, and workflow notes.
-5) Review your package and complete secure PayPal checkout.
+5) Review your package and complete checkout.
 
-The website then matches the intake to the verified payment before files are released.`,
+After payment is verified, your order is confirmed. MYCP then prepares the completed package from the appropriate master protocols and delivers it by email with a private download link.`,
         links({label:'Start my order',href:ORDER_URL},{label:'Browse protocols first',href:`${HOME_URL}#protocols`})
       );
     }
@@ -367,7 +367,7 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['2 treatments','4 treatments','6 treatments','7 treatments','8 treatments','9 treatments','custom quantity','other quantity','quantity not listed'])){
       return response(
-        `Online checkout is currently set up for packages containing exactly 1, 3, 5, or 10 treatments. For another quantity, contact MYCP for a custom order rather than forcing the checkout.`,
+        `Customized Protocol orders can include up to 8 treatments. Complete Treatment Package orders can include up to 5. For larger or ongoing needs, 30-Day All Access is $249 and lets one clinic submit eligible protocol requests throughout the active 30-day period.`,
         links({label:'Email for custom quantity',href:`mailto:${SUPPORT_EMAIL}?subject=Custom%20multi-treatment%20order`},{label:'View order page',href:ORDER_URL})
       );
     }
@@ -409,14 +409,14 @@ The website then matches the intake to the verified payment before files are rel
 
     if(hasAny(q,['initial version','instant draft','draft after payment','immediate download','download after payment'])){
       return response(
-        `The order flow provides an Initial Version by website download with an email backup after verified payment. That is followed by the RN-reviewed final version, normally in 1–2 hours and up to 24 hours depending on the document set. The Initial Version does not replace final clinical approval - your clinic’s qualified reviewer still needs to review and approve the final content.`,
+        `After checkout, your order is confirmed and MYCP prepares the completed package from the appropriate master protocols. Your Word and PDF files are delivered by email with a private download link, usually within 1-2 hours and up to 24 hours depending on the package. Final clinical approval remains with your clinic’s qualified provider or medical director.`,
         links({label:'Start an order',href:ORDER_URL})
       );
     }
 
     if(hasAny(q,['delivery','turnaround','how long','when will i get','receive my files','rn reviewed','reviewed version'])){
       return response(
-        `The website’s current workflow is: verified payment → Initial Version by website download and email backup → RN-reviewed version, usually in about 1–2 hours and up to 24 hours depending on the documents/customization → revision period if needed.`,
+        `The current workflow is simple: choose your protocol, complete the clinic customization form, checkout, receive your order confirmation, then MYCP prepares the completed package from the appropriate master protocols. Delivery is by email with a private download link, usually within 1-2 hours and up to 24 hours depending on the package.`,
         links({label:'Start an order',href:ORDER_URL},{label:'Time-sensitive question',href:`mailto:${SUPPORT_EMAIL}?subject=Delivery%20timing%20question`})
       );
     }
@@ -545,7 +545,7 @@ The website then matches the intake to the verified payment before files are rel
     }
 
     return response(
-      `I can answer most questions about the MYCP website - protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, PayPal checkout, delivery, the Initial Version, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
+      `I can answer most questions about the MYCP website - protocols, pricing, packages, included documents, state-specific customization, provider roles, branding, ordering, checkout, delivery, revisions, file formats, custom treatments, Guides, and support. I couldn’t confidently match that question, so I’d rather not guess. Try rephrasing it, or email ${SUPPORT_EMAIL} for a human answer.`,
       links({label:'Browse protocols',href:`${HOME_URL}#protocols`},{label:'Email support',href:`mailto:${SUPPORT_EMAIL}?subject=MyClinicProtocols%20Question`})
     );
   }
