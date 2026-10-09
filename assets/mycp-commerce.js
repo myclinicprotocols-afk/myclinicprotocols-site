@@ -1,7 +1,7 @@
 /* Shared checkout verification and privacy-safe ecommerce events. */
 (function () {
   'use strict';
-  const VERSION = '2026-10-09';
+  const VERSION = '2026-10-09-2';
   const API = 'https://orders.myclinicprotocols.com';
   const names = {protocol: 'Customized Protocol', complete: 'Complete Treatment Package'};
   function eventData(result) {
