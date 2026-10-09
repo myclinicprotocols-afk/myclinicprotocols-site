@@ -1,0 +1,33 @@
+name: Apply payment limits and access code frontend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/apply_payment_limits_access_codes_frontend.py
+      - .github/workflows/apply-payment-limits-access-codes-frontend.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply frontend changes
+        run: python scripts/apply_payment_limits_access_codes_frontend.py
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add order.html index.html all-access.html all-access-request.html checkout-return.html assets/mycp-commerce.js assets/mycp-search-support.js
+          git commit -m "Enforce plan limits and add 30-day access codes"
+          git push
