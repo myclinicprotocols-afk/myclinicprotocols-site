@@ -183,6 +183,7 @@
   <script>
   (()=>{
     const FULFILLMENT_API=MYCPCommerce.API;
+    const TERMS_VERSION='2026-10-10';
     const states=["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","District of Columbia","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"];
     const treatments=[
       ["Neuromodulators","Injectables"],["Dermal Fillers","Injectables"],["Biostimulatory Injectables","Injectables"],["Hyaluronidase / Filler Dissolution","Injectables"],["PDO Thread Treatments","Injectables"],["Sclerotherapy","Injectables"],
@@ -275,7 +276,7 @@
       const count=allTreatments().length;if(!pricing[model.package].units[count]){$('#checkoutNote').classList.add('show');$('#saved').classList.add('show');return}
       const button=$('#checkout'),status=$('#checkoutStatus');button.disabled=true;button.textContent="Opening checkout...";status.textContent="Preparing checkout...";status.classList.add('show');
       try{
-        const d=orderData(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};
+        const d=orderData(),acceptedAt=new Date().toISOString(),payload={...d,customerEmail:d.clinic.email,treatments:allTreatments(),details:{...d.details,orderConsent:{termsAccepted:true,termsVersion:TERMS_VERSION,termsAcceptedAt:acceptedAt,finalClinicalApprovalAcknowledged:true,noPhiConfirmed:true}},expectedTotal:d.estimatedTotal,pricingVersion:MYCPCommerce.VERSION};
         const response=await fetch(`${FULFILLMENT_API}/api/checkout/create`,{method:"POST",headers:{"Content-Type":"application/json","Accept":"application/json"},body:JSON.stringify(payload)});
         const result=await response.json().catch(()=>({}));if(!response.ok)throw new Error(result.detail||"Unable to create checkout");
         const approvalUrl=MYCPCommerce.verifyQuote(result,d.estimatedTotal);
