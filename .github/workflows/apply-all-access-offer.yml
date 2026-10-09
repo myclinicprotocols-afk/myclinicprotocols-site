@@ -1,0 +1,33 @@
+name: Apply All Access offer
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/apply_all_access_offer.py
+      - .github/workflows/apply-all-access-offer.yml
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Apply rollout patches
+        run: python scripts/apply_all_access_offer.py
+      - name: Commit generated changes
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add index.html assets/mycp-commerce.js assets/mycp-search-support.js fulfillment/service.py checkout-return.html
+          git commit -m "Launch 30-Day All Access offer"
+          git push
