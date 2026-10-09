@@ -1,0 +1,31 @@
+name: Add MYCP Access tab
+
+on:
+  push:
+    paths:
+      - '.github/workflows/add-access-tab.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-access-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Add Access tab
+        run: python scripts/add_access_tab.py
+      - name: Commit navigation updates
+        run: |
+          if git diff --quiet; then
+            echo "No navigation changes to commit"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add '*.html'
+          git commit -m "Add All Access portal navigation"
+          git push origin HEAD:main
