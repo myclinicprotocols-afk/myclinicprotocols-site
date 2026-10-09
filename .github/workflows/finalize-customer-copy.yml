@@ -1,4 +1,4 @@
-# Trigger full public customer copy audit
+# Trigger final sitewide customer copy audit
 name: Finalize simplified customer journey
 
 on:
@@ -27,6 +27,6 @@ jobs:
           fi
           git config user.name "myclinicprotocols-afk"
           git config user.email "myclinicprotocols@gmail.com"
-          git add index.html order.html editorial-standards.html assets/mycp-search-support.js
+          git add index.html order.html editorial-standards.html assets/mycp-search-support.js med-spa-protocol-templates.html
           git commit -m "Finalize simple customer checkout journey"
           git push origin HEAD:main
