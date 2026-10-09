@@ -314,11 +314,11 @@ async def create_checkout(checkout: Checkout):
             or (checkout.pricingVersion is not None and checkout.pricingVersion != PRICING_VERSION)):
         raise HTTPException(status_code=409, detail="Pricing has changed. Refresh the order page and review your total before paying.")
     payment_mode = os.environ.get("PAYPAL_MODE", "sandbox")
-    fulfillment_mode = "all_access" if checkout.package == "all_access" else _fulfillment_mode(checkout.treatments)
+    fulfillment_mode = "all_access" if checkout.package == "all_access" else "manual"
     if fulfillment_mode == "manual" and not _email_configured():
         raise HTTPException(
             status_code=409,
-            detail="This treatment requires clinic-specific preparation before delivery. Online payment is not available for it yet; please email myclinicprotocols@gmail.com and we’ll help you complete the order."
+            detail="Checkout is temporarily unavailable while order confirmation email is being configured. Please email myclinicprotocols@gmail.com and we will help you complete the order."
         )
     reference = "MYCP-" + datetime.now(timezone.utc).strftime("%Y%m%d") + "-" + secrets.token_hex(4).upper()
     return_url = os.environ.get("PAYPAL_RETURN_URL")
@@ -459,11 +459,11 @@ async def capture_checkout(capture: Capture):
             request_url = f"{origin}/all-access-request.html"
             customer_email_sent = await _send_email(
                 [row["customer_email"]],
-                f"Your MYCP 30-Day All Access is active — {row['order_reference']}",
-                f"<p>Payment confirmed — your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p>Your 30-Day Access Code is <strong>{access_code}</strong>.</p><p><a href='{request_url}'>Open the All Access Request Portal</a> and use this code with your purchasing email any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>")
+                f"Your MYCP 30-Day All Access is active: {row['order_reference']}",
+                f"<p>Payment confirmed. Your 30-Day All Access is active.</p><p>Your access is valid through <strong>{expires_dt.strftime('%B %d, %Y')}</strong>.</p><p>Your 30-Day Access Code is <strong>{access_code}</strong>.</p><p><a href='{request_url}'>Open the All Access Request Portal</a> and use this code with your purchasing email any time during your active period.</p><p>This pass is for one clinic/legal practice and is non-transferable. Specialty or investigational requests may require scope review. Please do not submit PHI.</p>")
             owner_email_sent = await _send_email(
                 [OWNER_EMAIL],
-                f"NEW $249 ALL ACCESS — {row['order_reference']}",
+                f"NEW $249 ALL ACCESS: {row['order_reference']}",
                 f"<p>A verified $249 30-Day All Access purchase was received.</p><p>Customer: {row['customer_email']}</p><p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Order: {row['order_reference']}</p><p>Access expires: {expires_dt.strftime('%B %d, %Y')}</p>")
             await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
             row["email_delivery"] = customer_email_sent
@@ -471,63 +471,44 @@ async def capture_checkout(capture: Capture):
             response["emailDelivery"] = {"customer": customer_email_sent, "owner": owner_email_sent}
             return response
 
-        fulfillment_mode = order.get("_fulfillmentMode") or _fulfillment_mode(order.get("treatments") or [])
-        storage_path = None
-        if fulfillment_mode == "automatic":
-            try:
-                package_bytes = make_package(order)
-                candidate_path = f"{row['order_reference']}/initial-version-package.zip"
-                if await _storage_upload(client, candidate_path, package_bytes):
-                    storage_path = candidate_path
-                else:
-                    local_path = ROOT / row["order_reference"] / "initial-version-package.zip"
-                    local_path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
-                    local_path.write_bytes(package_bytes)
-                    storage_path = "local:" + str(local_path)
-            except ValueError:
-                logging.exception("Automatic master generation failed; routing %s to manual fulfillment", row["order_reference"])
-                fulfillment_mode = "manual"
-                order["_fulfillmentMode"] = "manual"
-
+        fulfillment_mode = "manual"
+        order["_fulfillmentMode"] = "manual"
         paid_at = datetime.now(timezone.utc).isoformat()
-        values = {"payment_status": "COMPLETED", "paid_at": paid_at, "intake": order}
-        if storage_path:
-            values["package_storage_path"] = storage_path
-        await _update_order(client, row["order_reference"], values)
-        row["payment_status"] = "COMPLETED"
-        row["package_storage_path"] = storage_path
-        row["paid_at"] = paid_at
-        row["intake"] = order
+        await _update_order(client, row["order_reference"], {
+            "payment_status": "COMPLETED",
+            "paid_at": paid_at,
+            "package_storage_path": None,
+            "intake": order,
+        })
+        row.update({
+            "payment_status": "COMPLETED",
+            "paid_at": paid_at,
+            "package_storage_path": None,
+            "intake": order,
+        })
 
-    if storage_path:
-        url = _download_url(row["order_reference"])
-        customer_subject = f"Your MyClinicProtocols Initial Version — {row['order_reference']}"
-        customer_html = (f"<p>Payment confirmed.</p><p><a href='{url}'>Download your Initial Version DOCX + PDF package</a>. "
-                         "This private link expires in 24 hours.</p><p><strong>Prepared for qualified provider review.</strong></p>"
-                         "<p>Your RN-reviewed final version is normally delivered within 1–2 hours and may take up to 24 hours depending on the document set. "
-                         "Up to two consolidated revision rounds may be requested within 14 calendar days of delivery; revisions normally take 3–5 business days.</p>")
-        owner_subject = f"Paid MYCP order — {row['order_reference']}"
-    else:
-        url = None
-        customer_subject = f"Your MyClinicProtocols order is confirmed — {row['order_reference']}"
-        customer_html = ("<p>Payment confirmed. Your clinic-specific Initial Version is now being prepared from the appropriate MyClinicProtocols master package.</p>"
-                         "<p>It is normally emailed within 1–2 hours and may take up to 24 hours for larger or more complex document sets.</p>"
-                         "<p>You do not need to place another order. We will send the files to this email address when they are ready.</p>")
-        owner_subject = f"MANUAL FULFILLMENT — Paid MYCP order — {row['order_reference']}"
-
+    customer_subject = f"Order confirmed: {row['order_reference']}"
+    customer_html = (
+        "<p><strong>Order confirmed.</strong></p>"
+        "<p>We received your payment and are preparing your customized package from the appropriate MyClinicProtocols master protocols.</p>"
+        "<p>Most completed packages are delivered within 1-2 hours and may take up to 24 hours depending on the package, customization, and review needed.</p>"
+        "<p>Your completed Word and PDF files will be sent to this email address with a private download link. You do not need to place another order.</p>"
+        "<p>Final clinical approval remains with your clinic's qualified provider or medical director.</p>"
+    )
+    owner_subject = f"NEW PAID MYCP ORDER: {row['order_reference']}"
     customer_email_sent = await _send_email([row["customer_email"]], customer_subject, customer_html)
     owner_email_sent = await _send_email(
         [OWNER_EMAIL], owner_subject,
         f"<p>A verified payment of ${_row_amount(row)} USD was received.</p><p>Customer: {row['customer_email']}</p>"
-        f"<p>Order: {row['order_reference']}</p><p>Fulfillment mode: {fulfillment_mode}</p>"
-        f"<p>Treatment(s): {row.get('treatment') or ''}</p>")
+        f"<p>Clinic: {row.get('clinic_name') or 'Not provided'}</p><p>Order: {row['order_reference']}</p>"
+        f"<p>Fulfillment: Prepare from the appropriate MYCP master protocols and deliver by email/private download.</p>"
+        f"<p>Treatment(s): {row.get('treatment') or ''}</p>"
+    )
     async with httpx.AsyncClient(timeout=15) as client:
         await _update_order(client, row["order_reference"], {"email_delivery": customer_email_sent})
     row["email_delivery"] = customer_email_sent
     response = _completed_response(row)
     response["emailDelivery"] = {"customer": customer_email_sent, "owner": owner_email_sent}
-    if url:
-        response["downloadUrl"] = url
     return response
 
 
