@@ -52,7 +52,6 @@
   .mycp-support-panel{right:14px;bottom:72px;width:calc(100vw - 28px);max-height:calc(100vh - 90px)}
 }
 
-
 /* 2026 weight management catalog */
 .mycp-weight-feature{position:relative;overflow:hidden;border-color:#d4e9ea!important;background:linear-gradient(180deg,#fff 0%,#fbfefe 100%)!important}
 .mycp-weight-feature:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,#06999f,#75d2d5)}
@@ -69,7 +68,6 @@
 .treatment .mycp-treatment-badge{margin-bottom:7px!important}
 @media(max-width:620px){.mycp-weight-feature small{font-size:12px!important}.mycp-protocol-badge,.mycp-treatment-badge{font-size:9px!important}}
 
-
 /* Smart MYCP assistant actions */
 .mycp-support-panel{width:min(430px,calc(100vw - 32px));max-height:min(720px,calc(100vh - 110px))}
 .mycp-support-body{scroll-behavior:smooth}
@@ -81,24 +79,52 @@
 .mycp-support-compose input::placeholder{color:#8898aa}
 @media(max-width:620px){.mycp-support-panel{width:calc(100vw - 28px);max-height:calc(100vh - 90px)}.mycp-message{max-width:94%}.mycp-message-link{font-size:10px}}
 
-/* Homepage member access line */
-.hero::before{
-  content:"Already have a 30-Day All Access code? Use the ACCESS tab above to open your protocol library and submit a request.";
-  display:block;
+/* Clickable All Access member portal banner on the homepage. The generated banner belongs to the ACCESS link, so the full banner is a link. */
+body:has(.hero) .nav-links .nav-tab[href="all-access-request.html"]{position:static!important}
+body:has(.hero) .nav-links .nav-tab[href="all-access-request.html"]::before{
+  content:"30-Day All Access Member Portal   |   Protocol Library Access";
+  position:fixed;
+  top:112px;
+  left:50%;
+  z-index:20;
   width:min(1160px,calc(100% - 36px));
-  margin:0 auto 28px;
-  padding:11px 16px;
+  transform:translateX(-50%);
+  padding:12px 18px;
   border:1px solid #cde6e7;
   border-radius:12px;
   background:#eef9f9;
-  color:#0b5f65;
+  color:#076c72;
+  box-shadow:0 8px 24px rgba(7,31,87,.04);
   font-family:"Figtree","Segoe UI",Arial,sans-serif;
   font-size:13px;
-  font-weight:650;
-  line-height:1.45;
+  font-weight:700;
+  line-height:1.35;
   text-align:center;
   box-sizing:border-box;
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+body:has(.hero) .nav-links .nav-tab[href="all-access-request.html"]:hover::before{
+  background:#e3f6f6;
+  border-color:#9fd6d8;
+  box-shadow:0 10px 28px rgba(7,31,87,.08);
+}
+@supports (animation-timeline: scroll()){
+  body:has(.hero) .nav-links .nav-tab[href="all-access-request.html"]::before{
+    animation:mycpMemberBannerHide linear both;
+    animation-timeline:scroll(root block);
+    animation-range:0 150px;
+  }
+  @keyframes mycpMemberBannerHide{
+    0%,35%{opacity:1;visibility:visible}
+    100%{opacity:0;visibility:hidden}
+  }
 }
 @media(max-width:620px){
-  .hero::before{margin-bottom:22px;padding:10px 13px;font-size:12px}
+  body:has(.hero) .nav-links .nav-tab[href="all-access-request.html"]::before{
+    top:92px;
+    width:calc(100% - 24px);
+    padding:10px 12px;
+    font-size:11.5px;
+  }
 }
