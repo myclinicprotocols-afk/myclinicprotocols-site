@@ -80,3 +80,25 @@
 .mycp-quick-actions{margin-top:13px;max-height:124px;overflow:auto;padding-right:2px}
 .mycp-support-compose input::placeholder{color:#8898aa}
 @media(max-width:620px){.mycp-support-panel{width:calc(100vw - 28px);max-height:calc(100vh - 90px)}.mycp-message{max-width:94%}.mycp-message-link{font-size:10px}}
+
+/* Homepage member access line */
+.hero::before{
+  content:"Already have a 30-Day All Access code? Use the ACCESS tab above to open your protocol library and submit a request.";
+  display:block;
+  width:min(1160px,calc(100% - 36px));
+  margin:0 auto 28px;
+  padding:11px 16px;
+  border:1px solid #cde6e7;
+  border-radius:12px;
+  background:#eef9f9;
+  color:#0b5f65;
+  font-family:"Figtree","Segoe UI",Arial,sans-serif;
+  font-size:13px;
+  font-weight:650;
+  line-height:1.45;
+  text-align:center;
+  box-sizing:border-box;
+}
+@media(max-width:620px){
+  .hero::before{margin-bottom:22px;padding:10px 13px;font-size:12px}
+}
