@@ -1,4 +1,4 @@
-# Trigger final customer copy cleanup
+# Trigger full public customer copy audit
 name: Finalize simplified customer journey
 
 on:
