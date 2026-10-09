@@ -34,7 +34,7 @@
     if (data && typeof window.gtag === 'function') window.gtag('event', 'begin_checkout', data);
   }
   function trackPurchase(result) {
-    if (result.status !== 'COMPLETED' || !/^MYCP-[A-Z0-9-]+$/.test(result.orderReference || '')) return;
+    if (!['COMPLETED','PROCESSING'].includes(result.status) || !/^MYCP-[A-Z0-9-]+$/.test(result.orderReference || '')) return;
     const data = eventData(result);
     if (!data || typeof window.gtag !== 'function') return;
     const key = 'mycp_purchase_' + result.orderReference;
