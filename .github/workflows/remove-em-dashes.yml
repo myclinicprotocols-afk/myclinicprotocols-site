@@ -1,0 +1,33 @@
+name: Remove em dashes from MYCP copy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - scripts/remove_em_dashes.py
+      - .github/workflows/remove-em-dashes.yml
+
+permissions:
+  contents: write
+
+jobs:
+  clean:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Clean website punctuation
+        run: python scripts/remove_em_dashes.py
+      - name: Commit cleanup
+        shell: bash
+        run: |
+          if git diff --quiet; then
+            echo "No punctuation changes required"
+            exit 0
+          fi
+          git config user.name "myclinicprotocols-afk"
+          git config user.email "myclinicprotocols@gmail.com"
+          git add -A
+          git commit -m "Remove em dashes from MYCP website copy"
+          git push
