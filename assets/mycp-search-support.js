@@ -53,6 +53,9 @@
     {name:'Peptide Therapies',category:'Wellness & Medical Treatments',aliases:['peptide','peptides'],description:'Clinic-selected medication workflow. Exact product and scope details are reviewed during customization.'},
     {name:'Vitamin B12 / Lipo-B / Wellness Injections',orderValue:'IM / SQ Wellness Injections',category:'Wellness & Medical Treatments',aliases:['b12','vitamin b12','lipo b','mic b12','wellness injection','im injection','sq injection'],description:'Product-specific IM/SQ wellness-injection workflow.'},
     {name:'IV Hydration / Nutrient Therapy',category:'Wellness & Medical Treatments',aliases:['iv hydration','iv therapy','iv drip','nutrient therapy'],description:'Formula, infusion, and safety workflow.'},
+    {name:'Snow White Drip',category:'Wellness & Medical Treatments',aliases:['snow white drip','snow white iv','beauty drip','glutathione iv'],description:'Clinic-selected IV formula with ingredient, concentration, screening, infusion, monitoring, aftercare, and adverse-event workflow.'},
+    {name:'Cinderella Drip',category:'Wellness & Medical Treatments',aliases:['cinderella drip','cinderella iv','beauty infusion'],description:'Clinic-selected IV formula with ingredient, concentration, screening, infusion, monitoring, aftercare, and adverse-event workflow.'},
+    {name:"Myer's Cocktail IV",category:'Wellness & Medical Treatments',aliases:["myer's cocktail","myers cocktail","myers iv","myer's iv"],description:'Clinic-selected Myer’s/Myers’ nutrient IV workflow with dosing, infusion-rate, screening, monitoring, aftercare, and adverse-event guidance.'},
     {name:'Blood Draws / Laboratory Services',category:'Wellness & Medical Treatments',aliases:['blood draw','phlebotomy','lab services','laboratory'],description:'Collection, handling, and result workflow.'},
     {name:'HRT / TRT',category:'Wellness & Medical Treatments',aliases:['hrt','trt','hormone replacement','testosterone replacement'],description:'Hormone-wellness workflow.'},
     {name:'Sexual Wellness Treatments',category:'Wellness & Medical Treatments',aliases:['sexual wellness'],description:'Clinic-selected treatment workflow.'},
@@ -153,6 +156,32 @@
       observer.observe(grid,{childList:true,subtree:true});
     }
     run();
+  }
+
+  function installFeaturedIVProtocols(){
+    const grid=document.querySelector('#protocols .protocol-grid');
+    if(!grid || grid.querySelector('[data-value="Snow White Drip"]')) return;
+    const anchor=grid.querySelector('.protocol[data-value="IV Hydration / Nutrient Therapy"]');
+    if(!anchor) return;
+    const extras=[
+      ['Snow White Drip','Clinic-selected IV formula, infusion, monitoring, aftercare, and safety workflow'],
+      ['Cinderella Drip','Clinic-selected IV formula, infusion, monitoring, aftercare, and safety workflow'],
+      ["Myer's Cocktail IV","Clinic-selected nutrient IV formula, dosing, infusion rate, monitoring, and safety workflow"]
+    ];
+    let cursor=anchor;
+    extras.forEach(([name,description])=>{
+      const card=document.createElement('div');
+      card.className='protocol';
+      card.dataset.value=name;
+      card.tabIndex=0;
+      card.setAttribute('role','button');
+      card.innerHTML=`<strong>${name}</strong><small>${description}</small><span class="arrow">Customize →</span>`;
+      const open=()=>{location.href=`${ORDER_URL}?treatment=${encodeURIComponent(name)}`;};
+      card.addEventListener('click',open);
+      card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();open();}});
+      cursor.insertAdjacentElement('afterend',card);
+      cursor=card;
+    });
   }
 
   function installProtocolSearch(){
@@ -658,6 +687,7 @@ After payment is verified, your order is confirmed. MYCP then prepares the compl
   }
 
   function boot(){
+    installFeaturedIVProtocols();
     installProtocolSearch();
     installOrderSearch();
     installSupport();
