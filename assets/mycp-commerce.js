@@ -43,4 +43,12 @@
     try { localStorage.setItem(key, '1'); } catch (e) { /* GA4 also deduplicates by transaction_id. */ }
   }
   window.MYCPCommerce = {API, VERSION, verifyQuote, trackCheckout, trackPurchase};
+
+  /* The order page has additional state-specific pricing and clinic-contact rules. */
+  if (/\/order\.html$/.test(location.pathname)) {
+    const script = document.createElement('script');
+    script.src = 'assets/mycp-order-state-pricing.js?v=20261017';
+    script.async = false;
+    document.head.appendChild(script);
+  }
 })();
